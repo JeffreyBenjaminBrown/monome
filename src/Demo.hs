@@ -7,6 +7,7 @@
 
 module Demo where
 
+import Control.Concurrent (threadDelay)
 import Network.Socket
 import Network.Socket.ByteString as SB
 import Vivid.OSC
@@ -20,3 +21,4 @@ main = do
 
    -- send a message
    SB.send s $ encodeOSC $ OSC "/monome/grid/led/set" [OSC_I 1, OSC_I 1, OSC_I 15]
+
