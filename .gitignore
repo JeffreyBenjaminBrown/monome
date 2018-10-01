@@ -1,4 +1,5 @@
 .stack-work/
 *~
 python/pymonome/
+python/aiosc/
 hosc/
