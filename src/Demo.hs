@@ -1,8 +1,12 @@
 -- | Demonstrates how to send and receive with Vivid.OSC.
+--
 -- If you run two separate instances of GHCI, you can start one of the
 -- `mailbox*` functions below in one of them,
 -- call one of the `send*` functions below from the other,
 -- and see the first respond to the second.
+--
+-- Basically pulled straight from the README file for Vivid.OSC:
+-- https://hackage.haskell.org/package/vivid-osc
 
 
 {-# LANGUAGE OverloadedStrings #-}
@@ -19,12 +23,12 @@ import Util
 
 sendTest = do
   s <- sendsTo 57120
-  SB.send s $ encodeOSC $ OSC "/this/message/is/received" [
-      OSC_S "It includes this string and a nice round number."
+  SB.send s $ encodeOSC $ OSC "/Every/OSC/message/starts like/this" [
+      OSC_S "This one includes this string and a nice round number."
     , OSC_F pi
     ]
 
-sendBoom = do
+sendBoom = do -- ^ Messages in TidalCycles look like this.
   s <- sendsTo 57120
   SB.send s $ encodeOSC $
     OSC "/play2" [OSC_S "cps", OSC_F 1.2, OSC_S "s", OSC_S "bd"]
