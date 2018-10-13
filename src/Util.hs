@@ -8,17 +8,17 @@ import Network.Socket.ByteString as SB
 import Vivid.OSC
 
 
-getLocalSocket i = do
-  (a:_) <- getAddrInfo Nothing (Just "127.0.0.1") (Just $ show i)
+getLocalSocket host port = do
+  (a:_) <- getAddrInfo Nothing (Just host) (Just $ show port)
   s <- socket (addrFamily a) Datagram defaultProtocol
   return (s,a)
 
-sendsTo i = do
-  (s,a) <- getLocalSocket i
+sendsTo host port = do
+  (s,a) <- getLocalSocket host port
   connect s $ addrAddress a
   return s
 
-receivesAt i = do
-  (s,a) <- getLocalSocket i
+receivesAt host port = do
+  (s,a) <- getLocalSocket host port
   bind s $ addrAddress a
   return s

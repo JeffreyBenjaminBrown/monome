@@ -22,23 +22,23 @@ import Util
 
 
 sendTest = do
-  s <- sendsTo 57120
+  s <- sendsTo "192.168.0.15" 57120
   SB.send s $ encodeOSC $ OSC "/Every/OSC/message/starts like/this" [
       OSC_S "This one includes this string and a nice round number."
     , OSC_F pi
     ]
 
 sendBoom = do -- ^ Messages in TidalCycles look like this.
-  s <- sendsTo 57120
+  s <- sendsTo "192.168.0.15" 57120
   SB.send s $ encodeOSC $
     OSC "/play2" [OSC_S "cps", OSC_F 1.2, OSC_S "s", OSC_S "bd"]
 
 mailboxPrints = do
-  s <- receivesAt 57120
+  s <- receivesAt "192.168.0.15" 57120
   forever $ decodeOSC <$> SB.recv s 4096 >>= putStrLn . show
 
 mailboxInterprets = do
-  s <- receivesAt 57120
+  s <- receivesAt "192.168.0.15" 57120
   forever $ do
     o <- decodeOSC <$> SB.recv s 4096
     case o of
