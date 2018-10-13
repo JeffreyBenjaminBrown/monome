@@ -8,10 +8,11 @@ class GridStudies(monome.App):
     super().__init__('/monome')
 
   def on_grid_key(self, x, y, s):
+    print("\n" + self.grid.prefix)
     print("key:", x, y, s)
     self.grid.led_level_set(x, y, s*15)
 
-if __name__ == '__main__':
+def main():
   grid_studies = GridStudies()
 
   loop = asyncio.get_event_loop()
@@ -20,3 +21,6 @@ if __name__ == '__main__':
       loop=loop, autoconnect_app=grid_studies
   ) )
   loop.run_forever()
+
+if __name__ == '__main__':
+  main()
