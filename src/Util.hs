@@ -8,6 +8,8 @@ import Network.Socket.ByteString as SB
 import Vivid.OSC
 
 
+-- | = PITFALL: Port 0 fails, but every 5-digit numbers I've tried works.
+
 getLocalSocket host port = do
   (a:_) <- getAddrInfo Nothing (Just host) (Just $ show port)
   s <- socket (addrFamily a) Datagram defaultProtocol

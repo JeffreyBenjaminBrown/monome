@@ -23,12 +23,19 @@ import Util
 
 
 requestMonomeInfo = do
-  s <- sendsTo "192.168.0.15" 12002
+  s <- sendsTo "127.0.0.1" 12002
   SB.send s $ encodeOSC $ OSC "/sys/info" [
-    OSC_S "192.168.0.15"
+    OSC_S "127.0.0.1"
+    , OSC_I 11111
+    ]
+
+testMonomeMailbox = do
+  s <- sendsTo "127.0.0.1" 11111
+  SB.send s $ encodeOSC $ OSC "/testing/the/mailbox" [
+    OSC_S "Here, mailbox, have a string. And this number too:"
     , OSC_I 0
     ]
 
 monomeMailbox = do
-  s <- receivesAt "192.168.0.15" 0
+  s <- receivesAt "127.0.0.1" 11111
   forever $ decodeOSC <$> SB.recv s 4096 >>= putStrLn . show
