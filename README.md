@@ -1,3 +1,10 @@
+# What this is
+
+At src/Monome.hs is some code for communicating with a monome via serialosc, over UDP. It is currently just a proof of concept -- it sends a message and receives a message. I plan to flesh it out along the lines of pymonome.
+
+
+# Some links I used:
+
 asking Reddit Haskel
   https://www.reddit.com/r/haskellquestions/comments/9kb7uo/interacting_with_a_monome_via_osc/
 
@@ -6,6 +13,7 @@ HOsc
 
 monome OSC protocol
   https://monome.org/docs/osc/
+  https://llllllll.co/t/getting-started-with-the-serialosc-protocol/16834
 
 monome python tutorial
   https://monome.org/docs/grid-studies/python/
