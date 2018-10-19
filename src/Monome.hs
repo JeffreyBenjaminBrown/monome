@@ -11,6 +11,7 @@ import qualified Control.Concurrent as CC
 import Control.Concurrent.MVar
 import Control.Monad (forever)
 import qualified Data.ByteString as BS
+import Data.ByteString.Char8 (pack)
 import Network.Socket
 import qualified Network.Socket.ByteString as NSB
 import Vivid.OSC
@@ -44,14 +45,22 @@ requestDeviceList = do
     , OSC_I 11111
     ]
 
-requestInfo devicePort = do
-  -- ^ TODO : serialosc appears not to respond.
-  -- But this is just like requestDeviceList, to which it does.
+requestDeviceInfo devicePort = do
   s <- sendsTo "127.0.0.1" devicePort
   NSB.send s $ encodeOSC $ OSC "/sys/info" [
     OSC_S "127.0.0.1"
     , OSC_I 11111
     ]
+
+fade prefix devicePort x y l = do -- ^ fade light level from 0 to 15
+  s <- sendsTo "127.0.0.1" devicePort
+  NSB.send s $ encodeOSC $ OSC (pack $ prefix ++ "/grid/led/level/set")
+    [ OSC_I x, OSC_I y, OSC_I l ]
+
+onoff prefix devicePort x y l = do -- ^ toggle light level, 0 or 1
+  s <- sendsTo "127.0.0.1" devicePort
+  NSB.send s $ encodeOSC $ OSC (pack $ prefix ++ "/grid/led/set")
+    [ OSC_I x, OSC_I y, OSC_I l ]
 
 mailbox :: IO [OSC]
 mailbox = do
