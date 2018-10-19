@@ -24,9 +24,8 @@ source-repository head
 
 library
   exposed-modules:
-                  Demo
+                  Monome
                 , Util
-                , Monome
   other-modules:
       Paths_monome
   hs-source-dirs:
@@ -34,8 +33,6 @@ library
   build-depends:
                 base
               , bytestring
-              -- , cpython
-              -- , pyfi
               , hosc
               , network
               , text
