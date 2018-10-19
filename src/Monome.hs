@@ -31,12 +31,13 @@ readDevice ( OSC "/serialosc/device" [ OSC_S name
            , deviceType = monomeType
            , devicePort = fromIntegral port }
 
-nonsense = do
+nonsenseToPort port = do
   s <- sendsTo "127.0.0.1" 11111
-  NSB.send s $ encodeOSC $ OSC "/quack/bark" [OSC_S "oof"
-                                             , OSC_S "127.0.0.1"
-                                             , OSC_I 11111
-                                             ]
+  NSB.send s $ encodeOSC $ OSC "/quack/bark" [
+    OSC_S "this message tests something"
+    , OSC_S "127.0.0.1"
+    , OSC_I port
+    ]
 
 requestDeviceList = do
   s <- sendsTo "127.0.0.1" 12002
