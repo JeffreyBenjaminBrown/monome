@@ -1,14 +1,12 @@
-module Receive where
+module Mailbox where
 
 import Control.Concurrent (forkIO)
 import Control.Concurrent.MVar
 import Control.Monad (forever)
-import Data.ByteString.Char8 (pack)
-import Network.Socket (close)
-import Network.Socket.ByteString (recv)
 import Vivid.OSC
 
-import Util
+import Util.ByteString
+import Util.Network
 
 
 mailbox :: IO [OSC]

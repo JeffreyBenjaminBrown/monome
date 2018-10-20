@@ -25,9 +25,10 @@ source-repository head
 library
   exposed-modules:
                   Device
-                , Receive
-                , Send
-                , Util
+                , Mailbox
+                , OSCMessage
+                , Util.ByteString
+                , Util.Network
   other-modules:
       Paths_monome
   hs-source-dirs:

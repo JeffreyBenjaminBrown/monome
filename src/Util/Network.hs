@@ -1,0 +1,37 @@
+{-# LANGUAGE OverloadedStrings #-}
+
+module Util.Network where
+
+import Data.ByteString (ByteString)
+import Data.ByteString.Char8 (unpack)
+import Control.Monad (forever)
+import qualified Network.Socket as NS
+import qualified Network.Socket.ByteString as NSB
+import Vivid.OSC
+
+
+-- | = PITFALL: Ports 0-1024 are reserved.
+-- All 5-digit numbers seem to work, though.
+
+close = NS.close
+recv = NSB.recv
+send = NSB.send
+
+localhost = "127.0.0.1" :: ByteString
+toPort port = sendsTo (unpack localhost) port
+toSerialosc = toPort 12002
+
+getLocalSocket host port = do
+  (a:_) <- NS.getAddrInfo Nothing (Just host) (Just $ show port)
+  s <- NS.socket (NS.addrFamily a) NS.Datagram NS.defaultProtocol
+  return (s,a)
+
+sendsTo host port = do
+  (s,a) <- getLocalSocket host port
+  NS.connect s $ NS.addrAddress a
+  return s
+
+receivesAt host port = do
+  (s,a) <- getLocalSocket host port
+  NS.bind s $ NS.addrAddress a
+  return s
