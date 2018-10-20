@@ -33,8 +33,8 @@ readDevice ( OSC "/serialosc/device" [ OSC_S name
 
 nonsenseToPort port = do
   s <- sendsTo "127.0.0.1" 11111
-  NSB.send s $ encodeOSC $ OSC "/quack/bark" [
-    OSC_S "this message tests something"
+  NSB.send s $ encodeOSC $ OSC "/testing/testing" [
+    OSC_S "quack oink wackadoo"
     , OSC_S "127.0.0.1"
     , OSC_I port
     ]
@@ -52,6 +52,11 @@ requestDeviceInfo devicePort = do
     OSC_S "127.0.0.1"
     , OSC_I 11111
     ]
+
+requestSendTo devicePort mailbox = do
+  s <- sendsTo "127.0.0.1" devicePort
+  NSB.send s $ encodeOSC $ OSC "/sys/port" [OSC_I mailbox]
+  -- NSB.send s $ encodeOSC $ OSC "/sys/host" [OSC_S "127.0.0.1"]
 
 fade prefix devicePort x y l = do -- ^ fade light level from 0 to 15
   s <- sendsTo "127.0.0.1" devicePort
