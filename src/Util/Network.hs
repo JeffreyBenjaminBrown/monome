@@ -16,6 +16,7 @@ import Vivid.OSC
 close = NS.close
 recv = NSB.recv
 send = NSB.send
+type HostName = NS.HostName
 
 localhost :: ByteString
 localhost = "127.0.0.1"

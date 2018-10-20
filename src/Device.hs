@@ -5,6 +5,7 @@ module Device where
 import Vivid.OSC
 
 import Util.Byte
+import Util.Network (HostName)
 
 
 type X = Int
@@ -18,10 +19,10 @@ data DeviceID = DeviceID { deviceIDName :: ByteString
                          , deviceIDPort :: Int }
   deriving (Show, Eq, Ord)
 
-readDevice :: OSC -> DeviceID
-readDevice ( OSC "/serialosc/device" [ OSC_S name
-                                     , OSC_S monomeType
-                                     , OSC_I port ] )
+readDeviceID :: OSC -> DeviceID
+readDeviceID ( OSC "/serialosc/device" [ OSC_S name
+                                       , OSC_S monomeType
+                                       , OSC_I port ] )
   = DeviceID { deviceIDName = name
              , deviceIDType = monomeType
              , deviceIDPort = fromIntegral port }
@@ -29,15 +30,38 @@ readDevice ( OSC "/serialosc/device" [ OSC_S name
 
 -- | Non-contact information about a device.
 -- PITFALL: a device's DeviceInfo.deviceName = its DeviceID.deviceIDName
-data DeviceInfo = DeviceInfo {
-  deviceName :: String       -- ^ Reported via /sys/id
-  , deviceSize :: (Int, Int) -- ^ Reported via /sys/size
-  , deviceHost :: String     -- ^ Where it sends to. Reported via /sys/host
-  , devicePort :: Int        -- ^ Where it sends to. Reported via /sys/port
-  , devicePrefix :: String   -- ^ Reported via /sys/prefix
-    -- PITFALL: Includes a leading slash. I'm leaving it there.
-  , deviceRotation :: Int    -- ^ Reported via /sys/rotation
+data Device = Device {
+  deviceName :: String
+  , deviceSize :: (X,Y)
+  , deviceHost :: HostName   -- ^ Where it sends to.
+  , devicePort :: Int        -- ^ Where it sends to.
+  , devicePrefix :: String   -- ^ PITFALL: Includes a leading slash.
+  , deviceRotation :: Int    -- ^ 0, 90, 180 or 270
   } deriving (Show, Eq, Ord)
+
+readDeviceName :: OSC -> String
+readDeviceName (OSC "/sys/id" [OSC_S name]) = unpack name
+readDeviceSize :: OSC -> (X,Y)
+readDeviceSize (OSC "/sys/size" [OSC_I x, OSC_I y]) = (fi x, fi y)
+readDeviceHost :: OSC -> HostName
+readDeviceHost (OSC "/sys/host" [OSC_S name]) = unpack name
+readDevicePort :: OSC -> Int
+readDevicePort (OSC "/sys/port" [OSC_I port]) = fi port
+readDevicePrefix :: OSC -> String
+readDevicePrefix (OSC "/sys/prefix" [OSC_S prefix]) = unpack prefix
+readDeviceRotation :: OSC -> Int
+readDeviceRotation (OSC "/sys/rotation" [OSC_I rotation]) = fi rotation
+
+-- | PITFALL: If serialosc changed the order of its outputs, this would fail.
+readDevice :: [OSC] -> Device
+readDevice [a,b,c,d,e,f] = Device {
+    deviceName = readDeviceName a
+  , deviceSize = readDeviceSize b
+  , deviceHost = readDeviceHost c
+  , devicePort = readDevicePort d
+  , devicePrefix = readDevicePrefix e
+  , deviceRotation = readDeviceRotation f
+  }
 
 
 -- | The mechanical state of a monome button
