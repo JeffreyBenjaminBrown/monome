@@ -24,7 +24,9 @@ source-repository head
 
 library
   exposed-modules:
-                  Monome
+                  Device
+                , Receive
+                , Send
                 , Util
   other-modules:
       Paths_monome
