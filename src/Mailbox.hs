@@ -5,7 +5,7 @@ import Control.Concurrent.MVar
 import Control.Monad (forever)
 import Vivid.OSC
 
-import Util.ByteString
+import Util.Byte
 import Util.Network
 
 

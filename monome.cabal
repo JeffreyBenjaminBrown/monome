@@ -27,7 +27,7 @@ library
                   Device
                 , Mailbox
                 , OSCMessage
-                , Util.ByteString
+                , Util.Byte
                 , Util.Network
   other-modules:
       Paths_monome

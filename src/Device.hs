@@ -4,7 +4,7 @@ module Device where
 
 import Vivid.OSC
 
-import Util.ByteString
+import Util.Byte
 
 
 data Device = Device { deviceName :: ByteString

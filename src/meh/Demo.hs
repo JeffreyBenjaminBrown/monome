@@ -18,7 +18,7 @@ import Network.Socket
 import Network.Socket.ByteString as SB
 import Vivid.OSC
 
-import Util.ByteString
+import Util.Byte
 
 
 sendTest = do
