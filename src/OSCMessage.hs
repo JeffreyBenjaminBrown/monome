@@ -10,30 +10,30 @@ import Util.Network (localhost)
 
 -- | to the SerialOSC server
 
-requestDeviceList :: Int32 -> ByteString
+requestDeviceList :: Int -> ByteString
 requestDeviceList mailboxPort = do
   encodeOSC $ OSC "/serialosc/list" [ OSC_S localhost
-                                    , OSC_I mailboxPort ]
+                                    , OSC_I $ fi mailboxPort ]
 
 
 -- | to a device, esp. a monome
 
-requestDeviceInfo :: Int32 -> ByteString
+requestDeviceInfo :: Int -> ByteString
 requestDeviceInfo mailboxPort = do
-  encodeOSC $ OSC "/sys/info" [ OSC_S localhost, OSC_I mailboxPort ]
+  encodeOSC $ OSC "/sys/info" [ OSC_S localhost, OSC_I $ fi mailboxPort ]
 
-requestSendTo :: Int32 -> [ByteString]
+requestSendTo :: Int -> [ByteString]
 requestSendTo mailboxPort =
   [ encodeOSC $ OSC "/sys/host" [OSC_S localhost]
-  , encodeOSC $ OSC "/sys/port" [OSC_I mailboxPort]
+  , encodeOSC $ OSC "/sys/port" [OSC_I $ fi mailboxPort]
   ]
 
-fade :: String -> Int32 -> Int32 -> Int32 -> ByteString
+fade :: String -> Int -> Int -> Int -> ByteString
 fade devicePrefix x y l = do -- ^ fade light level from 0 to 15
   encodeOSC $ OSC (pack $ devicePrefix ++ "/grid/led/level/set")
-    [ OSC_I x, OSC_I y, OSC_I l ]
+    [ OSC_I $ fi x, OSC_I $ fi y, OSC_I $ fi l ]
 
-onoff :: String -> Int32 -> Int32 -> Int32 -> ByteString
+onoff :: String -> Int -> Int -> Int -> ByteString
 onoff devicePrefix x y l = do -- ^ toggle light level, 0 or 1
   encodeOSC $ OSC (pack $ devicePrefix ++ "/grid/led/set")
-    [ OSC_I x, OSC_I y, OSC_I l ]
+    [ OSC_I $ fi x, OSC_I $ fi y, OSC_I $ fi l ]
