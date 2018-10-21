@@ -21,6 +21,9 @@ send toMonome $ requestDeviceInfo 11111
 send toMonome $ fade "/monome" 7 7 7
 send toMonome $ shineToOscByte "/monome" (Shine 8 8 Lit)
 
+mapM (send toMonome . shineToOscByte "/monome" . (\(x,y) -> Shine x y Lit)) $ enharmonicKeys (0,15)
+mapM (send toMonome . shineToOscByte "/monome" . (\(x,y) -> Shine x y Dark)) $ enharmonicKeys (0,15)
+
 :{
 d = readDevice [
     OSC "/sys/id" [OSC_S "m0000102"]
