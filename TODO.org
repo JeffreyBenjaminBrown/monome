@@ -1,22 +1,17 @@
 * TODO NEXT: add a shift window
 * architecture
+** ? windows are currently switch-aware but LED-unaware
 ** state
 *** which buttons are down
 *** which lights are on
 *** which buttons correspond to which voices
 *** which voices are playing what
-** windows
-*** window :: (X,Y) -> Bool
-*** windows are contained in a list or tree
-Windows are tested first if earlier in the list or closer to the tree's root.
-A tree would be faster, but that can wait.
 ** behavior
 Each button press is tested for which window it's in, and handled by the associated function.
 After that, a new grid LED state is computed, and then the difference between it and the old one, and those changes are requested from the monome.
 * refector
 ** rename pressure, etc -> LED and LEDAct, Switch and SwitchAct
 * features
-** microtone | octave shift
 ** sustain these and future
 ** sustain these
 ** light up enharmonics of pressed|sounding keys
@@ -24,9 +19,13 @@ After that, a new grid LED state is computed, and then the difference between it
 ** loop bank
 ** timbre
 ** split keyboard
+** shift should move the guideposts
+and maybe that window should be visible
 ** reset buttons
 *** silence all voices
 *** redraw entire grid
+*** restore shift to 1
+to remove floating point error
 * separate projects
 ** separate Vivid.Jbb from Vivid
  this will make starting the repl faster

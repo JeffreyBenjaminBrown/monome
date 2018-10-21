@@ -17,10 +17,10 @@ import Types.Button
 import Util.Byte
 
 
-playKey :: Synth BoopParams -> ((X,Y), Switch) -> IO ()
-playKey sy ((x,y), s) = do
-  set sy $ (toI $ 0.05 * fi (switchToInt s) :: I "amp")
-  set sy $ (toI $ 100 * et31ToFreq (xyToEt31 (x,y)) :: I "freq")
+playKey :: Synth BoopParams -> Float -> ((X,Y), Switch) -> IO ()
+playKey sy shift (xy, s) = do
+  set sy (toI $ 0.05 * fi (switchToInt s) :: I "amp")
+  set sy (toI $ 100 * (et31ToFreq $ shift + xyToEt31 xy) :: I "freq")
 
 xyToEt31 :: (X,Y) -> Float
 xyToEt31 (x,y) = fi (15-x) + 6 * fi y

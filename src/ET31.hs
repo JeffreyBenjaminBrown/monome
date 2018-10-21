@@ -23,25 +23,32 @@ import Types.Button
 
 
 -- | Windows listed first are "on top of" later ones.
-windows = [keyboardWindow]
+windows = [shiftWindow, keyboardWindow]
 
 keyboardWindow = Window {
   windowContains = const True
   , windowHandler =
     let f mst press @ (xy,_) = do
           st <- readMVar mst
-          playKey ((M.!) (voices st) xy) press
+          playKey ((M.!) (voices st) xy) (shift st) press
     in f
 }
 
---shiftWindow = Window {
---  windowContains = \(x,y) -> numBetween x 0 1 && numBetween y 13 15
---  , windowHandler =
---    let f mst press @ (xy,_) = do
---          st <- readMVar mst
---          playKey ((M.!) (voices st) xy) press
---    in f
---}
+shiftWindow = Window {
+  windowContains = \(x,y) -> numBetween x 0 1 && numBetween y 13 15
+  , windowHandler =
+    let f _   (_, SwitchOff) = return ()
+        f mst (xy,SwitchOn ) = do
+          let shiftInMicrotones = case xy of (0,15) -> 6
+                                             (1,15) -> 31
+                                             (0,14) -> -1
+                                             (1,14) -> 1
+                                             (0,13) -> -6
+                                             (1,13) -> -31
+          st <- takeMVar mst
+          putMVar mst $ st {shift = shift st + shiftInMicrotones}
+    in f
+}
 
 guideposts :: Socket -> Led -> IO ()
 guideposts toMonome led = mapM_ f $ enharmonicKeys (8,8)
