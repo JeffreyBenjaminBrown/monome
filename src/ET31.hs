@@ -23,7 +23,7 @@ import Types.Button
 
 
 -- | Windows listed first are "on top of" later ones.
-windows = [shiftWindow, keyboardWindow]
+windows = [sustainWindow, shiftWindow, keyboardWindow]
 
 keyboardWindow = Window {
   windowContains = const True
@@ -50,11 +50,24 @@ shiftWindow = Window {
     in f
 }
 
+sustainWindow = Window {
+  windowContains = \(x,y) -> x == 0 && y == 0
+  , windowHandler = let
+      f _   (_ , SwitchOff) = return ()
+      f mst (xy, SwitchOn ) = do
+        st <- takeMVar mst
+        let colorIt led = send (toMonome st) $ ledOsc "/monome" (xy, led)
+        case sustain st of True -> colorIt LedOff
+                           False -> colorIt LedOn
+        putMVar mst $ st {sustain = not $ sustain st}
+    in f
+}
+
 guideposts :: Socket -> Led -> IO ()
 guideposts toMonome led = mapM_ f $ enharmonicKeys (8,8)
   where f = send toMonome . ledOsc "/monome" . (,led)
 
-et31 :: IO ()
+et31 :: IO State
 et31 = do
   inbox <- receivesAt "127.0.0.1" 11111
   toMonome <- sendsTo (unpack localhost) 13993
@@ -63,7 +76,8 @@ et31 = do
   mst <- newMVar $ State { inbox = inbox
                          , toMonome = toMonome
                          , voices = voices
-                         , shift = 1 }
+                         , shift = 1
+                         , sustain = False }
 
   guideposts toMonome LedOn
 
@@ -74,11 +88,12 @@ et31 = do
                    let switch = readSwitchOSC osc
                    in  handleSwitch windows mst switch
 
-  let loop :: IO ()
+  let loop :: IO State
       loop = do cmd <- getChar
                 case cmd of 'q' -> close inbox
                                    >> mapM_ free (M.elems voices)
                                    >> killThread mailbox
                                    >> guideposts toMonome LedOff
+                                   >> readMVar mst >>= return
                             _   -> loop
   loop

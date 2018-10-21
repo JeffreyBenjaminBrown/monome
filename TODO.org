@@ -1,4 +1,3 @@
-* TODO NEXT: add a shift window
 * architecture
 ** ? windows are currently switch-aware but LED-unaware
 ** state
@@ -12,8 +11,8 @@ After that, a new grid LED state is computed, and then the difference between it
 * refector
 ** rename pressure, etc -> LED and LEDAct, Switch and SwitchAct
 * features
-** sustain these and future
 ** sustain these
+** sustain these and future
 ** light up enharmonics of pressed|sounding keys
 ** chord bank
 ** loop bank

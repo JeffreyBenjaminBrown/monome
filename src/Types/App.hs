@@ -17,14 +17,12 @@ data State = State {
   , toMonome :: Socket
   , voices :: M.Map (X,Y) (Synth BoopParams)
   , shift :: Float -- ^ multiplicative; 2 = one octave higher
-  }
+  , sustain :: Bool
+  } deriving (Show, Eq)
 
 data Window = Window {
   windowContains :: (X,Y) -> Bool
   , windowHandler :: MVar State -> ((X,Y), Switch) -> IO () }
-
-type AppLeds = S.Set (X,Y)
-type AppSwitches = S.Set (X,Y)
 
 handleSwitch :: [Window] -> MVar State -> ((X,Y), Switch) -> IO ()
 handleSwitch []     _  _            = return ()
