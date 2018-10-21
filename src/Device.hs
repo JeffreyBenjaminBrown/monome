@@ -13,8 +13,7 @@ type X = Int
 type Y = Int
 
 
--- | Describes how to reach a monome.
--- SerialOsc responds to /serialosc/list messages with these.
+-- | SerialOsc responds to /serialosc/list messages with this information.
 data DeviceID = DeviceID { deviceIDName :: ByteString
                          , deviceIDType :: ByteString
                          , deviceIDPort :: Int }
@@ -29,8 +28,11 @@ readDeviceID ( OSC "/serialosc/device" [ OSC_S name
              , deviceIDPort = fromIntegral port }
 
 
--- | Non-contact information about a device.
--- PITFALL: a device's DeviceInfo.deviceName = its DeviceID.deviceIDName
+-- | A monome (distinct form serialosc!) responds to /sys/info messages
+-- with this information.
+--
+-- A device's DeviceInfo.deviceName = its DeviceID.deviceIDName.
+-- That is the only pooint where `Device` and `DeviceID` overlap.
 data Device = Device {
   deviceName :: String
   , deviceSize :: (X,Y)
