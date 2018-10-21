@@ -3,7 +3,12 @@
 , OverloadedStrings
 , TupleSections #-}
 
-module ET31.Keyboard where
+module ET31.Keyboard (
+  playKey
+  , xyToEt31
+  , et31ToFreq
+  , enharmonicKeys
+  ) where
 
 import Vivid
 
@@ -22,3 +27,9 @@ xyToEt31 (x,y) = fi (15-x) + 6 * fi y
 
 et31ToFreq :: Float -> Float
 et31ToFreq f = 2**(f/31)
+
+enharmonicKeys :: (X,Y) -> [(X,Y)]
+enharmonicKeys (x,y) = let contained x = x <= 15 && x >= 0
+  in filter (\(x,y) -> contained x && contained y)
+     $ [(x + x' * 6 + y' * (-1), y + x' * 1 + y' * 5 )
+       | x' <- [-2..2], y' <- [-3..3] ]

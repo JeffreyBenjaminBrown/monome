@@ -1,6 +1,11 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Types.Button where
+module Types.Button (
+  X, Y
+  , Switch(..), Led(..)
+  , ledOsc, ledToInt, ledFromInt
+  , readSwitchOSC, switchToInt, switchFromInt
+  ) where
 
 import Vivid.OSC
 

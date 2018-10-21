@@ -1,6 +1,9 @@
 {-# LANGUAGE DataKinds, ExtendedDefaultRules #-}
 
-module Synth where
+module Synth (
+  BoopParams
+  , boop
+  ) where
 
 import Vivid
 

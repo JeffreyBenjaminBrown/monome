@@ -1,6 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Types.Device where
+module Types.Device (
+  DeviceID(..), readDeviceID,
+  Device(..), readDevice
+  ) where
 
 import Vivid.OSC
 
@@ -38,19 +41,6 @@ data Device = Device {
   , deviceRotation :: Int    -- ^ 0, 90, 180 or 270
   } deriving (Show, Eq, Ord)
 
-readDeviceName :: OSC -> String
-readDeviceName (OSC "/sys/id" [OSC_S name]) = unpack name
-readDeviceSize :: OSC -> (X,Y)
-readDeviceSize (OSC "/sys/size" [OSC_I x, OSC_I y]) = (fi x, fi y)
-readDeviceHost :: OSC -> HostName
-readDeviceHost (OSC "/sys/host" [OSC_S name]) = unpack name
-readDevicePort :: OSC -> Int
-readDevicePort (OSC "/sys/port" [OSC_I port]) = fi port
-readDevicePrefix :: OSC -> String
-readDevicePrefix (OSC "/sys/prefix" [OSC_S prefix]) = unpack prefix
-readDeviceRotation :: OSC -> Int
-readDeviceRotation (OSC "/sys/rotation" [OSC_I rotation]) = fi rotation
-
 -- | PITFALL: If serialosc changed the order of its outputs, this would fail.
 readDevice :: [OSC] -> Device
 readDevice [a,b,c,d,e,f] = Device {
@@ -61,3 +51,16 @@ readDevice [a,b,c,d,e,f] = Device {
   , devicePrefix = readDevicePrefix e
   , deviceRotation = readDeviceRotation f
   }
+  where
+    readDeviceName :: OSC -> String
+    readDeviceName (OSC "/sys/id" [OSC_S name]) = unpack name
+    readDeviceSize :: OSC -> (X,Y)
+    readDeviceSize (OSC "/sys/size" [OSC_I x, OSC_I y]) = (fi x, fi y)
+    readDeviceHost :: OSC -> HostName
+    readDeviceHost (OSC "/sys/host" [OSC_S name]) = unpack name
+    readDevicePort :: OSC -> Int
+    readDevicePort (OSC "/sys/port" [OSC_I port]) = fi port
+    readDevicePrefix :: OSC -> String
+    readDevicePrefix (OSC "/sys/prefix" [OSC_S prefix]) = unpack prefix
+    readDeviceRotation :: OSC -> Int
+    readDeviceRotation (OSC "/sys/rotation" [OSC_I rotation]) = fi rotation
