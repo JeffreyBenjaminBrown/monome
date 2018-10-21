@@ -40,24 +40,18 @@ readPress (OSC "/monome/grid/key" [OSC_I x, OSC_I y, OSC_I s]) =
 
 
 -- | The state of a monome LED
-data Light = Lit | Dark
+data Led = LedOn | LedOff
   deriving (Show, Eq, Ord)
 
-lightToInt :: Light -> Int
-lightToInt Lit = 1
-lightToInt Dark = 0
+ledToInt :: Led -> Int
+ledToInt LedOff = 0
+ledToInt LedOn = 1
 
-lightFromInt :: Int -> Light
-lightFromInt 0 = Dark
-lightFromInt 1 = Lit
+ledFromInt :: Int -> Led
+ledFromInt 0 = LedOff
+ledFromInt 1 = LedOn
 
 
 -- | The act of changing a monome LED's Light
-data Shine = Shine { shineX :: X
-                   , shineY :: Y
-                   , shineLight :: Light }
-  deriving (Show, Eq, Ord)
-
-shineToOscByte :: String -> Shine -> ByteString
-shineToOscByte prefix s = onoff prefix (shineX s) (shineY s)
-  (lightToInt $ shineLight s)
+ledOsc :: String -> ((X,Y), Led) -> ByteString
+ledOsc prefix ((x, y), led) = onoff prefix x y $ ledToInt led

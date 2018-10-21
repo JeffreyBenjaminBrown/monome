@@ -1,4 +1,7 @@
-{-# LANGUAGE DataKinds, ExtendedDefaultRules, OverloadedStrings #-}
+{-# LANGUAGE DataKinds
+, ExtendedDefaultRules
+, OverloadedStrings
+, TupleSections #-}
 
 module ET31 where
 
@@ -45,8 +48,7 @@ et31 :: IO ()
 et31 = do
   inbox <- receivesAt "127.0.0.1" 11111
   toMonome <- sendsTo (unpack localhost) 13993
-  mapM (send toMonome . shineToOscByte "/monome"
-        . (\(x,y) -> Shine x y Lit)) $ enharmonicKeys (8,8)
+  mapM (send toMonome . ledOsc "/monome" . (,LedOn)) $ enharmonicKeys (8,8)
   let places = [(a,b) | a <- [0..15], b <- [0..15]]
   voices <- M.fromList . zip places <$> mapM (synth boop) (replicate 256 ())
   mailbox <- forkIO $ forever $ do

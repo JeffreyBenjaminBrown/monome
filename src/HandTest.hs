@@ -19,10 +19,9 @@ toMonome <- sendsTo (unpack localhost) 13993
 send toMonome $ requestDeviceInfo 11111
 
 send toMonome $ fade "/monome" 7 7 7
-send toMonome $ shineToOscByte "/monome" (Shine 8 8 Lit)
+send toMonome $ ledOsc "/monome" ((6,6) , LedOn)
 
-mapM (send toMonome . shineToOscByte "/monome" . (\(x,y) -> Shine x y Lit)) $ enharmonicKeys (0,15)
-mapM (send toMonome . shineToOscByte "/monome" . (\(x,y) -> Shine x y Dark)) $ enharmonicKeys (0,15)
+mapM (send toMonome . ledOsc "/monome" . (,LedOn)) $ enharmonicKeys (0,15)
 
 :{
 d = readDevice [
