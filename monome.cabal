@@ -28,6 +28,8 @@ library
                 , ET31
                 , Mailbox
                 , OSCMessage
+                , Types.Button
+                , Types.Device
                 , Util.Byte
                 , Util.Network
   other-modules:

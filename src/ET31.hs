@@ -11,7 +11,7 @@ import Vivid.OSC
 
 import Util.Byte
 import Util.Network
-import Device
+import Types.Button
 
 
 type BoopParams = '["freq","amp"]
