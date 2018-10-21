@@ -43,7 +43,7 @@ enharmonicKeys (x,y) = let contained x = x <= 15 && x >= 0
 
 mailboxSynths :: IO ()
 mailboxSynths = do
-  s <- receivesAt "127.0.0.1" 11111
+  inbox <- receivesAt "127.0.0.1" 11111
   toMonome <- sendsTo (unpack localhost) 13993
   mapM (send toMonome . shineToOscByte "/monome"
         . (\(x,y) -> Shine x y Lit)) $ enharmonicKeys (8,8)
@@ -51,10 +51,10 @@ mailboxSynths = do
   voices <- M.fromList . zip places <$> mapM (synth boop) (replicate 256 ())
   let loop :: IO ()
       loop = do cmd <- getChar
-                case cmd of 'q' -> do close s >> mapM_ free (M.elems voices)
+                case cmd of 'q' -> close inbox >> mapM_ free (M.elems voices)
                             _   -> loop
   mailbox <- forkIO $ forever $ do
-    eOsc <- decodeOSC <$> recv s 4096
+    eOsc <- decodeOSC <$> recv inbox 4096
     case eOsc of Left text -> putStrLn . show $ text
                  Right osc -> let p@(Press x y s) = readPress osc
                               in playKey ((M.!) voices (x,y)) p
