@@ -12,9 +12,12 @@ import Types.Button
 import Util.Network
 
 
-data State = State { inbox :: Socket
-                   , toMonome :: Socket
-                   , voices :: M.Map (X,Y) (Synth BoopParams) }
+data State = State {
+  inbox :: Socket
+  , toMonome :: Socket
+  , voices :: M.Map (X,Y) (Synth BoopParams)
+  , shift :: Float -- ^ multiplicative; 2 = one octave higher
+  }
 
 data Window = Window {
   windowContains :: (X,Y) -> Bool

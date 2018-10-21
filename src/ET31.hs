@@ -22,6 +22,7 @@ import Types.App
 import Types.Button
 
 
+-- | Windows listed first are "on top of" later ones.
 windows = [keyboardWindow]
 
 keyboardWindow = Window {
@@ -33,16 +34,31 @@ keyboardWindow = Window {
     in f
 }
 
+--shiftWindow = Window {
+--  windowContains = \(x,y) -> numBetween x 0 1 && numBetween y 13 15
+--  , windowHandler =
+--    let f mst press @ (xy,_) = do
+--          st <- readMVar mst
+--          playKey ((M.!) (voices st) xy) press
+--    in f
+--}
+
+guideposts :: Socket -> Led -> IO ()
+guideposts toMonome led = mapM_ f $ enharmonicKeys (8,8)
+  where f = send toMonome . ledOsc "/monome" . (,led)
+
 et31 :: IO ()
 et31 = do
-  -- variables
   inbox <- receivesAt "127.0.0.1" 11111
   toMonome <- sendsTo (unpack localhost) 13993
   voices <- let places = [(a,b) | a <- [0..15], b <- [0..15]]
     in M.fromList . zip places <$> mapM (synth boop) (replicate 256 ())
-  mst <- newMVar $ State inbox toMonome voices
+  mst <- newMVar $ State { inbox = inbox
+                         , toMonome = toMonome
+                         , voices = voices
+                         , shift = 1 }
 
-  mapM (send toMonome . ledOsc "/monome" . (,LedOn)) $ enharmonicKeys (8,8)
+  guideposts toMonome LedOn
 
   mailbox <- forkIO $ forever $ do
     eOsc <- decodeOSC <$> recv inbox 4096
@@ -56,5 +72,6 @@ et31 = do
                 case cmd of 'q' -> close inbox
                                    >> mapM_ free (M.elems voices)
                                    >> killThread mailbox
+                                   >> guideposts toMonome LedOff
                             _   -> loop
   loop
