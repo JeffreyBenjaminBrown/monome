@@ -6,6 +6,7 @@ import Vivid.OSC
 
 import Util.Byte
 import Util.Network (HostName)
+import OSCMessage
 
 
 type X = Int
@@ -13,7 +14,7 @@ type Y = Int
 
 
 -- | Describes how to reach a monome.
--- SerialOSC responds to /serialosc/list messages with these.
+-- SerialOsc responds to /serialosc/list messages with these.
 data DeviceID = DeviceID { deviceIDName :: ByteString
                          , deviceIDType :: ByteString
                          , deviceIDPort :: Int }
@@ -83,6 +84,12 @@ data Press = Press { pressX :: X
                    , pressState :: Pressure }
   deriving (Show, Eq, Ord)
 
+readPress :: OSC -> Press
+readPress (OSC "/monome/grid/key" [OSC_I x, OSC_I y, OSC_I s]) =
+  Press { pressX     =                   fi x
+        , pressY     =                   fi y
+        , pressState = pressureFromInt $ fi s}
+
 
 -- | The state of a monome LED
 data Light = Lit | Dark
@@ -100,5 +107,9 @@ lightFromInt 1 = Lit
 -- | The act of changing a monome LED's Light
 data Shine = Shine { shineX :: X
                    , shineY :: Y
-                   , shineState :: Shine }
+                   , shineLight :: Light }
   deriving (Show, Eq, Ord)
+
+shineToOscByte :: String -> Shine -> ByteString
+shineToOscByte prefix s = onoff prefix (shineX s) (shineY s)
+  (lightToInt $ shineLight s)

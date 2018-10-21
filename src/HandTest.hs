@@ -19,6 +19,7 @@ toMonome <- sendsTo (unpack localhost) 13993
 send toMonome $ requestDeviceInfo 11111
 
 send toMonome $ fade "/monome" 7 7 7
+send toMonome $ shineToOscByte "/monome" (Shine 8 8 Lit)
 
 :{
 d = readDevice [
@@ -30,3 +31,5 @@ d = readDevice [
   , OSC "/sys/rotation" [OSC_I 0]
   ]
 :}
+
+readPress $ OSC "/monome/grid/key" [OSC_I 7, OSC_I 7, OSC_I 1]
