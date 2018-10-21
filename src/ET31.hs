@@ -11,6 +11,7 @@ import Control.Concurrent (forkIO, killThread)
 import Control.Concurrent.MVar
 import Control.Monad (forever)
 import qualified Data.Map as M
+import qualified Data.Set as S
 import Vivid
 import Vivid.OSC
 
@@ -27,10 +28,14 @@ windows = [sustainWindow, shiftWindow, keyboardWindow]
 
 keyboardWindow = Window {
   windowContains = const True
-  , windowHandler =
-    let f mst press @ (xy,_) = do
-          st <- readMVar mst
-          playKey ((M.!) (voices st) xy) (shift st) press
+  , windowHandler = let
+      f mst press @ (xy,sw) = do
+        st <- takeMVar mst
+        playKey ((M.!) (voices st) xy)
+          (S.member xy $ sustained st)  (shift st)  press
+        let newFingers = case sw of SwitchOn -> S.insert xy $ fingers st
+                                    SwitchOff -> S.delete xy $ fingers st
+        putMVar mst $ st { fingers = newFingers }
     in f
 }
 
@@ -53,13 +58,24 @@ shiftWindow = Window {
 sustainWindow = Window {
   windowContains = \(x,y) -> x == 0 && y == 0
   , windowHandler = let
+
       f _   (_ , SwitchOff) = return ()
       f mst (xy, SwitchOn ) = do
-        st <- takeMVar mst
-        let colorIt led = send (toMonome st) $ ledOsc "/monome" (xy, led)
-        case sustain st of True -> colorIt LedOff
-                           False -> colorIt LedOn
-        putMVar mst $ st {sustain = not $ sustain st}
+        st <- takeMVar mst -- PITFALL: old state; has opposite sustain value.
+        let color led xy = send (toMonome st) $ ledOsc "/monome" (xy, led)
+
+        case sustain st of
+          True -> do -- Sustain is off now. Free the voices, dark the led.
+            putStrLn $ show $ sustained st
+            let sy xy = (M.!) (voices st) xy
+                quiet xy = playKey (sy xy) False (shift st) (xy, SwitchOff)
+            color LedOff xy
+            mapM_ quiet $ sustained st -- turn off sustained voices
+          False -> color LedOn xy >> return ()
+
+        putMVar mst $ st { sustain = not $ sustain st
+                         , sustained = if sustain st then S.empty
+                           else fingers st  }
     in f
 }
 
@@ -77,7 +93,10 @@ et31 = do
                          , toMonome = toMonome
                          , voices = voices
                          , shift = 1
-                         , sustain = False }
+                         , sustain = False
+                         , fingers = S.empty
+                         , sustained = S.empty
+                         }
 
   guideposts toMonome LedOn
 
