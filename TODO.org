@@ -1,0 +1,11 @@
+* separate projects
+** separate Vivid.Jbb from Vivid
+ this will make starting the repl faster
+** separate my own Vivid projects
+*** namely these
+ Vivid (clone, for reference)
+ Vivid.Synths.Jbb
+ Vivid.Dispatch
+ Monome
+*** use symlinks between them as needed
+e.g. from Monome to Synths

@@ -26,6 +26,7 @@ library
   exposed-modules:
                   Device
                 , Mailbox
+                , Mailbox.PrinterKeeper
                 , OSCMessage
                 , Util.Byte
                 , Util.Network

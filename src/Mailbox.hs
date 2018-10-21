@@ -32,8 +32,9 @@ et31ToFreq f = 2**(f/31)
 
 playKey :: Synth BoopParams -> Press -> IO ()
 playKey sy pr@(Press x y p) = do
-  set sy $ (toI $ 0.02 * fi (pressureToInt p) :: I "amp")
+  set sy $ (toI $ 0.1 * fi (pressureToInt p) :: I "amp")
   set sy $ (toI $ 50 * et31ToFreq (xyToEt31 pr) :: I "freq")
+
 
 mailboxSynths :: IO ()
 mailboxSynths = do
@@ -49,25 +50,4 @@ mailboxSynths = do
     case eOsc of Left text -> putStrLn . show $ text
                  Right osc -> let p@(Press x y s) = readPress osc
                               in playKey ((M.!) voices (x,y)) p
-  loop
-
--- ^ Tries to read as OSC, then prints (as OSC or otherwise).
--- Useful when running `requestDeviceList` from another repl.
-mailboxPrints :: IO [OSC]
-mailboxPrints = do
-  s <- receivesAt "127.0.0.1" 11111
-  acc <- newMVar []
-  let loop :: IO [OSC]
-      loop = do cmd <- getChar
-                case cmd of 'q' -> close s >> readMVar acc >>= return
-                            _   -> loop
-      printAndShow :: OSC -> IO ()
-      printAndShow osc = do accNow <- takeMVar acc
-                            putMVar acc $ osc : accNow
-                            putStrLn . show $ osc
-      printAndShowEitherOsc :: Either String OSC -> IO ()
-      printAndShowEitherOsc (Left s) = putStrLn . show $ s
-      printAndShowEitherOsc (Right osc) = printAndShow osc
-  mailbox <- forkIO $
-    forever $ decodeOSC <$> recv s 4096 >>= printAndShowEitherOsc
   loop
