@@ -32,8 +32,8 @@ et31ToFreq f = 2**(f/31)
 
 playKey :: Synth BoopParams -> Press -> IO ()
 playKey sy pr@(Press x y p) = do
-  set sy $ (toI $ 0.1 * fi (pressureToInt p) :: I "amp")
-  set sy $ (toI $ 50 * et31ToFreq (xyToEt31 pr) :: I "freq")
+  set sy $ (toI $ 0.05 * fi (pressureToInt p) :: I "amp")
+  set sy $ (toI $ 100 * et31ToFreq (xyToEt31 pr) :: I "freq")
 
 enharmonicKeys :: (X,Y) -> [(X,Y)]
 enharmonicKeys (x,y) = let contained x = x <= 15 && x >= 0
@@ -44,6 +44,9 @@ enharmonicKeys (x,y) = let contained x = x <= 15 && x >= 0
 mailboxSynths :: IO ()
 mailboxSynths = do
   s <- receivesAt "127.0.0.1" 11111
+  toMonome <- sendsTo (unpack localhost) 13993
+  mapM (send toMonome . shineToOscByte "/monome"
+        . (\(x,y) -> Shine x y Lit)) $ enharmonicKeys (8,8)
   let places = [(a,b) | a <- [0..15], b <- [0..15]]
   voices <- M.fromList . zip places <$> mapM (synth boop) (replicate 256 ())
   let loop :: IO ()
