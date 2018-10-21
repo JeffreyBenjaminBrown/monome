@@ -20,24 +20,30 @@ boop :: SynthDef BoopParams
 boop = sd ( 0 :: I "freq"
           , 0 :: I "amp"
           ) $ do
-   s1 <- (V::V "amp") ~* sinOsc (freq_ (V::V "freq"))
-   out 0 [s1, s1]
+  sin <- tanh' $ sinOsc (freq_ (V::V "freq"))
+  s1 <- (V::V "amp") ~* sin ~* sin
+  out 0 [s1, s1]
+
+xyToEt31 :: Press -> Float
+xyToEt31 (Press x y _) = fi (15-x) + 6 * fi y
+
+et31ToFreq :: Float -> Float
+et31ToFreq f = 2**(f/31)
 
 playKey :: Synth BoopParams -> Press -> IO ()
-playKey sy (Press x y p) = do
+playKey sy pr@(Press x y p) = do
   set sy $ (toI $ 0.02 * fi (pressureToInt p) :: I "amp")
-  set sy $ (toI $ 100 + x + 10*y :: I "freq")
+  set sy $ (toI $ 50 * et31ToFreq (xyToEt31 pr) :: I "freq")
 
-mailboxSynths :: IO [OSC]
+mailboxSynths :: IO ()
 mailboxSynths = do
   s <- receivesAt "127.0.0.1" 11111
-  acc <- newMVar []
-  let loop :: IO [OSC]
-      loop = do cmd <- getChar
-                case cmd of 'q' -> close s >> readMVar acc >>= return
-                            _   -> loop
-      places = [(a,b) | a <- [1..16], b <- [1..16]]
+  let places = [(a,b) | a <- [0..15], b <- [0..15]]
   voices <- M.fromList . zip places <$> mapM (synth boop) (replicate 256 ())
+  let loop :: IO ()
+      loop = do cmd <- getChar
+                case cmd of 'q' -> do close s >> mapM_ free (M.elems voices)
+                            _   -> loop
   mailbox <- forkIO $ forever $ do
     eOsc <- decodeOSC <$> recv s 4096
     case eOsc of Left text -> putStrLn . show $ text
