@@ -5,6 +5,7 @@ module Mailbox where
 import Control.Concurrent (forkIO)
 import Control.Concurrent.MVar
 import Control.Monad (forever)
+import qualified Data.Map as M
 import Vivid
 import Vivid.OSC
 
@@ -22,27 +23,26 @@ boop = sd ( 0 :: I "freq"
    s1 <- (V::V "amp") ~* sinOsc (freq_ (V::V "freq"))
    out 0 [s1, s1]
 
-playKey :: Synth BoopParams -> OSC -> IO ()
-playKey sy osc@(OSC "/monome/grid/key" _) = do
-  putStrLn $ show osc
-  let (Press x y p) = readPress osc
+playKey :: Synth BoopParams -> Press -> IO ()
+playKey sy (Press x y p) = do
   set sy $ (toI $ 0.02 * fi (pressureToInt p) :: I "amp")
   set sy $ (toI $ 100 + x + 10*y :: I "freq")
-playKey _ osc = putStrLn . show $ osc
 
 mailboxSynths :: IO [OSC]
 mailboxSynths = do
   s <- receivesAt "127.0.0.1" 11111
   acc <- newMVar []
---  spots = [(a,b) | a <- [1..16], b <- [1..16]]
---  voices <- zip spots <$> mapM (synth boop) (repeat $ 0 :: I "amp")
-  voice <- synth boop ()
   let loop :: IO [OSC]
       loop = do cmd <- getChar
                 case cmd of 'q' -> close s >> readMVar acc >>= return
                             _   -> loop
-  mailbox <- forkIO $ forever $
-    decodeOSC <$> recv s 4096 >>= either (putStrLn . show) (playKey voice)
+      places = [(a,b) | a <- [1..16], b <- [1..16]]
+  voices <- M.fromList . zip places <$> mapM (synth boop) (replicate 256 ())
+  mailbox <- forkIO $ forever $ do
+    eOsc <- decodeOSC <$> recv s 4096
+    case eOsc of Left text -> putStrLn . show $ text
+                 Right osc -> let p@(Press x y s) = readPress osc
+                              in playKey ((M.!) voices (x,y)) p
   loop
 
 -- ^ Tries to read as OSC, then prints (as OSC or otherwise).

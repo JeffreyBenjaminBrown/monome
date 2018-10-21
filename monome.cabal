@@ -36,6 +36,7 @@ library
   build-depends:
                 base
               , bytestring
+              , containers
               , hosc
               , network
               , text
