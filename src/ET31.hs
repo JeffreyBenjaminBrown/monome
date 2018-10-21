@@ -12,31 +12,12 @@ import qualified Data.Map as M
 import Vivid
 import Vivid.OSC
 
+import ET31.Keyboard
 import Util.Byte
 import Util.Network
+import Synth
 import Types.Button
 
-
-type BoopParams = '["freq","amp"]
-
-boop :: SynthDef BoopParams
-boop = sd ( 0 :: I "freq"
-          , 0 :: I "amp"
-          ) $ do
-  sin <- tanh' $ sinOsc (freq_ (V::V "freq"))
-  s1 <- (V::V "amp") ~* sin ~* sin
-  out 0 [s1, s1]
-
-xyToEt31 :: (X,Y) -> Float
-xyToEt31 (x,y) = fi (15-x) + 6 * fi y
-
-et31ToFreq :: Float -> Float
-et31ToFreq f = 2**(f/31)
-
-playKey :: Synth BoopParams -> ((X,Y), Switch) -> IO ()
-playKey sy ((x,y), s) = do
-  set sy $ (toI $ 0.05 * fi (switchToInt s) :: I "amp")
-  set sy $ (toI $ 100 * et31ToFreq (xyToEt31 (x,y)) :: I "freq")
 
 enharmonicKeys :: (X,Y) -> [(X,Y)]
 enharmonicKeys (x,y) = let contained x = x <= 15 && x >= 0

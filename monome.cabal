@@ -26,6 +26,7 @@ library
   exposed-modules:
                   Device
                 , ET31
+                , ET31.Keyboard
                 , Mailbox
                 , OSCMessage
                 , Types.App
