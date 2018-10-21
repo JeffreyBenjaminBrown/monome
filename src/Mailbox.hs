@@ -35,6 +35,11 @@ playKey sy pr@(Press x y p) = do
   set sy $ (toI $ 0.1 * fi (pressureToInt p) :: I "amp")
   set sy $ (toI $ 50 * et31ToFreq (xyToEt31 pr) :: I "freq")
 
+enharmonicKeys :: (X,Y) -> [(X,Y)]
+enharmonicKeys (x,y) = let contained x = x <= 15 && x >= 0
+  in filter (\(x,y) -> contained x && contained y)
+     $ [(x + x' * 6 + y' * (-1), y + x' * 1 + y' * 5 )
+       | x' <- [-2..2], y' <- [-3..3] ]
 
 mailboxSynths :: IO ()
 mailboxSynths = do
