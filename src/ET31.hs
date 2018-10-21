@@ -27,16 +27,16 @@ boop = sd ( 0 :: I "freq"
   s1 <- (V::V "amp") ~* sin ~* sin
   out 0 [s1, s1]
 
-xyToEt31 :: Press -> Float
-xyToEt31 (Press x y _) = fi (15-x) + 6 * fi y
+xyToEt31 :: (X,Y) -> Float
+xyToEt31 (x,y) = fi (15-x) + 6 * fi y
 
 et31ToFreq :: Float -> Float
 et31ToFreq f = 2**(f/31)
 
-playKey :: Synth BoopParams -> Press -> IO ()
-playKey sy pr@(Press x y p) = do
-  set sy $ (toI $ 0.05 * fi (pressureToInt p) :: I "amp")
-  set sy $ (toI $ 100 * et31ToFreq (xyToEt31 pr) :: I "freq")
+playKey :: Synth BoopParams -> ((X,Y), Switch) -> IO ()
+playKey sy ((x,y), s) = do
+  set sy $ (toI $ 0.05 * fi (switchToInt s) :: I "amp")
+  set sy $ (toI $ 100 * et31ToFreq (xyToEt31 (x,y)) :: I "freq")
 
 enharmonicKeys :: (X,Y) -> [(X,Y)]
 enharmonicKeys (x,y) = let contained x = x <= 15 && x >= 0
@@ -54,8 +54,8 @@ et31 = do
   mailbox <- forkIO $ forever $ do
     eOsc <- decodeOSC <$> recv inbox 4096
     case eOsc of Left text -> putStrLn . show $ text
-                 Right osc -> let p@(Press x y s) = readPress osc
-                              in playKey ((M.!) voices (x,y)) p
+                 Right osc -> let p@(xy, _) = readSwitchOSC osc
+                              in  playKey ((M.!) voices xy) p
   let loop :: IO ()
       loop = do cmd <- getChar
                 case cmd of 'q' -> close inbox

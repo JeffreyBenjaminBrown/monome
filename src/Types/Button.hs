@@ -14,29 +14,20 @@ type Y = Int
 
 
 -- | The mechanical state of a monome button
-data Pressure = Pressed | Unpressed
+data Switch = SwitchOn | SwitchOff
   deriving (Show, Eq, Ord)
 
-pressureToInt :: Pressure -> Int
-pressureToInt Pressed = 1
-pressureToInt Unpressed = 0
+switchToInt :: Switch -> Int
+switchToInt SwitchOn = 1
+switchToInt SwitchOff = 0
 
-pressureFromInt :: Int -> Pressure
-pressureFromInt 0 = Unpressed
-pressureFromInt 1 = Pressed
+switchFromInt :: Int -> Switch
+switchFromInt 0 = SwitchOff
+switchFromInt 1 = SwitchOn
 
-
--- | The act of changing a monome button's Pressure
-data Press = Press { pressX :: X
-                   , pressY :: Y
-                   , pressState :: Pressure }
-  deriving (Show, Eq, Ord)
-
-readPress :: OSC -> Press
-readPress (OSC "/monome/grid/key" [OSC_I x, OSC_I y, OSC_I s]) =
-  Press { pressX     =                   fi x
-        , pressY     =                   fi y
-        , pressState = pressureFromInt $ fi s}
+readSwitchOSC :: OSC -> ((X,Y), Switch)
+readSwitchOSC (OSC "/monome/grid/key" [OSC_I x, OSC_I y, OSC_I s]) =
+  ((fi x, fi y), switchFromInt $ fi s)
 
 
 -- | The state of a monome LED
