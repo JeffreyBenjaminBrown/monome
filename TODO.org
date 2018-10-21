@@ -14,6 +14,8 @@ A tree would be faster, but that can wait.
 ** behavior
 Each button press is tested for which window it's in, and handled by the associated function.
 After that, a new grid LED state is computed, and then the difference between it and the old one, and those changes are requested from the monome.
+* refector
+** rename pressure, etc -> LED and LEDAct, Switch and SwitchAct
 * features
 ** microtone | octave shift
 ** sustain these and future

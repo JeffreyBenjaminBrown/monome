@@ -28,6 +28,7 @@ library
                 , ET31
                 , Mailbox
                 , OSCMessage
+                , Types.App
                 , Types.Button
                 , Types.Device
                 , Util.Byte
