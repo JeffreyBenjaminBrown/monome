@@ -25,8 +25,8 @@ source-repository head
 library
   exposed-modules:
                   Device
+                , ET31
                 , Mailbox
-                , Mailbox.PrinterKeeper
                 , OSCMessage
                 , Util.Byte
                 , Util.Network
