@@ -2,7 +2,7 @@
 
 module ET31 where
 
-import Control.Concurrent (forkIO)
+import Control.Concurrent (forkIO, killThread)
 import Control.Concurrent.MVar
 import Control.Monad (forever)
 import qualified Data.Map as M
@@ -49,13 +49,15 @@ et31 = do
         . (\(x,y) -> Shine x y Lit)) $ enharmonicKeys (8,8)
   let places = [(a,b) | a <- [0..15], b <- [0..15]]
   voices <- M.fromList . zip places <$> mapM (synth boop) (replicate 256 ())
-  let loop :: IO ()
-      loop = do cmd <- getChar
-                case cmd of 'q' -> close inbox >> mapM_ free (M.elems voices)
-                            _   -> loop
   mailbox <- forkIO $ forever $ do
     eOsc <- decodeOSC <$> recv inbox 4096
     case eOsc of Left text -> putStrLn . show $ text
                  Right osc -> let p@(Press x y s) = readPress osc
                               in playKey ((M.!) voices (x,y)) p
+  let loop :: IO ()
+      loop = do cmd <- getChar
+                case cmd of 'q' -> close inbox
+                                   >> mapM_ free (M.elems voices)
+                                   >> killThread mailbox
+                            _   -> loop
   loop
