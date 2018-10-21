@@ -17,6 +17,7 @@ close = NS.close
 recv = NSB.recv
 send = NSB.send
 type HostName = NS.HostName
+type Socket = NS.Socket
 
 localhost :: ByteString
 localhost = "127.0.0.1"

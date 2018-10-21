@@ -1,11 +1,10 @@
 * TODO NEXT: add a shift window
 * architecture
 ** state
-*** what it includes
-**** which buttons are down
-**** which lights are on
-**** which buttons correspond to which voices
-**** which voices are playing what
+*** which buttons are down
+*** which lights are on
+*** which buttons correspond to which voices
+*** which voices are playing what
 ** windows
 *** window :: (X,Y) -> Bool
 *** windows are contained in a list or tree
