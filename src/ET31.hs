@@ -65,12 +65,12 @@ sustainWindow = Window {
         let color led xy = send (toMonome st) $ ledOsc "/monome" (xy, led)
 
         case sustain st of
-          True -> do -- Sustain is off now. Free the voices, dark the led.
+          True -> do -- Sustain is off now. Free some voices, dark the led.
             putStrLn $ show $ sustained st
             let sy xy = (M.!) (voices st) xy
                 quiet xy = playKey (sy xy) False (shift st) (xy, SwitchOff)
             color LedOff xy
-            mapM_ quiet $ sustained st -- turn off sustained voices
+            mapM_ quiet $ S.difference (sustained st) (fingers st)
           False -> color LedOn xy >> return ()
 
         putMVar mst $ st { sustain = not $ sustain st
@@ -80,7 +80,7 @@ sustainWindow = Window {
 }
 
 guideposts :: Socket -> Led -> IO ()
-guideposts toMonome led = mapM_ f $ enharmonicKeys (8,8)
+guideposts toMonome led = mapM_ f $ enharmonicKeys (9,0)
   where f = send toMonome . ledOsc "/monome" . (,led)
 
 et31 :: IO State

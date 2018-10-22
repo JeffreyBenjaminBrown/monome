@@ -10,10 +10,10 @@ Each button press is tested for which window it's in, and handled by the associa
 After that, a new grid LED state is computed, and then the difference between it and the old one, and those changes are requested from the monome.
 * refector
 ** playKey should be playVoice, and know nothing about sustain
-** rename pressure, etc -> LED and LEDAct, Switch and SwitchAct
 * features
-** sustain these
 ** sustain these and future
+This is what most piano sustain pedals do.
+The sustain that's programmed so far sustains only things under your fingers when you press the sustain button.
 ** light up enharmonics of pressed|sounding keys
 ** chord bank
 ** loop bank
