@@ -57,9 +57,10 @@ shiftWindow = Window {
         f mst (xy,SwitchOn ) = do
           st <- takeMVar mst
           let anchorShift = case xy of (0,15) -> -6
-                                       (0,14) -> -1
-                                       (1,14) -> 1
+                                       (0,14) -> 1
+                                       (1,14) -> -1
                                        (0,13) -> 6
+                                       _ -> 0
               pitchShift = case xy of (0,15) -> 6
                                       (1,15) -> 31
                                       (0,14) -> -1
