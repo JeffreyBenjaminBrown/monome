@@ -56,16 +56,16 @@ shiftWindow = Window {
     let f _   (_, SwitchOff) = return ()
         f mst (xy,SwitchOn ) = do
           st <- takeMVar mst
-          let anchorShift = case xy of (0,15) -> -6
+          let anchorShift = case xy of (0,15) -> 6
                                        (0,14) -> 1
                                        (1,14) -> -1
-                                       (0,13) -> 6
+                                       (0,13) -> -6
                                        _ -> 0
-              pitchShift = case xy of (0,15) -> 6
+              pitchShift = case xy of (0,15) -> -6
                                       (1,15) -> 31
                                       (0,14) -> -1
                                       (1,14) -> 1
-                                      (0,13) -> -6
+                                      (0,13) -> 6
                                       (1,13) -> -31
               newAnchor = anchor st + anchorShift
           colorAnchors (toMonome st) (anchor st) LedOff
@@ -109,7 +109,7 @@ et31 = do
   toMonome <- sendsTo (unpack localhost) 13993
   voices <- let places = [(a,b) | a <- [0..15], b <- [0..15]]
     in M.fromList . zip places <$> mapM (synth boop) (replicate 256 ())
-  let initialAnchor = 6 :: Int
+  let initialAnchor = 2 :: Int
   mst <- newMVar $ State { inbox = inbox
                          , toMonome = toMonome
                          , voices = voices

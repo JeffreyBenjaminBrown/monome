@@ -8,12 +8,16 @@
 ** behavior
 Each button press is tested for which window it's in, and handled by the associated function.
 After that, a new grid LED state is computed, and then the difference between it and the old one, and those changes are requested from the monome.
+* mystery: shifted enharmonics of sustianed notes make cool sounds
 * features
+** add to ongoing sustained group
+** transpose ongoing notes
+** save to chord bank from sustain
+** sustained voices do not block keys
 ** sustain these and future
 This is what most piano sustain pedals do.
 The sustain that's programmed so far sustains only things under your fingers when you press the sustain button.
 ** light up enharmonics of pressed|sounding keys
-** chord bank
 ** loop bank
 ** timbre
 ** split keyboard
