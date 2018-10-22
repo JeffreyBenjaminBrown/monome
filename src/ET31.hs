@@ -24,21 +24,31 @@ import Types.App
 import Types.Button
 
 
--- | Windows listed first are "on top of" later ones.
+-- | PITFALL: Order matters.
+-- Windows listed first are "on top of" later ones.
+-- Key presses are handled by the first window containing them.
 windows = [sustainWindow, shiftWindow, keyboardWindow]
 
-keyboardWindow = Window {
-  windowContains = const True
-  , windowHandler = let
-      f mst press @ (xy,sw) = do
-        st <- takeMVar mst
-        playKey ((M.!) (voices st) xy)
-          (S.member xy $ sustained st)  (shift st)  press
-        let newFingers = case sw of SwitchOn -> S.insert xy $ fingers st
-                                    SwitchOff -> S.delete xy $ fingers st
-        putMVar mst $ st { fingers = newFingers }
-    in f
-}
+keyboardWindow = let
+  playKey :: State -> ((X,Y), Switch) -> IO ()
+  playKey st (xy, sw)
+    | S.member xy (sustained st) = return ()
+    | otherwise =
+      let freq = 100 * (et31ToFreq $ shift st + xyToEt31 xy)
+      in set ((M.!) (voices st) xy)
+         (toI freq                         :: I "freq"
+         , toI $ 0.15 * fi (switchToInt sw) :: I "amp")
+
+  windowHandler mst press @ (xy,sw) = do
+    st <- takeMVar mst
+    playKey st press
+    let newFingers = case sw of
+          SwitchOn -> S.insert xy $ fingers st
+          SwitchOff -> S.delete xy $ fingers st
+    putMVar mst $ st { fingers = newFingers }
+
+  in Window { windowContains = const True
+            , windowHandler = windowHandler }
 
 shiftWindow = Window {
   windowContains = \(x,y) -> numBetween x 0 1 && numBetween y 13 15
@@ -69,7 +79,7 @@ sustainWindow = Window {
           True -> do -- Sustain is off now. Free some voices, dark the led.
             putStrLn $ show $ sustained st
             let sy xy = (M.!) (voices st) xy
-                quiet xy = playKey (sy xy) False (shift st) (xy, SwitchOff)
+                quiet xy = set (sy xy) (0 :: I "amp")
             color LedOff xy
             mapM_ quiet $ S.difference (sustained st) (fingers st)
           False -> color LedOn xy >> return ()
@@ -101,7 +111,7 @@ et31 = do
 
   guideposts toMonome LedOn
 
-  mailbox <- forkIO $ forever $ do
+  responder <- forkIO $ forever $ do
     decodeOSC <$> recv inbox 4096 >>= \case
       Left text -> putStrLn . show $ text
       Right osc -> let switch = readSwitchOSC osc
@@ -111,7 +121,7 @@ et31 = do
       loop = getChar >>= \case
         'q' -> close inbox
                >> mapM_ free (M.elems voices)
-               >> killThread mailbox
+               >> killThread responder
                >> guideposts toMonome LedOff
                >> readMVar mst >>= return
         _   -> loop

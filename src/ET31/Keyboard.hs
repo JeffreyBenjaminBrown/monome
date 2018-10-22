@@ -4,8 +4,7 @@
 , TupleSections #-}
 
 module ET31.Keyboard (
-  playKey
-  , xyToEt31
+  xyToEt31
   , et31ToFreq
   , enharmonicKeys
   ) where
@@ -16,13 +15,6 @@ import Synth
 import Types.Button
 import Util.Byte
 
-
-playKey :: Synth BoopParams -> Bool -> Float -> ((X,Y), Switch) -> IO ()
-playKey sy sustained shift (xy, sw)
-  | sustained = return ()
-  | not sustained = do let freq = 100 * (et31ToFreq $ shift + xyToEt31 xy)
-                       set sy (toI freq :: I "freq")
-                       set sy (toI $ 0.15 * fi (switchToInt sw) :: I "amp")
 
 xyToEt31 :: (X,Y) -> Float
 xyToEt31 (x,y) = fi (15-x) + 6 * fi y
