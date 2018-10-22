@@ -55,21 +55,28 @@ shiftWindow = Window {
   , windowHandler =
     let f _   (_, SwitchOff) = return ()
         f mst (xy,SwitchOn ) = do
-          let shiftInMicrotones = case xy of (0,15) -> 6
-                                             (1,15) -> 31
-                                             (0,14) -> -1
-                                             (1,14) -> 1
-                                             (0,13) -> -6
-                                             (1,13) -> -31
           st <- takeMVar mst
-          putMVar mst $ st {shift = shift st + shiftInMicrotones}
+          let anchorShift = case xy of (0,15) -> -6
+                                       (0,14) -> -1
+                                       (1,14) -> 1
+                                       (0,13) -> 6
+              pitchShift = case xy of (0,15) -> 6
+                                      (1,15) -> 31
+                                      (0,14) -> -1
+                                      (1,14) -> 1
+                                      (0,13) -> -6
+                                      (1,13) -> -31
+              newAnchor = anchor st + anchorShift
+          colorAnchors (toMonome st) (anchor st) LedOff
+          colorAnchors (toMonome st) newAnchor LedOn
+          putMVar mst $ st { shift = shift st + pitchShift
+                           , anchor = mod newAnchor 31 }
     in f
 }
 
 sustainWindow = Window {
   windowContains = \(x,y) -> x == 0 && y == 0
   , windowHandler = let
-
       f _   (_ , SwitchOff) = return ()
       f mst (xy, SwitchOn ) = do
         st <- takeMVar mst -- PITFALL: old state; has opposite sustain value.
@@ -90,9 +97,10 @@ sustainWindow = Window {
     in f
 }
 
-guideposts :: Socket -> Led -> IO ()
-guideposts toMonome led = mapM_ f $ enharmonicToXY (9,0)
-  where f = send toMonome . ledOsc "/monome" . (,led)
+colorAnchors :: Socket -> Int -> Led -> IO ()
+colorAnchors toMonome anchor led = mapM_ f xy
+  where xy = enharmonicToXY $ et31ToLowXY anchor
+        f = send toMonome . ledOsc "/monome" . (,led)
 
 et31 :: IO State
 et31 = do
@@ -100,16 +108,18 @@ et31 = do
   toMonome <- sendsTo (unpack localhost) 13993
   voices <- let places = [(a,b) | a <- [0..15], b <- [0..15]]
     in M.fromList . zip places <$> mapM (synth boop) (replicate 256 ())
+  let initialAnchor = 6 :: Int
   mst <- newMVar $ State { inbox = inbox
                          , toMonome = toMonome
                          , voices = voices
-                         , shift = 1
+                         , anchor = initialAnchor
+                         , shift = 0
                          , fingers = S.empty
                          , sustainOn = False
                          , sustained = S.empty
                          }
 
-  guideposts toMonome LedOn
+  colorAnchors toMonome initialAnchor LedOn
 
   responder <- forkIO $ forever $ do
     decodeOSC <$> recv inbox 4096 >>= \case
@@ -119,10 +129,11 @@ et31 = do
 
   let loop :: IO State
       loop = getChar >>= \case
-        'q' -> close inbox
-               >> mapM_ free (M.elems voices)
-               >> killThread responder
-               >> guideposts toMonome LedOff
-               >> readMVar mst >>= return
+        'q' -> do close inbox
+                  mapM_ free (M.elems voices)
+                  killThread responder
+                  st <- readMVar mst
+                  colorAnchors toMonome (anchor st) LedOff
+                  return st
         _   -> loop
   loop

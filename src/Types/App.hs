@@ -16,6 +16,7 @@ data State = State {
   inbox :: Socket
   , toMonome :: Socket
   , voices :: M.Map (X,Y) (Synth BoopParams)
+  , anchor :: Int
   , shift :: Float -- ^ multiplicative; 2 = one octave higher
   , fingers :: S.Set (X,Y)
   , sustainOn :: Bool
