@@ -1,4 +1,6 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE
+LambdaCase
+, OverloadedStrings #-}
 
 module Mailbox where
 
@@ -20,9 +22,8 @@ mailbox = do
   s <- receivesAt "127.0.0.1" 11111
   acc <- newMVar []
   let loop :: IO [OSC]
-      loop = do cmd <- getChar
-                case cmd of 'q' -> close s >> readMVar acc >>= return
-                            _   -> loop
+      loop = getChar >>= \case 'q' -> close s >> readMVar acc >>= return
+                               _   -> loop
       printAndShow :: OSC -> IO ()
       printAndShow osc = do accNow <- takeMVar acc
                             putMVar acc $ osc : accNow

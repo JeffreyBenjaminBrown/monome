@@ -1,5 +1,6 @@
 {-# LANGUAGE DataKinds
 , ExtendedDefaultRules
+, LambdaCase
 , OverloadedStrings
 , TupleSections #-}
 
@@ -101,18 +102,17 @@ et31 = do
   guideposts toMonome LedOn
 
   mailbox <- forkIO $ forever $ do
-    eOsc <- decodeOSC <$> recv inbox 4096
-    case eOsc of Left text -> putStrLn . show $ text
-                 Right osc ->
-                   let switch = readSwitchOSC osc
+    decodeOSC <$> recv inbox 4096 >>= \case
+      Left text -> putStrLn . show $ text
+      Right osc -> let switch = readSwitchOSC osc
                    in  handleSwitch windows mst switch
 
   let loop :: IO State
-      loop = do cmd <- getChar
-                case cmd of 'q' -> close inbox
-                                   >> mapM_ free (M.elems voices)
-                                   >> killThread mailbox
-                                   >> guideposts toMonome LedOff
-                                   >> readMVar mst >>= return
-                            _   -> loop
+      loop = getChar >>= \case
+        'q' -> close inbox
+               >> mapM_ free (M.elems voices)
+               >> killThread mailbox
+               >> guideposts toMonome LedOff
+               >> readMVar mst >>= return
+        _   -> loop
   loop
