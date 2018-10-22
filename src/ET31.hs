@@ -75,7 +75,7 @@ sustainWindow = Window {
         st <- takeMVar mst -- PITFALL: old state; has opposite sustain value.
         let color led xy = send (toMonome st) $ ledOsc "/monome" (xy, led)
 
-        case sustain st of
+        case sustainOn st of
           True -> do -- Sustain is off now. Free some voices, dark the led.
             putStrLn $ show $ sustained st
             let sy xy = (M.!) (voices st) xy
@@ -84,8 +84,8 @@ sustainWindow = Window {
             mapM_ quiet $ S.difference (sustained st) (fingers st)
           False -> color LedOn xy >> return ()
 
-        putMVar mst $ st { sustain = not $ sustain st
-                         , sustained = if sustain st then S.empty
+        putMVar mst $ st { sustainOn = not $ sustainOn st
+                         , sustained = if sustainOn st then S.empty
                            else fingers st  }
     in f
 }
@@ -104,8 +104,8 @@ et31 = do
                          , toMonome = toMonome
                          , voices = voices
                          , shift = 1
-                         , sustain = False
                          , fingers = S.empty
+                         , sustainOn = False
                          , sustained = S.empty
                          }
 

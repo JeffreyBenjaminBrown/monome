@@ -17,8 +17,8 @@ data State = State {
   , toMonome :: Socket
   , voices :: M.Map (X,Y) (Synth BoopParams)
   , shift :: Float -- ^ multiplicative; 2 = one octave higher
-  , sustain :: Bool
   , fingers :: S.Set (X,Y)
+  , sustainOn :: Bool
   , sustained :: S.Set (X,Y)
   } deriving (Show, Eq)
 
