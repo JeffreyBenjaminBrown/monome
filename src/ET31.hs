@@ -91,7 +91,7 @@ sustainWindow = Window {
 }
 
 guideposts :: Socket -> Led -> IO ()
-guideposts toMonome led = mapM_ f $ enharmonicKeys (9,0)
+guideposts toMonome led = mapM_ f $ enharmonicToXY (9,0)
   where f = send toMonome . ledOsc "/monome" . (,led)
 
 et31 :: IO State

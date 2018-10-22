@@ -8,9 +8,6 @@
 ** behavior
 Each button press is tested for which window it's in, and handled by the associated function.
 After that, a new grid LED state is computed, and then the difference between it and the old one, and those changes are requested from the monome.
-* refector
-** playKey should be playVoice, and know nothing about sustain
-** sustain should be sustainOn
 * features
 ** sustain these and future
 This is what most piano sustain pedals do.
