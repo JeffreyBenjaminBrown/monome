@@ -29,6 +29,7 @@ library
                 , ET31.Keyboard
                 , Mailbox
                 , OSCMessage
+                , Test
                 , Types.App
                 , Types.Button
                 , Types.Device
@@ -45,6 +46,7 @@ library
                 base
               , bytestring
               , containers
+              , HUnit
               , network
               , text
               , vivid
