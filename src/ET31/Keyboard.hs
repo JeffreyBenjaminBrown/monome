@@ -7,7 +7,7 @@ module ET31.Keyboard (
   xyToEt31
   , et31ToFreq
   , et31ToLowXY
-  , enharmonicToXY
+  , enharmonicToXYs
   ) where
 
 import Vivid
@@ -31,8 +31,8 @@ et31ToLowXY i = let i' = mod i 31
 et31ToFreq :: Float -> Float
 et31ToFreq f = 2**(f/31)
 
-enharmonicToXY :: (X,Y) -> [(X,Y)]
-enharmonicToXY (x,y) =
+enharmonicToXYs :: (X,Y) -> [(X,Y)]
+enharmonicToXYs (x,y) =
   filter (\(x,y) -> numBetween x 0 15 && numBetween y 0 15)
   $ [(x + x' * 6 + y' * (-1), y + x' * 1 + y' * 5 )
     | x' <- [-2..2], y' <- [-3..3] ]

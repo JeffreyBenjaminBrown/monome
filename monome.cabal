@@ -42,7 +42,6 @@ library
                 base
               , bytestring
               , containers
-              , hosc
               , network
               , text
               , vivid

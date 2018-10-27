@@ -13,7 +13,7 @@ import Util.Network
 
 
 data State = State {
-  inbox :: Socket
+    inbox :: Socket
   , toMonome :: Socket
   , voices :: M.Map (X,Y) (Synth BoopParams)
   , anchor :: Int

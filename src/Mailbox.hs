@@ -2,6 +2,7 @@
 LambdaCase
 , OverloadedStrings #-}
 
+
 module Mailbox where
 
 import Control.Concurrent (forkIO)

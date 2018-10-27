@@ -6,6 +6,7 @@
 
 module ET31 (
   et31
+  , colorArrows
   ) where
 
 import Control.Concurrent (forkIO, killThread)
@@ -100,8 +101,13 @@ sustainWindow = Window {
 
 colorAnchors :: Socket -> Int -> Led -> IO ()
 colorAnchors toMonome anchor led = mapM_ f xy
-  where xy = enharmonicToXY $ et31ToLowXY anchor
+  where xy = enharmonicToXYs $ et31ToLowXY anchor
         f = send toMonome . ledOsc "/monome" . (,led)
+
+colorArrows :: Socket -> IO ()
+colorArrows toMonome = mapM_ f [ (0,15),(0,14),(0,13)
+                               , (1,14) ]
+  where f = send toMonome . ledOsc "/monome" . (,LedOn) 
 
 et31 :: IO State
 et31 = do
@@ -120,6 +126,7 @@ et31 = do
                          , sustained = S.empty
                          }
 
+  colorArrows toMonome
   colorAnchors toMonome initialAnchor LedOn
 
   responder <- forkIO $ forever $ do
