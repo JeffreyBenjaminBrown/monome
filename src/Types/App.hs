@@ -17,9 +17,11 @@ import Util.Network
 type LedRelay = ((X,Y), Led) -> IO ()
 type LedFilter = ((X,Y), Led) -> Bool
 
+-- | PITFALL: `allWindows` should be literally all of them, including `w`.
 belongsHere :: [Window] -> Window -> LedFilter
-belongsHere ws w = f where
-  obscurers = takeWhile (/= w) ws -- the windows above `w`
+belongsHere allWindows w = f where
+  obscurers = takeWhile (/= w) allWindows
+    -- `obscurers` == the windows above `w`
   obscured :: (X,Y) -> Bool
   obscured xy = or $ map ($ xy) $ map windowContains obscurers
   f :: ((X,Y), Led) -> Bool

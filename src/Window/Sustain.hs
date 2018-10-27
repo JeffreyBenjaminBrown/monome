@@ -23,9 +23,9 @@ sustainWindow = Window {
 
 handler :: MVar State -> LedRelay -> [Window] -> ((X,Y), Switch) -> IO ()
 handler _   _  _ (_ , SwitchOff) = return ()
-handler mst lr _ (xy, SwitchOn ) = do
+handler mst toSustainWindow _ (xy, SwitchOn ) = do
   st <- takeMVar mst -- PITFALL: old state; has opposite sustain value.
-  let color led xy = lr (xy, led)
+  let color led xy = toSustainWindow (xy, led)
 
   case sustainOn st of
     True -> do -- Sustain is off now. Free some voices, dark the led.
