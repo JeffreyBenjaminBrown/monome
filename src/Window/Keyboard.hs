@@ -2,6 +2,7 @@
 
 module Window.Keyboard (
   keyboardWindow
+  , label
   ) where
 
 import Control.Concurrent.MVar
@@ -15,11 +16,13 @@ import Types.Button
 import Types.State
 import Util.Byte
 import Math31
-import Window.Shift (colorAnchors)
+import Window.Common (colorAnchors)
 
+
+label = "keyboard window"
 
 keyboardWindow =  Window {
-  windowLabel = "keyboardWindow"
+  windowLabel = label
   , windowContains = const True
   , windowInit = \mst toKeyboard ->
       do a <- anchor <$> readMVar mst

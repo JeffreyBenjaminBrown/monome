@@ -4,6 +4,7 @@ module Window.Shift (
   shiftWindow
   , colorAnchors
   , colorArrows
+  , label
   ) where
 
 import Control.Concurrent.MVar
@@ -15,19 +16,18 @@ import Types.Button
 import Types.State
 import Util.Byte
 import Util.Network
+import Window.Common (colorAnchors)
+import qualified Window.Keyboard
 
+
+label = "shift window"
 
 shiftWindow = Window {
-  windowLabel = "shiftWindow"
+  windowLabel = label
   , windowContains = \(x,y) -> numBetween x 0 1 && numBetween y 13 15
   , windowInit = \_ toShiftWindow -> colorArrows toShiftWindow
   , windowHandler = handler
 }
-
-colorAnchors :: LedRelay -> PitchClass -> Led -> IO ()
-colorAnchors toKeyboardWindow anchor led = mapM_ f xys
-  where xys = enharmonicToXYs $ et31ToLowXY anchor
-        f = toKeyboardWindow . (,led)
 
 colorArrows :: LedRelay -> IO ()
 colorArrows toShiftWindow = mapM_ f [ (0,15),(0,14),(0,13)
@@ -38,7 +38,8 @@ handler :: MVar State -> LedRelay -> [Window] -> ((X,Y), Switch) -> IO ()
 handler    _             _           _           (_,  SwitchOff) = return ()
 handler    mst           toShift     ws          (xy, SwitchOn ) = do
   st <- takeMVar mst
-  let Just keyboard = L.find ((==) "keyboardWindow" . windowLabel) ws
+  let Just keyboard = L.find pred ws where
+                      pred = (==) Window.Keyboard.label . windowLabel
       toKeyboard = colorIfHere (toMonome st) ws keyboard
       anchorShift = case xy of (0,15) -> 6
                                (0,14) -> 1

@@ -37,6 +37,7 @@ library
                 , Types.Window
                 , Util.Byte
                 , Util.Network
+                , Window.Common
                 , Window.Keyboard
                 , Window.Shift
                 , Window.Sustain

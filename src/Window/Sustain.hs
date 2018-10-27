@@ -2,6 +2,7 @@
 
 module Window.Sustain (
   sustainWindow
+  , label
   ) where
 
 import Control.Concurrent.MVar
@@ -15,8 +16,10 @@ import Types.State
 import Util.Network
 
 
+label = "sustain window"
+
 sustainWindow = Window {
-  windowLabel = "sustainWindow"
+  windowLabel = label
   , windowContains = \(x,y) -> x == 0 && y == 0
   , windowInit = \_ _ -> return ()
   , windowHandler = handler
