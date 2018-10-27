@@ -7,6 +7,7 @@ module Window.Shift (
   ) where
 
 import Control.Concurrent.MVar
+import Data.List as L
 
 import ET31.Keyboard
 import Types.App
@@ -31,11 +32,13 @@ colorAnchors toMonome anchor led = mapM_ f xys
   where xys = enharmonicToXYs $ et31ToLowXY anchor
         f = toMonome . (,led)
 
-handler :: MVar State -> LedRelay -> ((X,Y), Switch) -> IO ()
-handler _   _        (_, SwitchOff) = return ()
-handler mst toMonome (xy,SwitchOn ) = do
+handler :: MVar State -> LedRelay -> [Window] -> ((X,Y), Switch) -> IO ()
+handler    _             _           _           (_,  SwitchOff) = return ()
+handler    mst           toShift     ws          (xy, SwitchOn ) = do
   st <- takeMVar mst
-  let anchorShift = case xy of (0,15) -> 6
+  let Just keyboard = L.find ((==) "keyboardWindow" . windowLabel) ws
+      toKeyboard = colorIfHere (toMonome st) ws keyboard
+      anchorShift = case xy of (0,15) -> 6
                                (0,14) -> 1
                                (1,14) -> -1
                                (0,13) -> -6
@@ -47,7 +50,7 @@ handler mst toMonome (xy,SwitchOn ) = do
                               (0,13) -> 6
                               (1,13) -> -31
       newAnchor = anchor st + anchorShift
-  colorAnchors toMonome (anchor st) LedOff
-  colorAnchors toMonome newAnchor LedOn
+  colorAnchors toKeyboard (anchor st) LedOff
+  colorAnchors toKeyboard newAnchor LedOn
   putMVar mst $ st { shift = shift st + pitchShift
                    , anchor = mod newAnchor 31 }

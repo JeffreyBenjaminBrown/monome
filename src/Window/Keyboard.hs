@@ -32,8 +32,9 @@ playKey st (xy, sw)
 
 handler :: MVar State
   -> LedRelay
+  -> [Window]
   -> ((X,Y), Switch) -> IO ()
-handler mst _ press @ (xy,sw) = do
+handler mst _ _ press @ (xy,sw) = do
   st <- takeMVar mst
   playKey st press
   let newFingers = case sw of

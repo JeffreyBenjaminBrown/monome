@@ -47,7 +47,9 @@ data Window = Window {
     windowLabel :: String
   , windowContains :: (X,Y) -> Bool
   , windowHandler :: MVar State
-    -> LedRelay -- ^ control Leds via this, not raw `send` command
+    -> LedRelay -- ^ control Leds via this, not raw `send` commands
+    -> [Window] -- ^ to construct an LedRelay to another Window, if needed
+      -- PIFALL: Should be a list of all Windows -- not just, say, later ones.
     -> ((X,Y), Switch) -- ^ the incoming button press|release
     -> IO ()
   }
@@ -65,5 +67,5 @@ handleSwitch               allWindows mst (xy,sw) =
     st <- readMVar mst
     case windowContains w xy of
       True -> let ledRelay = colorIfHere (toMonome st) allWindows w
-              in windowHandler w mst ledRelay sw
+              in windowHandler w mst ledRelay allWindows sw
       False -> handleSwitch' allWindows ws mst sw

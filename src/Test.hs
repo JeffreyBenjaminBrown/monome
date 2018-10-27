@@ -11,7 +11,7 @@ tests = runTestTT $ TestList [
     ]
 
 testBelongsHere = TestCase $ do
-  let emptyHandler = \_ _ _ -> return ()
+  let emptyHandler = \_ _ _ _ -> return ()
       w1 = Window "w1" (\(x,y) -> x > y) emptyHandler
       w2 = Window "w2" (\(x,y) -> x > 4) emptyHandler
       w3 = Window "w3" (\(x,y) -> True)  emptyHandler

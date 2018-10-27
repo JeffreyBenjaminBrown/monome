@@ -14,9 +14,15 @@ import Types.Button
 import Util.Network
 
 
-handler :: MVar State -> LedRelay -> ((X,Y), Switch) -> IO ()
-handler _   _        (_ , SwitchOff) = return ()
-handler mst lr (xy, SwitchOn ) = do
+sustainWindow = Window {
+  windowLabel = "sustainWindow"
+  , windowContains = \(x,y) -> x == 0 && y == 0
+  , windowHandler = handler
+}
+
+handler :: MVar State -> LedRelay -> [Window] -> ((X,Y), Switch) -> IO ()
+handler _   _  _ (_ , SwitchOff) = return ()
+handler mst lr _ (xy, SwitchOn ) = do
   st <- takeMVar mst -- PITFALL: old state; has opposite sustain value.
   let color led xy = lr (xy, led)
 
@@ -32,9 +38,3 @@ handler mst lr (xy, SwitchOn ) = do
   putMVar mst $ st { sustainOn = not $ sustainOn st
                    , sustained = if sustainOn st then S.empty
                      else fingers st  }
-
-sustainWindow = Window {
-  windowLabel = "sustainWindow"
-  , windowContains = \(x,y) -> x == 0 && y == 0
-  , windowHandler = handler
-}
