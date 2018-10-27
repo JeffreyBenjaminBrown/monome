@@ -46,6 +46,7 @@ data State = State {
 data Window = Window {
     windowLabel :: String
   , windowContains :: (X,Y) -> Bool
+  , windowInit :: MVar State -> LedRelay -> IO ()
   , windowHandler :: MVar State
     -> LedRelay -- ^ control Leds via this, not raw `send` commands
     -> [Window] -- ^ to construct an LedRelay to another Window, if needed
@@ -56,6 +57,12 @@ data Window = Window {
 
 instance Eq Window where
   (==) a b = windowLabel a == windowLabel b
+
+runWindowInit :: MVar State -> [Window] -> IO ()
+runWindowInit mst allWindows = do
+  st <- readMVar mst
+  let toWindow w = colorIfHere (toMonome st) allWindows w
+  mapM_ (\w -> windowInit w mst $ toWindow w) allWindows
 
 handleSwitch :: [Window] -> MVar State -> ((X,Y), Switch) -> IO ()
 handleSwitch               allWindows mst (xy,sw) =

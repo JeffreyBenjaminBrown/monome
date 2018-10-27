@@ -17,6 +17,7 @@ import Util.Network
 sustainWindow = Window {
   windowLabel = "sustainWindow"
   , windowContains = \(x,y) -> x == 0 && y == 0
+  , windowInit = \_ _ -> return ()
   , windowHandler = handler
 }
 

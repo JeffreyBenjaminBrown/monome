@@ -11,10 +11,9 @@ tests = runTestTT $ TestList [
     ]
 
 testBelongsHere = TestCase $ do
-  let emptyHandler = \_ _ _ _ -> return ()
-      w1 = Window "w1" (\(x,y) -> x > y) emptyHandler
-      w2 = Window "w2" (\(x,y) -> x > 4) emptyHandler
-      w3 = Window "w3" (\(x,y) -> True)  emptyHandler
+  let w1 = Window "w1" (\(x,y) -> x > y) mempty mempty
+      w2 = Window "w2" (\(x,y) -> x > 4) mempty mempty
+      w3 = Window "w3" (\(x,y) -> True)  mempty mempty
       ws = [w1,w2,w3]
   assertBool "caught by w1 before reaching w3" $
     not $ belongsHere ws w3 ((1,0),LedOn)

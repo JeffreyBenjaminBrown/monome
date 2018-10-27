@@ -19,18 +19,19 @@ import Util.Network
 shiftWindow = Window {
   windowLabel = "shiftWindow"
   , windowContains = \(x,y) -> numBetween x 0 1 && numBetween y 13 15
+  , windowInit = \_ toShiftWindow -> colorArrows toShiftWindow
   , windowHandler = handler
 }
 
-colorArrows :: Socket -> IO ()
-colorArrows toMonome = mapM_ f [ (0,15),(0,14),(0,13)
-                               , (1,14) ]
-  where f = send toMonome . ledOsc "/monome" . (,LedOn) 
-
 colorAnchors :: LedRelay -> Int -> Led -> IO ()
-colorAnchors toMonome anchor led = mapM_ f xys
+colorAnchors toKeyboardWindow anchor led = mapM_ f xys
   where xys = enharmonicToXYs $ et31ToLowXY anchor
-        f = toMonome . (,led)
+        f = toKeyboardWindow . (,led)
+
+colorArrows :: LedRelay -> IO ()
+colorArrows toShiftWindow = mapM_ f [ (0,15),(0,14),(0,13)
+                               , (1,14) ]
+  where f = toShiftWindow . (,LedOn)
 
 handler :: MVar State -> LedRelay -> [Window] -> ((X,Y), Switch) -> IO ()
 handler    _             _           _           (_,  SwitchOff) = return ()

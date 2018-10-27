@@ -14,11 +14,15 @@ import Types.App
 import Types.Button
 import Util.Byte
 import ET31.Keyboard
+import Window.Shift (colorAnchors)
 
 
 keyboardWindow =  Window {
   windowLabel = "keyboardWindow"
   , windowContains = const True
+  , windowInit = \mst toKeyboard ->
+      do a <- anchor <$> readMVar mst
+         colorAnchors toKeyboard a LedOn
   , windowHandler = handler }
 
 playKey :: State -> ((X,Y), Switch) -> IO ()

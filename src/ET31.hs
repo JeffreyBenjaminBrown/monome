@@ -6,7 +6,6 @@
 
 module ET31 (
   et31
-  , colorArrows
   ) where
 
 import Control.Concurrent (forkIO, killThread)
@@ -49,6 +48,8 @@ et31 = do
                          , sustainOn = False
                          , sustained = S.empty
                          }
+
+  runWindowInit mst windows
 
   responder <- forkIO $ forever $ do
     decodeOSC <$> recv inbox 4096 >>= \case
