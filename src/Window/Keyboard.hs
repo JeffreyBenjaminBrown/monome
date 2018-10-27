@@ -26,8 +26,8 @@ playKey st (xy, sw)
   | otherwise =
     let freq = 100 * (et31ToFreq $ shift st + xyToEt31 xy)
     in set ((M.!) (voices st) xy)
-       (toI freq                         :: I "freq"
-       , toI $ 0.15 * fi (switchToInt sw) :: I "amp")
+       ( toI freq                         :: I "freq"
+       , toI $ 0.15 * fi (switchToInt sw) :: I "amp" )
 
 handler :: MVar State -> ((X,Y), Switch) -> IO ()
 handler mst press @ (xy,sw) = do
