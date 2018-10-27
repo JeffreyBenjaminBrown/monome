@@ -27,6 +27,7 @@ library
                   Device
                 , ET31
                 , ET31.Keyboard
+                , Instances
                 , Mailbox
                 , OSCMessage
                 , Test
