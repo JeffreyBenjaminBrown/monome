@@ -36,4 +36,3 @@ enharmonicToXYs (x,y) =
   filter (\(x,y) -> numBetween x 0 15 && numBetween y 0 15)
   $ [(x + x' * 6 + y' * (-1), y + x' * 1 + y' * 5 )
     | x' <- [-2..2], y' <- [-3..3] ]
-

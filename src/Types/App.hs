@@ -24,8 +24,12 @@ data State = State {
   } deriving (Show, Eq)
 
 data Window = Window {
-  windowContains :: (X,Y) -> Bool
+    windowLabel :: String
+  , windowContains :: (X,Y) -> Bool
   , windowHandler :: MVar State -> ((X,Y), Switch) -> IO () }
+
+instance Eq Window where
+  (==) a b = windowLabel a == windowLabel b
 
 handleSwitch :: [Window] -> MVar State -> ((X,Y), Switch) -> IO ()
 handleSwitch []     _  _            = return ()
