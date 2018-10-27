@@ -10,8 +10,9 @@ import Data.Map as M
 import Vivid
 
 import Synth
-import Types.App
+import Types.Window
 import Types.Button
+import Types.State
 import Util.Byte
 import Math31
 import Window.Shift (colorAnchors)

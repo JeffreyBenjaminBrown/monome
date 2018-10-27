@@ -9,8 +9,9 @@ import Data.Map as M
 import Data.Set as S
 import Vivid
 
-import Types.App
+import Types.Window
 import Types.Button
+import Types.State
 import Util.Network
 
 

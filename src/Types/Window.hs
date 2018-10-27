@@ -1,4 +1,4 @@
-module Types.App where
+module Types.Window where
 
 import qualified Data.Map as M
 import qualified Data.Set as S
@@ -9,6 +9,7 @@ import Vivid
 import Synth
 import Math31
 import Types.Button
+import Types.State
 import Util.Network
 
 
@@ -33,17 +34,6 @@ colorIfHere toMonome ws w = f where
   f msg = if belongsHere ws w msg
     then (send toMonome $ ledOsc "/monome" msg) >> return ()
     else return ()
-
-data State = State {
-    inbox :: Socket
-  , toMonome :: Socket -- ^ PITFALL : some function arguments share this name
-  , voices :: M.Map (X,Y) (Synth BoopParams)
-  , anchor :: Int
-  , shift :: Float -- ^ multiplicative; 2 = one octave higher
-  , fingers :: S.Set (X,Y)
-  , sustainOn :: Bool
-  , sustained :: S.Set (X,Y)
-  } deriving (Show, Eq)
 
 data Window = Window {
     windowLabel :: String

@@ -20,8 +20,9 @@ import Math31
 import Util.Byte
 import Util.Network
 import Synth
-import Types.App
+import Types.Window
 import Types.Button
+import Types.State
 import Window.Keyboard
 import Window.Shift
 import Window.Sustain

@@ -2,7 +2,7 @@ module Test (tests) where
 
 import Test.HUnit
 
-import Types.App
+import Types.Window
 import Types.Button
 
 

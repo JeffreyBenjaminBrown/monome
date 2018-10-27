@@ -31,9 +31,10 @@ library
                 , Math31
                 , OSCMessage
                 , Test
-                , Types.App
                 , Types.Button
                 , Types.Device
+                , Types.State
+                , Types.Window
                 , Util.Byte
                 , Util.Network
                 , Window.Keyboard

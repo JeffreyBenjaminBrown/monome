@@ -10,8 +10,9 @@ import Control.Concurrent.MVar
 import Data.List as L
 
 import Math31
-import Types.App
+import Types.Window
 import Types.Button
+import Types.State
 import Util.Byte
 import Util.Network
 
