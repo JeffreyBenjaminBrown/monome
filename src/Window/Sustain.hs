@@ -14,6 +14,7 @@ import Types.Button
 import Util.Network
 
 
+handler :: MVar State -> ((X,Y), Switch) -> IO ()
 handler _   (_ , SwitchOff) = return ()
 handler mst (xy, SwitchOn ) = do
   st <- takeMVar mst -- PITFALL: old state; has opposite sustain value.

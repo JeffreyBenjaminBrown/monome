@@ -31,6 +31,7 @@ colorAnchors toMonome anchor led = mapM_ f xy
   where xy = enharmonicToXYs $ et31ToLowXY anchor
         f = send toMonome . ledOsc "/monome" . (,led)
 
+handler :: MVar State -> ((X,Y), Switch) -> IO ()
 handler _   (_, SwitchOff) = return ()
 handler mst (xy,SwitchOn ) = do
   st <- takeMVar mst

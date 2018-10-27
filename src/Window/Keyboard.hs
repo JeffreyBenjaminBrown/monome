@@ -29,6 +29,7 @@ playKey st (xy, sw)
        (toI freq                         :: I "freq"
        , toI $ 0.15 * fi (switchToInt sw) :: I "amp")
 
+handler :: MVar State -> ((X,Y), Switch) -> IO ()
 handler mst press @ (xy,sw) = do
   st <- takeMVar mst
   playKey st press
