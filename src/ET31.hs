@@ -50,9 +50,6 @@ et31 = do
                          , sustained = S.empty
                          }
 
-  colorArrows toMonome
-  colorAnchors toMonome initialAnchor LedOn
-
   responder <- forkIO $ forever $ do
     decodeOSC <$> recv inbox 4096 >>= \case
       Left text -> putStrLn . show $ text
@@ -65,7 +62,6 @@ et31 = do
                   mapM_ free (M.elems voices)
                   killThread responder
                   st <- readMVar mst
-                  colorAnchors toMonome (anchor st) LedOff
                   return st
         _   -> loop
   loop

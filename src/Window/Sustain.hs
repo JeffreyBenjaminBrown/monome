@@ -14,11 +14,11 @@ import Types.Button
 import Util.Network
 
 
-handler :: MVar State -> ((X,Y), Switch) -> IO ()
-handler _   (_ , SwitchOff) = return ()
-handler mst (xy, SwitchOn ) = do
+handler :: MVar State -> LedRelay -> ((X,Y), Switch) -> IO ()
+handler _   _        (_ , SwitchOff) = return ()
+handler mst lr (xy, SwitchOn ) = do
   st <- takeMVar mst -- PITFALL: old state; has opposite sustain value.
-  let color led xy = send (toMonome st) $ ledOsc "/monome" (xy, led)
+  let color led xy = lr (xy, led)
 
   case sustainOn st of
     True -> do -- Sustain is off now. Free some voices, dark the led.

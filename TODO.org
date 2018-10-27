@@ -1,12 +1,16 @@
 * architecture
 ** ? windows are currently switch-aware but LED-unaware
-*** what IO they do
-draw to monome
-mutate state
-play to a voice
-*** changing how they draw
-Each Window's windowHandler should take as an argument an IO function on x-y-led triples.
-That argument is constructed to filter out anything outside of the window.
+*** how to finish this branch
+windows need init and terminate
+Window type needs to take a list of all Windows, usually ignored
+*** earlier plans (still valid but stale)
+**** what IO they do
+ draw to monome
+ mutate state
+ play to a voice
+**** changing how they draw
+ Each Window's windowHandler should take as an argument an IO function on x-y-led triples.
+ That argument is constructed to filter out anything outside of the window.
 ** state
 *** which buttons are down
 *** which lights are on

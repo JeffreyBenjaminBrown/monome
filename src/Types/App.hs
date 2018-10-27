@@ -19,14 +19,14 @@ type LedFilter = ((X,Y), Led) -> Bool
 
 belongsHere :: [Window] -> Window -> LedFilter
 belongsHere ws w = f where
-  above = takeWhile (/= w) ws -- the windows above `w`
+  obscurers = takeWhile (/= w) ws -- the windows above `w`
   obscured :: (X,Y) -> Bool
-  obscured xy = or $ map ($ xy) $ map windowContains above
+  obscured xy = or $ map ($ xy) $ map windowContains obscurers
   f :: ((X,Y), Led) -> Bool
   f (xy,_) = not (obscured xy) && windowContains w xy
 
-playIfHere :: Socket -> [Window] -> Window -> LedRelay
-playIfHere toMonome ws w = f where
+colorIfHere :: Socket -> [Window] -> Window -> LedRelay
+colorIfHere toMonome ws w = f where
   f :: ((X,Y),Led) -> IO ()
   f msg = if belongsHere ws w msg
     then (send toMonome $ ledOsc "/monome" msg) >> return ()
@@ -34,7 +34,7 @@ playIfHere toMonome ws w = f where
 
 data State = State {
     inbox :: Socket
-  , toMonome :: Socket
+  , toMonome :: Socket -- ^ PITFALL : some function arguments share this name
   , voices :: M.Map (X,Y) (Synth BoopParams)
   , anchor :: Int
   , shift :: Float -- ^ multiplicative; 2 = one octave higher
@@ -47,7 +47,7 @@ data Window = Window {
     windowLabel :: String
   , windowContains :: (X,Y) -> Bool
   , windowHandler :: MVar State
---    -> LedRelay -- ^ Windows speaks to device through this
+    -> LedRelay -- ^ control Leds via this, not raw `send` command
     -> ((X,Y), Switch) -- ^ the incoming button press|release
     -> IO ()
   }
@@ -56,9 +56,14 @@ instance Eq Window where
   (==) a b = windowLabel a == windowLabel b
 
 handleSwitch :: [Window] -> MVar State -> ((X,Y), Switch) -> IO ()
-handleSwitch []     _  _            = return ()
-handleSwitch (w:ws) mst sw @ (xy,_) = do
-  st <- readMVar mst
-  case windowContains w xy of
-    True -> windowHandler w mst sw
-    False -> handleSwitch ws mst sw
+handleSwitch               allWindows mst (xy,sw) =
+  handleSwitch' allWindows allWindows mst (xy,sw) where
+  -- `handleSwitch'` keeps the complete list of windows in its first arg,
+  -- while iteratively discarding the head of its second.
+  handleSwitch' allWindows []         _   _           = return ()
+  handleSwitch' allWindows (w:ws)     mst sw @ (xy,_) = do
+    st <- readMVar mst
+    case windowContains w xy of
+      True -> let ledRelay = colorIfHere (toMonome st) allWindows w
+              in windowHandler w mst ledRelay sw
+      False -> handleSwitch' allWindows ws mst sw

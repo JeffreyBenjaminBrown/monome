@@ -26,14 +26,14 @@ colorArrows toMonome = mapM_ f [ (0,15),(0,14),(0,13)
                                , (1,14) ]
   where f = send toMonome . ledOsc "/monome" . (,LedOn) 
 
-colorAnchors :: Socket -> Int -> Led -> IO ()
-colorAnchors toMonome anchor led = mapM_ f xy
-  where xy = enharmonicToXYs $ et31ToLowXY anchor
-        f = send toMonome . ledOsc "/monome" . (,led)
+colorAnchors :: LedRelay -> Int -> Led -> IO ()
+colorAnchors toMonome anchor led = mapM_ f xys
+  where xys = enharmonicToXYs $ et31ToLowXY anchor
+        f = toMonome . (,led)
 
-handler :: MVar State -> ((X,Y), Switch) -> IO ()
-handler _   (_, SwitchOff) = return ()
-handler mst (xy,SwitchOn ) = do
+handler :: MVar State -> LedRelay -> ((X,Y), Switch) -> IO ()
+handler _   _        (_, SwitchOff) = return ()
+handler mst toMonome (xy,SwitchOn ) = do
   st <- takeMVar mst
   let anchorShift = case xy of (0,15) -> 6
                                (0,14) -> 1
@@ -47,7 +47,7 @@ handler mst (xy,SwitchOn ) = do
                               (0,13) -> 6
                               (1,13) -> -31
       newAnchor = anchor st + anchorShift
-  colorAnchors (toMonome st) (anchor st) LedOff
-  colorAnchors (toMonome st) newAnchor LedOn
+  colorAnchors toMonome (anchor st) LedOff
+  colorAnchors toMonome newAnchor LedOn
   putMVar mst $ st { shift = shift st + pitchShift
                    , anchor = mod newAnchor 31 }
