@@ -3,8 +3,9 @@
 module Types.Button (
   X, Y
   , Switch(..), Led(..)
-  , ledOsc, ledToInt, ledFromInt
   , readSwitchOSC, switchToInt, switchFromInt
+  , ledToInt, ledFromInt
+  , ledOsc, allLedOsc
   ) where
 
 import Vivid.OSC
@@ -51,3 +52,6 @@ ledFromInt 1 = LedOn
 -- | The act of changing a monome LED's Light
 ledOsc :: String -> ((X,Y), Led) -> ByteString
 ledOsc prefix ((x, y), led) = onoff prefix x y $ ledToInt led
+
+allLedOsc :: String -> Led -> ByteString
+allLedOsc prefix led = allLeds prefix $ ledToInt led

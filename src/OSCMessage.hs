@@ -37,3 +37,8 @@ onoff :: String -> Int -> Int -> Int -> ByteString
 onoff devicePrefix x y l = do -- ^ toggle light level, 0 or 1
   encodeOSC $ OSC (pack $ devicePrefix ++ "/grid/led/set")
     [ OSC_I $ fi x, OSC_I $ fi y, OSC_I $ fi l ]
+
+allLeds :: String -> Int -> ByteString
+allLeds devicePrefix l = do -- ^ toggle light level, 0 or 1
+  encodeOSC $ OSC (pack $ devicePrefix ++ "/grid/led/all")
+    [ OSC_I $ fi l ]

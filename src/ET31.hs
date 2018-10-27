@@ -63,6 +63,7 @@ et31 = do
                   mapM_ free (M.elems voices)
                   killThread responder
                   st <- readMVar mst
+                  send toMonome $ allLedOsc "/monome" LedOff
                   return st
         _   -> loop
   loop
