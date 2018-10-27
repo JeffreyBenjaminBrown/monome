@@ -46,6 +46,7 @@ et31 = do
                          , anchor = initialAnchor
                          , shift = 0
                          , fingers = S.empty
+                         , lit = M.empty
                          , sustainOn = False
                          , sustained = S.empty
                          }

@@ -17,6 +17,8 @@ import Types.Button
 import Util.Byte
 
 
+type PitchClass = Int -- modulo 31
+
 -- | xyToEt31 and et31ToLowXY are roughly inverses:
 -- xyToEt31 <$> et31ToLowXY <$> [0..31] == [0,1,2,3,4,5,6,7,8,9,10,11,12,
 -- 13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,0]
@@ -24,7 +26,7 @@ import Util.Byte
 xyToEt31 :: (X,Y) -> Float
 xyToEt31 (x,y) = fi (15-x) + 6 * fi y
 
-et31ToLowXY :: Int -> (X,Y)
+et31ToLowXY :: PitchClass -> (X,Y)
 et31ToLowXY i = let i' = mod i 31
   in (15 - mod i' 6, div i' 6)
 

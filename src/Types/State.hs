@@ -15,8 +15,9 @@ data State = State {
   , toMonome :: Socket -- ^ PITFALL : some function arguments share this name
   , voices :: M.Map (X,Y) (Synth BoopParams)
   , anchor :: Int
-  , shift :: Float -- ^ multiplicative; 2 = one octave higher
+  , shift :: Float
   , fingers :: S.Set (X,Y)
+  , lit :: M.Map Int [(X,Y)]
   , sustainOn :: Bool
   , sustained :: S.Set (X,Y)
   } deriving (Show, Eq)

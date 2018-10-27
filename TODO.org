@@ -1,4 +1,3 @@
-rename App.hs -> Window.hs
 * state
 ** which buttons are down
 ** which lights are on
@@ -6,6 +5,8 @@ rename App.hs -> Window.hs
 ** which voices are playing what
 * features
 ** light up enharmonics of pressed keys
+*** TODO mystery: two functions from X,Y to PitchClass, one relative
+*** overview
 (Sustained keys will come later.)
 
 Some things to maybe track:
@@ -13,7 +14,30 @@ Some things to maybe track:
   Which pitch classes to light up
   Which keys are responsible for a lit pitch class
 
-Window needs to keep track of which LEDs are on, off.
+When to do things
+  Press a button
+    Add it to the list of keys responsible for that pitch class
+  Release a button
+    Remove it from said list
+    If said list is empty, dark that pitch class
+*** relevant functions
+shift ought to be called keyboardShift and type (X,Y)
+colorAnchors ought to take a PitchClass and a keyboardShift value (x,y)
+
+colorAnchors :: LedRelay -> Int -> Led -> IO ()
+
+et31ToFreq :: Float -> Float
+ought to take PitchClass and shift::(X,Y) as parameters
+
+Shift.handler :: MVar State -> LedRelay -> [Window] 
+  -> ((X,Y), Switch) -> IO ()
+Currently darks old anchor, colors new anchor, changes anchor and shift.
+Ought to take a PitchClass and a keyboardShift value (x,Y),
+  and use colorAnchors,
+  and change the state of the keyboardshift but not the anchor
+
+*** what uses anchors: Window.Shift, Window.Keyboard
+*** what uses shift: Window.Shift, Window.Keyboard
 ** add to ongoing sustained group
 ** transpose ongoing notes
 ** save to chord bank from sustain
