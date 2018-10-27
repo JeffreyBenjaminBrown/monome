@@ -24,7 +24,7 @@ shiftWindow = Window {
   , windowHandler = handler
 }
 
-colorAnchors :: LedRelay -> Int -> Led -> IO ()
+colorAnchors :: LedRelay -> PitchClass -> Led -> IO ()
 colorAnchors toKeyboardWindow anchor led = mapM_ f xys
   where xys = enharmonicToXYs $ et31ToLowXY anchor
         f = toKeyboardWindow . (,led)

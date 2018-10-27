@@ -20,8 +20,8 @@ When to do things
   Release a button
     Remove it from said list
     If said list is empty, dark that pitch class
-*** relevant functions
-shift ought to be called keyboardShift and type (X,Y)
+*** functions to edit
+shift ought to be called keyboardShift and have type (X,Y)
 colorAnchors ought to take a PitchClass and a keyboardShift value (x,y)
 
 colorAnchors :: LedRelay -> Int -> Led -> IO ()
