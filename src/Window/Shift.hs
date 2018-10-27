@@ -9,6 +9,7 @@ module Window.Shift (
 
 import Control.Concurrent.MVar
 import Data.List as L
+import Data.NumInstances
 
 import Math31
 import Types.Window
@@ -41,19 +42,16 @@ handler    mst           toShift     ws          (xy, SwitchOn ) = do
   let Just keyboard = L.find pred ws where
                       pred = (==) Window.Keyboard.label . windowLabel
       toKeyboard = colorIfHere (toMonome st) ws keyboard
-      anchorShift = case xy of (0,15) -> 6
-                               (0,14) -> 1
-                               (1,14) -> -1
-                               (0,13) -> -6
-                               _ -> 0
-      pitchShift = case xy of (0,15) -> -6
-                              (1,15) -> 31
-                              (0,14) -> -1
-                              (1,14) -> 1
-                              (0,13) -> 6
-                              (1,13) -> -31
+      shift :: (X,Y) -> (PitchClass, (X,Y))
+      shift xy = case xy of (0,15) -> ( 6, ( 0, 1)) 
+                            (0,14) -> ( 1, (-1, 0))
+                            (0,13) -> (-6, ( 1, 0))
+                            (1,15) -> ( 0, ( 1, -5)) -- up octave
+                            (1,14) -> (-1, ( 1,  0))
+                            (1,13) -> ( 0, (-1, 5))  -- down octave
+      (anchorShift, xyShiftShift) = shift xy
       newAnchor = anchor st + anchorShift
   colorAnchors toKeyboard (anchor st) LedOff
   colorAnchors toKeyboard newAnchor LedOn
-  putMVar mst $ st { shift = shift st + pitchShift
+  putMVar mst $ st { xyShift = xyShift st + xyShiftShift
                    , anchor = mod newAnchor 31 }

@@ -27,7 +27,7 @@
 {-# LANGUAGE NoMonomorphismRestriction #-}
 
 
-module Instances where
+module Instances.TypesafeArgs where
  
 import Control.Arrow (first, second)
 import GHC.Exts

@@ -7,6 +7,7 @@ module Math31 (
   Pitch, PitchClass
   , xyToEt31
   , et31ToFreq
+  , relXyToEtRel31
   , et31ToLowXY
   , enharmonicToXYs
   ) where
@@ -30,6 +31,9 @@ type PitchClass = Int
 -- (notice the 0 at the end).
 xyToEt31 :: (X,Y) -> Pitch
 xyToEt31 (x,y) = fi (15-x) + 6 * y
+
+relXyToEtRel31 :: (X,Y) -> Pitch
+relXyToEtRel31 (x,y) = (-x) + 6 * y
 
 et31ToLowXY :: PitchClass -> (X,Y)
 et31ToLowXY i = let i' = mod i 31

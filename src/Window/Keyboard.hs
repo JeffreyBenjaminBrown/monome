@@ -33,7 +33,8 @@ playKey :: State -> ((X,Y), Switch) -> IO ()
 playKey st (xy, sw)
   | S.member xy (sustained st) = return ()
   | otherwise =
-    let freq = 100 * (et31ToFreq $ shift st + xyToEt31 xy)
+    let freq = 100 * (et31ToFreq
+                      $ xyToEt31 xy - relXyToEtRel31 (xyShift st))
         voice = (M.!) (voices st) xy
     in set voice ( toI freq                         :: I "freq"
                  , toI $ 0.15 * fi (switchToInt sw) :: I "amp" )

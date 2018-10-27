@@ -21,7 +21,6 @@ When to do things
     Remove it from said list
     If said list is empty, dark that pitch class
 *** functions to edit
-shift ought to be called keyboardShift and have type (X,Y)
 colorAnchors ought to take a PitchClass and a keyboardShift value (x,y)
 
 colorAnchors :: LedRelay -> Int -> Led -> IO ()
@@ -32,7 +31,7 @@ ought to take PitchClass and shift::(X,Y) as parameters
 Shift.handler :: MVar State -> LedRelay -> [Window] 
   -> ((X,Y), Switch) -> IO ()
 Currently darks old anchor, colors new anchor, changes anchor and shift.
-Ought to take a PitchClass and a keyboardShift value (x,Y),
+Ought to take a PitchClass and a keyboardShift value (x,y),
   and use colorAnchors,
   and change the state of the keyboardshift but not the anchor
 

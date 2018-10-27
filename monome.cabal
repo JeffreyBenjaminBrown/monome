@@ -51,6 +51,7 @@ library
               , containers
               , HUnit
               , network
+              , NumInstances
               , text
               , vivid
               , vivid-osc

@@ -16,9 +16,9 @@ data State = State {
   , toMonome :: Socket -- ^ PITFALL : some function arguments share this name
   , voices :: M.Map (X,Y) (Synth BoopParams)
   , anchor :: PitchClass
-  , shift :: Pitch
+  , xyShift :: (X,Y) -- ^ this is relative -- a vector, not a point
   , fingers :: S.Set (X,Y)
-  , lit :: M.Map PitchClass [(X,Y)]
+  , lit :: M.Map PitchClass (S.Set (X,Y))
   , sustainOn :: Bool
   , sustained :: S.Set (X,Y)
   } deriving (Show, Eq)
