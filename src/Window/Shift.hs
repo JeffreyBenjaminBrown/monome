@@ -3,6 +3,7 @@
 module Window.Shift (
   shiftWindow
   , colorAnchors
+  , colorArrows
   ) where
 
 import Control.Concurrent.MVar
@@ -19,6 +20,11 @@ shiftWindow = Window {
   , windowContains = \(x,y) -> numBetween x 0 1 && numBetween y 13 15
   , windowHandler = handler
 }
+
+colorArrows :: Socket -> IO ()
+colorArrows toMonome = mapM_ f [ (0,15),(0,14),(0,13)
+                               , (1,14) ]
+  where f = send toMonome . ledOsc "/monome" . (,LedOn) 
 
 colorAnchors :: Socket -> Int -> Led -> IO ()
 colorAnchors toMonome anchor led = mapM_ f xy

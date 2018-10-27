@@ -33,11 +33,6 @@ import Window.Sustain
 -- Key presses are handled by the first window containing them.
 windows = [sustainWindow, shiftWindow, keyboardWindow]
 
-colorArrows :: Socket -> IO ()
-colorArrows toMonome = mapM_ f [ (0,15),(0,14),(0,13)
-                               , (1,14) ]
-  where f = send toMonome . ledOsc "/monome" . (,LedOn) 
-
 et31 :: IO State
 et31 = do
   inbox <- receivesAt "127.0.0.1" 11111
