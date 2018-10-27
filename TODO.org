@@ -1,26 +1,10 @@
-* architecture
-** ? windows are currently switch-aware but LED-unaware
-*** how to finish this branch
-windows need init and terminate
-Window type needs to take a list of all Windows, usually ignored
-*** earlier plans (still valid but stale)
-**** what IO they do
- draw to monome
- mutate state
- play to a voice
-**** changing how they draw
- Each Window's windowHandler should take as an argument an IO function on x-y-led triples.
- That argument is constructed to filter out anything outside of the window.
-** state
-*** which buttons are down
-*** which lights are on
-*** which buttons correspond to which voices
-*** which voices are playing what
-** behavior
-Each button press is tested for which window it's in, and handled by the associated function.
-After that, a new grid LED state is computed, and then the difference between it and the old one, and those changes are requested from the monome.
-* mystery: shifted enharmonics of sustianed notes make cool sounds
+* state
+** which buttons are down
+** which lights are on
+** which buttons correspond to which voices
+** which voices are playing what
 * features
+** light up enharmonics of pressed|sounding keys
 ** add to ongoing sustained group
 ** transpose ongoing notes
 ** save to chord bank from sustain
@@ -28,12 +12,9 @@ After that, a new grid LED state is computed, and then the difference between it
 ** sustain these and future
 This is what most piano sustain pedals do.
 The sustain that's programmed so far sustains only things under your fingers when you press the sustain button.
-** light up enharmonics of pressed|sounding keys
 ** loop bank
 ** timbre
 ** split keyboard
-** shift should move the guideposts
-and maybe that window should be visible
 ** reset buttons
 *** silence all voices
 *** redraw entire grid

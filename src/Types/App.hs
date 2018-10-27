@@ -7,7 +7,7 @@ import Control.Concurrent.MVar
 import Vivid
 
 import Synth
-import ET31.Keyboard
+import Math31
 import Types.Button
 import Util.Network
 

@@ -9,7 +9,7 @@ module Window.Shift (
 import Control.Concurrent.MVar
 import Data.List as L
 
-import ET31.Keyboard
+import Math31
 import Types.App
 import Types.Button
 import Util.Byte

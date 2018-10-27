@@ -4,7 +4,7 @@
 , OverloadedStrings
 , TupleSections #-}
 
-module ET31 (
+module AppMain (
   et31
   ) where
 
@@ -16,7 +16,7 @@ import qualified Data.Set as S
 import Vivid
 import Vivid.OSC
 
-import ET31.Keyboard
+import Math31
 import Util.Byte
 import Util.Network
 import Synth

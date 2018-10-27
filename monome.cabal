@@ -24,11 +24,11 @@ source-repository head
 
 library
   exposed-modules:
-                  Device
-                , ET31
-                , ET31.Keyboard
+                  AppMain
+                , Device
                 , Instances
                 , Mailbox
+                , Math31
                 , OSCMessage
                 , Test
                 , Types.App

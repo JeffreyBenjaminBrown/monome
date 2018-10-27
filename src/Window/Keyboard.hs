@@ -13,7 +13,7 @@ import Synth
 import Types.App
 import Types.Button
 import Util.Byte
-import ET31.Keyboard
+import Math31
 import Window.Shift (colorAnchors)
 
 

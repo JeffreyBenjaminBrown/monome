@@ -1,9 +1,10 @@
 -- | This adds VarList instances for synths with more than 26 parameters.
 -- It goes up to 32.
+--
+-- With minor changes, this is a simple duplication of
+-- Vivid.Synthdef.TypesafeArgs
 
-{-# OPTIONS_HADDOCK show-extensions #-}
 {-# LANGUAGE NoIncoherentInstances #-}
-
 -- {-# LANGUAGE ConstraintKinds -}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE ExistentialQuantification #-}
@@ -15,7 +16,7 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE PolyKinds #-}
-v-- {-# LANGUAGE RankNTypes #-}
+-- {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TypeFamilies, NoMonoLocalBinds #-}
@@ -23,13 +24,11 @@ v-- {-# LANGUAGE RankNTypes #-}
 -- Needed for a nested type family instance:
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE ViewPatterns #-}
-
 {-# LANGUAGE NoMonomorphismRestriction #-}
 
 
 module Instances where
-
-
+ 
 import Control.Arrow (first, second)
 import GHC.Exts
 import GHC.TypeLits

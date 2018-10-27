@@ -3,7 +3,7 @@
 , OverloadedStrings
 , TupleSections #-}
 
-module ET31.Keyboard (
+module Math31 (
   xyToEt31
   , et31ToFreq
   , et31ToLowXY
