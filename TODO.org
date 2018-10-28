@@ -2,8 +2,14 @@
 master -> ledRelay: done
 master -> enharmonicLeds -> topLeftOrigin
   that is, before finishing enharmonicLeds, I'm taking a break to put the origin where it belongs
+* TODO ongoing : redraw everything upon shift
+There is a bad interaction between the keyboard and shift.
+If I play a chord, shift the board, then release the chord, the LEDs stay lit. They move appropriately during the shift, though.
+
+It should be that when I release a key, I search for any pitch it is responsible for.
+
+I need a new data field. I have one with pitchlass keys and xy values; I need one with xy keys and pitchclass values.
 * features
-** redraw everything upon shift
 ** show sustained notes
 ** add to ongoing sustained group
 ** transpose ongoing notes

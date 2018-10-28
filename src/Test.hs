@@ -1,14 +1,26 @@
 module Test (tests) where
 
+import Data.Map as M
+import Data.Set as S
 import Test.HUnit
 
-import Types.Window
+import Window.Common
 import Types.Button
+import Types.State
+import Types.Window
 
 
 tests = runTestTT $ TestList [
     TestLabel "testBelongsHere" testBelongsHere
-    ]
+  , TestLabel "testDependentPitchClass" testDependentPitchClass
+  ]
+
+testDependentPitchClass = TestCase $ do
+  let m = M.singleton 10 $ S.singleton (1,1)
+  assertBool "dependentPitchClass finds it" $
+    dependentPitchClass m (1,1) == Just 10
+  assertBool "dependentPitchClass does not find it" $
+    dependentPitchClass m (0,1) == Nothing
 
 testBelongsHere = TestCase $ do
   let w1 = Window "w1" (\(x,y) -> x > y) mempty mempty
