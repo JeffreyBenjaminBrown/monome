@@ -16,7 +16,7 @@ tests = runTestTT $ TestList [
   ]
 
 testDependentPitchClass = TestCase $ do
-  let m = M.singleton 10 $ S.singleton (1,1)
+  let m = M.singleton 10 $ S.singleton $ LedFromSwitch(1,1)
   assertBool "dependentPitchClass finds it" $
     dependentPitchClass m (1,1) == Just 10
   assertBool "dependentPitchClass does not find it" $

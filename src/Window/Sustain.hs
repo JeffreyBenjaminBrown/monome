@@ -51,8 +51,3 @@ handler mst toSustainWindow _ (xy, SwitchOn ) = do
                }
   
   putMVar mst $ st'
-
--- newLit :: State -> Switch -> State
--- newLit st SwitchOn =
---   let 
---   LedFromSustain
