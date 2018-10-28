@@ -25,8 +25,8 @@ keyboardWindow =  Window {
   windowLabel = label
   , windowContains = const True
   , windowInit = \mst toKeyboard ->
-      do a <- anchor <$> readMVar mst
-         colorAnchors toKeyboard a LedOn
+      do st <- readMVar mst
+         colorAnchors toKeyboard (anchor st) (xyShift st) LedOn
   , windowHandler = handler }
 
 playKey :: State -> ((X,Y), Switch) -> IO ()

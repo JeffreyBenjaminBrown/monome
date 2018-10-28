@@ -2,7 +2,6 @@
 
 module Window.Shift (
   shiftWindow
-  , colorAnchors
   , colorArrows
   , label
   ) where
@@ -45,13 +44,11 @@ handler    mst           toShift     ws          (xy, SwitchOn ) = do
       shift :: (X,Y) -> (PitchClass, (X,Y))
       shift xy = case xy of (0,15) -> ( 6, ( 0, 1)) 
                             (0,14) -> ( 1, (-1, 0))
-                            (0,13) -> (-6, ( 1, 0))
+                            (0,13) -> (-6, ( 0, -1))
                             (1,15) -> ( 0, ( 1, -5)) -- up octave
                             (1,14) -> (-1, ( 1,  0))
                             (1,13) -> ( 0, (-1, 5))  -- down octave
       (anchorShift, xyShiftShift) = shift xy
-      newAnchor = anchor st + anchorShift
-  colorAnchors toKeyboard (anchor st) LedOff
-  colorAnchors toKeyboard newAnchor LedOn
-  putMVar mst $ st { xyShift = xyShift st + xyShiftShift
-                   , anchor = mod newAnchor 31 }
+  colorAnchors toKeyboard (anchor st              ) (xyShift st) LedOff
+  colorAnchors toKeyboard (anchor st + anchorShift) (xyShift st) LedOn
+  putMVar mst $ st { xyShift = xyShift st + xyShiftShift }

@@ -5,7 +5,6 @@
 ** which voices are playing what
 * features
 ** light up enharmonics of pressed keys
-*** TODO mystery: two functions from X,Y to PitchClass, one relative
 *** overview
 (Sustained keys will come later.)
 
@@ -20,13 +19,15 @@ When to do things
   Release a button
     Remove it from said list
     If said list is empty, dark that pitch class
-*** functions to edit
-colorAnchors ought to take a PitchClass and a keyboardShift value (x,y)
-
+*** what uses anchors: Window.Shift, Window.Keyboard
+*** what uses shift: Window.Shift, Window.Keyboard
+*** DONE Functions to edit to use xyShift and anchor together
 colorAnchors :: LedRelay -> Int -> Led -> IO ()
+ought to take a PitchClass and a keyboardShift value (x,y)
 
-et31ToFreq :: Float -> Float
-ought to take PitchClass and shift::(X,Y) as parameters
+dubious
+  et31ToFreq :: Float -> Float
+  xought to take PitchClass and shift::(X,Y) as parameters
 
 Shift.handler :: MVar State -> LedRelay -> [Window] 
   -> ((X,Y), Switch) -> IO ()
@@ -35,8 +36,6 @@ Ought to take a PitchClass and a keyboardShift value (x,y),
   and use colorAnchors,
   and change the state of the keyboardshift but not the anchor
 
-*** what uses anchors: Window.Shift, Window.Keyboard
-*** what uses shift: Window.Shift, Window.Keyboard
 ** add to ongoing sustained group
 ** transpose ongoing notes
 ** save to chord bank from sustain
@@ -52,6 +51,7 @@ The sustain that's programmed so far sustains only things under your fingers whe
 *** redraw entire grid
 *** restore shift to 1
 to remove floating point error
+* bug : excessive shift makes the leds weird
 * separate projects
 ** separate Vivid.Jbb from Vivid
  this will make starting the repl faster

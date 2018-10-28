@@ -66,6 +66,7 @@ et31 = do
                   killThread responder
                   st <- readMVar mst
                   send toMonome $ allLedOsc "/monome" LedOff
-                  return st
+                  return
+                    $ st { voices = mempty } -- PITFALL : more readable
         _   -> loop
   loop
