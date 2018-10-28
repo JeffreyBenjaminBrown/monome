@@ -24,9 +24,11 @@ label = "keyboard window"
 keyboardWindow =  Window {
   windowLabel = label
   , windowContains = const True
-  , windowInit = \mst toKeyboard ->
-      do st <- readMVar mst
-         colorAnchors toKeyboard (anchor st) (xyShift st) LedOn
+  , windowInit = \mst toKeyboard -> do
+      st <- readMVar mst
+      let f pitchClass =
+            colorAnchors toKeyboard pitchClass (xyShift st) LedOn
+      mapM_ f $ M.keys $ lit st
   , windowHandler = handler }
 
 soundKey :: State -> ((X,Y), Switch) -> IO ()
@@ -64,16 +66,16 @@ handler mst toKeyboard _ press @ (xy,sw) = do
 
 newLit :: ((X,Y), Switch)
        -> PitchClass
-       -> M.Map PitchClass (S.Set (X,Y))
-       -> M.Map PitchClass (S.Set (X,Y))
+       -> M.Map PitchClass (S.Set LedReason)
+       -> M.Map PitchClass (S.Set LedReason)
 newLit (xy,SwitchOn) pitchClass m
   | M.lookup pitchClass m == Nothing =
-      M.insert pitchClass (S.singleton xy) m
+      M.insert pitchClass (S.singleton $ LedFromSwitch xy) m
   | Just reasons <- M.lookup pitchClass m =
-      M.insert pitchClass (S.insert xy reasons) m
+      M.insert pitchClass (S.insert (LedFromSwitch xy) reasons) m
 newLit (xy,SwitchOff) pitchClass m
   | M.lookup pitchClass m == Nothing = m -- should not happen
   | Just reasons <- M.lookup pitchClass m =
       case S.size reasons < 2 of -- size < 1 should not happen
         True -> M.delete pitchClass m
-        False -> M.insert pitchClass (S.delete xy reasons) m
+        False -> M.insert pitchClass (S.delete  (LedFromSwitch xy) reasons) m

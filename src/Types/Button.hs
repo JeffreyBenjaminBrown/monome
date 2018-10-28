@@ -2,7 +2,7 @@
 
 module Types.Button (
   X, Y
-  , Switch(..), Led(..)
+  , Switch(..), Led(..), LedReason(..)
   , readSwitchOSC, switchToInt, switchFromInt
   , ledToInt, ledFromInt
   , ledOsc, allLedOsc
@@ -55,3 +55,9 @@ ledOsc prefix ((x, y), led) = onoff prefix x y $ ledToInt led
 
 allLedOsc :: String -> Led -> ByteString
 allLedOsc prefix led = allLeds prefix $ ledToInt led
+
+
+-- | Why is an Led lit up?
+data LedReason = LedFromSwitch {xy :: (X,Y)}
+               | LedFromAnchor
+  deriving (Show, Eq, Ord)

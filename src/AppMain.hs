@@ -43,10 +43,9 @@ et31 = do
   mst <- newMVar $ State { inbox = inbox
                          , toMonome = toMonome
                          , voices = voices
-                         , anchor = initialAnchor
                          , xyShift = 0
                          , fingers = S.empty
-                         , lit = M.empty
+                         , lit = M.singleton 2 $ S.singleton LedFromAnchor
                          , sustainOn = False
                          , sustained = S.empty
                          }
