@@ -25,8 +25,8 @@ drawPitchClass toKeyboardWindow xyShift led pitchClass = do
 
 -- TODO (#speed) Instead, keep a map from xy to pitchclass
 dependentPitchClass :: M.Map PitchClass (S.Set LedReason)
-                    -> (X,Y) -> Maybe PitchClass
-dependentPitchClass m xy = fst <$> mPair
-  where pred = S.member (LedFromSwitch xy) . snd
+                    -> LedReason -> Maybe PitchClass
+dependentPitchClass m ldr = fst <$> mPair
+  where pred = S.member ldr . snd
         mPair = Mb.listToMaybe $ filter pred $ M.toList m
   -- if I'm right, laziness => `fst` makes this stop at the first result

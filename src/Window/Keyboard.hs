@@ -53,7 +53,7 @@ handler mst toKeyboard _ press @ (xy,sw) = do
         SwitchOff -> S.delete xy $ fingers st
       pitchClassNow = mod (xyToEt31 $ addPair xy $ negPair $ xyShift st) 31
         -- what that key represents currently.
-      pitchClassBefore = dependentPitchClass (lit st) xy
+      pitchClassBefore = dependentPitchClass (lit st) $ LedFromSwitch xy
         -- pitches that key lit up in the past
       nl = newLit (xy,sw) pitchClassNow pitchClassBefore $ lit st
       oldKeys = S.fromList $ M.keys $ lit st

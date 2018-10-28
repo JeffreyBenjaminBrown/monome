@@ -59,6 +59,6 @@ allLedOsc prefix led = allLeds prefix $ ledToInt led
 
 -- | The reason an Led is lit.
 data LedReason = LedFromSwitch {xy :: (X,Y)}
+               | LedFromSustain {xy :: (X,Y)}
                | LedFromAnchor
-               | LedFromSustain
   deriving (Show, Eq, Ord)

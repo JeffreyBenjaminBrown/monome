@@ -9,6 +9,8 @@ If I play a chord, shift the board, then release the chord, the LEDs stay lit. T
 It should be that when I release a key, I search for any pitch it is responsible for.
 
 I need a new data field. I have one with pitchlass keys and xy values; I need one with xy keys and pitchclass values.
+* maybe Led and Switch should be synonyms for Bool
+so that I can call not on them, or condition on them
 * features
 ** show sustained notes
 ** add to ongoing sustained group

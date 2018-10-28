@@ -18,9 +18,9 @@ tests = runTestTT $ TestList [
 testDependentPitchClass = TestCase $ do
   let m = M.singleton 10 $ S.singleton $ LedFromSwitch(1,1)
   assertBool "dependentPitchClass finds it" $
-    dependentPitchClass m (1,1) == Just 10
+    dependentPitchClass m (LedFromSwitch (1,1)) == Just 10
   assertBool "dependentPitchClass does not find it" $
-    dependentPitchClass m (0,1) == Nothing
+    dependentPitchClass m  (LedFromSwitch (1,0)) == Nothing
 
 testBelongsHere = TestCase $ do
   let w1 = Window "w1" (\(x,y) -> x > y) mempty mempty
