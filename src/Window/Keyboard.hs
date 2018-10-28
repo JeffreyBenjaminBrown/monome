@@ -24,7 +24,7 @@ label = "keyboard window"
 keyboardWindow =  Window {
   windowLabel = label
   , windowContains = \(x,y) -> let pred = numBetween 0 15
-                               in pred x && pred y 
+                               in pred x && pred y
   , windowInit = \mst toKeyboard -> do
       st <- readMVar mst
       mapM_ (drawPitchClass toKeyboard (xyShift st) LedOn) $ M.keys $ lit st

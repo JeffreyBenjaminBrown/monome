@@ -3,6 +3,8 @@ master -> ledRelay: done
 master -> enharmonicLeds -> topLeftOrigin
   that is, before finishing enharmonicLeds, I'm taking a break to put the origin where it belongs
 * features
+** redraw everything upon shift
+** show sustained notes
 ** add to ongoing sustained group
 ** transpose ongoing notes
 ** save to chord bank from sustain

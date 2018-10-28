@@ -22,6 +22,7 @@ import qualified Window.Keyboard
 
 label = "shift window"
 
+-- | = the arrows
 rightArrow = (15,15)
 downArrow =  (14,15)
 leftArrow =  (13,15)
@@ -29,6 +30,15 @@ upOctave =   (15,14)
 upArrow =    (14,14)
 downOctave = (13,14)
 
+shift :: (X,Y) -> (PitchClass, (X,Y))
+      shift xy | xy == rightArrow = ( 1, 0)
+               | xy == downArrow  = ( 0, 1)
+               | xy == leftArrow  = (-1, 0)
+               | xy == upOctave   = (-5,-1)
+               | xy == upArrow    = ( 0,-1)
+               | xy == downOctave = ( 5, 1)
+
+-- | = the window
 shiftWindow = Window {
   windowLabel = label
   , windowContains = \(x,y) -> numBetween 13 15 x && numBetween 14 15 y
@@ -44,18 +54,11 @@ handler :: MVar State -> LedRelay -> [Window] -> ((X,Y), Switch) -> IO ()
 handler    _             _           _           (_,  SwitchOff) = return ()
 handler    mst           toShift     ws          (xy, SwitchOn ) = do
   st <- takeMVar mst
-  let Just keyboard = L.find pred ws where
+  let Just keyboard = L.find pred ws where -- unsafe but it must be in there
                       pred = (==) Window.Keyboard.label . windowLabel
-      toKeyboard = colorIfHere (toMonome st) ws keyboard
-      shift :: (X,Y) -> (PitchClass, (X,Y))
-      shift xy | xy == rightArrow = ( 6, ( 1, 0))
-               | xy == downArrow  = ( 1, ( 0, 1))
-               | xy == leftArrow  = (-6, (-1, 0))
-               | xy == upOctave   = ( 0, (-5,-1))
-               | xy == upArrow    = (-1, ( 0,-1))
-               | xy == downOctave = ( 0, ( 5, 1))
-      (anchorShift, xyShiftShift) = shift xy
-      drawPitchClass' = drawPitchClass toKeyboard $ xyShift st
-  mapM_ (drawPitchClass' LedOff                 ) $ M.keys $ lit st
-  mapM_ (drawPitchClass' LedOn . (+) anchorShift) $ M.keys $ lit st
-  putMVar mst $ st { xyShift = addPair (xyShift st) xyShiftShift }
+      toKeyboard = relayIfHere (toMonome st) ws keyboard
+      st' = st { xyShift = addPair (xyShift st) (shift xy) }
+      draw st = drawPitchClass toKeyboard $ xyShift st
+  mapM_ (draw st  LedOff) $ M.keys $ lit st
+  mapM_ (draw st' LedOn ) $ M.keys $ lit st'
+  putMVar mst st'

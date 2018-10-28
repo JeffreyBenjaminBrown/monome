@@ -28,8 +28,8 @@ belongsHere allWindows w = f where
   f :: ((X,Y), Led) -> Bool
   f (xy,_) = not (obscured xy) && windowContains w xy
 
-colorIfHere :: Socket -> [Window] -> Window -> LedRelay
-colorIfHere toMonome ws w = f where
+relayIfHere :: Socket -> [Window] -> Window -> LedRelay
+relayIfHere toMonome ws w = f where
   f :: ((X,Y),Led) -> IO ()
   f msg = if belongsHere ws w msg
     then (send toMonome $ ledOsc "/monome" msg) >> return ()
@@ -56,7 +56,7 @@ instance Eq Window where
 runWindowInit :: MVar State -> [Window] -> IO ()
 runWindowInit mst allWindows = do
   st <- readMVar mst
-  let toWindow w = colorIfHere (toMonome st) allWindows w
+  let toWindow w = relayIfHere (toMonome st) allWindows w
   mapM_ (\w -> windowInit w mst $ toWindow w) allWindows
 
 handleSwitch :: [Window] -> MVar State -> ((X,Y), Switch) -> IO ()
@@ -68,6 +68,6 @@ handleSwitch               allWindows mst (xy,sw) =
   handleSwitch' allWindows (w:ws)     mst sw @ (xy,_) = do
     st <- readMVar mst
     case windowContains w xy of
-      True -> let ledRelay = colorIfHere (toMonome st) allWindows w
+      True -> let ledRelay = relayIfHere (toMonome st) allWindows w
               in windowHandler w mst ledRelay allWindows sw
       False -> handleSwitch' allWindows ws mst sw
