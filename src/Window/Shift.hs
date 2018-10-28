@@ -16,7 +16,7 @@ import Types.Button
 import Types.State
 import Util.Byte
 import Util.Network
-import Window.Common (colorAnchors)
+import Window.Common (drawPitchClass)
 import qualified Window.Keyboard
 
 
@@ -49,8 +49,7 @@ handler    mst           toShift     ws          (xy, SwitchOn ) = do
                             (1,14) -> (-1, ( 1,  0))
                             (1,13) -> ( 0, (-1, 5))  -- down octave
       (anchorShift, xyShiftShift) = shift xy
-      colorAnchors' led pitchClass =
-          colorAnchors toKeyboard pitchClass (xyShift st) led
-  mapM_ (colorAnchors' LedOff)                  $ M.keys $ lit st
-  mapM_ (colorAnchors' LedOn . (+) anchorShift) $ M.keys $ lit st
+      drawPitchClass' = drawPitchClass toKeyboard $ xyShift st
+  mapM_ (drawPitchClass' LedOff                 ) $ M.keys $ lit st
+  mapM_ (drawPitchClass' LedOn . (+) anchorShift) $ M.keys $ lit st
   putMVar mst $ st { xyShift = addPair (xyShift st) xyShiftShift }

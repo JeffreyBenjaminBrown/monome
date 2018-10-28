@@ -16,7 +16,7 @@ import Types.Button
 import Types.State
 import Util.Byte
 import Math31
-import Window.Common (colorAnchors)
+import Window.Common (drawPitchClass)
 
 
 label = "keyboard window"
@@ -26,9 +26,7 @@ keyboardWindow =  Window {
   , windowContains = const True
   , windowInit = \mst toKeyboard -> do
       st <- readMVar mst
-      let f pitchClass =
-            colorAnchors toKeyboard pitchClass (xyShift st) LedOn
-      mapM_ f $ M.keys $ lit st
+      mapM_ (drawPitchClass toKeyboard (xyShift st) LedOn) $ M.keys $ lit st
   , windowHandler = handler }
 
 soundKey :: State -> ((X,Y), Switch) -> IO ()
@@ -59,12 +57,10 @@ handler mst toKeyboard _ press @ (xy,sw) = do
       toDark = S.difference oldKeys newKeys
       toLight = S.difference newKeys oldKeys
       cheatShift = addPair (xyShift st) (-3,2) -- TODO ? Why do I need this?
-      colorAnchors' :: (X,Y) -> Led -> PitchClass -> IO ()
-      colorAnchors' shift led pc = colorAnchors toKeyboard pc shift led
   putStrLn "\nlit:" >> mapM_ (putStrLn . show) (M.toList $ lit st)
   putStrLn "\nnl:"  >> mapM_ (putStrLn . show) (M.toList nl)
-  mapM_ (colorAnchors' cheatShift LedOff) toDark
-  mapM_ (colorAnchors' cheatShift LedOn) toLight
+  mapM_ (drawPitchClass toKeyboard cheatShift LedOff) toDark
+  mapM_ (drawPitchClass toKeyboard cheatShift LedOn) toLight
   putMVar mst $ st { fingers = newFingers
                    , lit = nl }
 
