@@ -1,4 +1,4 @@
-{-# LANGUAGE TupleSections #-}
+{-# LANGUAGE TupleSections, ScopedTypeVariables #-}
 
 module Window.Shift (
   shiftWindow
@@ -30,13 +30,13 @@ upOctave =   (15,14)
 upArrow =    (14,14)
 downOctave = (13,14)
 
-shift :: (X,Y) -> (PitchClass, (X,Y))
-      shift xy | xy == rightArrow = ( 1, 0)
-               | xy == downArrow  = ( 0, 1)
-               | xy == leftArrow  = (-1, 0)
-               | xy == upOctave   = (-5,-1)
-               | xy == upArrow    = ( 0,-1)
-               | xy == downOctave = ( 5, 1)
+shift :: (X,Y) -> (X,Y)
+shift xy | xy == rightArrow = ( 1, 0)
+         | xy == downArrow  = ( 0, 1)
+         | xy == leftArrow  = (-1, 0)
+         | xy == upOctave   = (-5,-1)
+         | xy == upArrow    = ( 0,-1)
+         | xy == downOctave = ( 5, 1)
 
 -- | = the window
 shiftWindow = Window {
@@ -55,7 +55,7 @@ handler    _             _           _           (_,  SwitchOff) = return ()
 handler    mst           toShift     ws          (xy, SwitchOn ) = do
   st <- takeMVar mst
   let Just keyboard = L.find pred ws where -- unsafe but it must be in there
-                      pred = (==) Window.Keyboard.label . windowLabel
+        pred = (==) Window.Keyboard.label . windowLabel
       toKeyboard = relayIfHere (toMonome st) ws keyboard
       st' = st { xyShift = addPair (xyShift st) (shift xy) }
       draw st = drawPitchClass toKeyboard $ xyShift st
