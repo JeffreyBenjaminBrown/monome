@@ -8,6 +8,11 @@ import Util.Byte
 import Util.Network (localhost)
 
 
+-- | PITFALL: The monome will respond to out-of-bounds (x,y) values.
+-- Therefore every Window should have a nontrivial windowContains field,
+-- even if it is the background Window.
+
+
 -- | to the SerialOSC server
 
 requestDeviceList :: Int -> ByteString

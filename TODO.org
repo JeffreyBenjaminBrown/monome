@@ -2,53 +2,13 @@
 master -> ledRelay: done
 master -> enharmonicLeds -> topLeftOrigin
   that is, before finishing enharmonicLeds, I'm taking a break to put the origin where it belongs
-* TODO next: in Keyboard.hs, find where things turn off
-so that the anchor does not
-* state
-** which buttons are down
-** which lights are on
-** which buttons correspond to which voices
-** which voices are playing what
 * features
-** light up enharmonics of pressed keys
-*** overview
-(Sustained keys will come later.)
-
-Some things to maybe track:
-  The keys under your fingers
-  Which keys are responsible for each lit pitch class
-    => which pitch class is lit up
-
-When to do things
-  Press a button
-    Add it to the list of keys responsible for that pitch class
-  Release a button
-    Remove it from said list
-    If said list is empty, dark that pitch class
-*** what uses anchors: Window.Shift, Window.Keyboard
-*** what uses shift: Window.Shift, Window.Keyboard
-*** DONE Functions to edit to use xyShift and anchor together
-colorAnchors :: LedRelay -> Int -> Led -> IO ()
-ought to take a PitchClass and a keyboardShift value (x,y)
-
-dubious
-  et31ToFreq :: Float -> Float
-  xought to take PitchClass and shift::(X,Y) as parameters
-
-Shift.handler :: MVar State -> LedRelay -> [Window] 
-  -> ((X,Y), Switch) -> IO ()
-Currently darks old anchor, colors new anchor, changes anchor and shift.
-Ought to take a PitchClass and a keyboardShift value (x,y),
-  and use colorAnchors,
-  and change the state of the keyboardshift but not the anchor
-
 ** add to ongoing sustained group
 ** transpose ongoing notes
 ** save to chord bank from sustain
 ** sustained voices do not block keys
 ** sustain these and future
 This is what most piano sustain pedals do.
-The sustain that's programmed so far sustains only things under your fingers when you press the sustain button.
 ** loop bank
 ** timbre
 ** split keyboard
@@ -68,6 +28,3 @@ Vivid.Dispatch
 Monome
 *** use symlinks between them as needed
 e.g. from Monome to Synths
-* bug: the relation from anchor to xy-space is not the relation from xy-space to pitchClass.
-** cheatShift = addPair (xyShift st) (-3,2) -- TODO ? Why do I need this?
-

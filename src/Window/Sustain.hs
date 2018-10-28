@@ -35,7 +35,6 @@ handler mst toSustainWindow _ (xy, SwitchOn ) = do
 
   case sustainOn st of
     True -> do -- Sustain is off now. Free some voices, dark the led.
-      putStrLn $ show $ sustained st
       let sy xy = (M.!) (voices st) xy
           quiet xy = set (sy xy) (0 :: I "amp")
       color LedOff xy

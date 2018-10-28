@@ -2,6 +2,7 @@
 , ExtendedDefaultRules
 , LambdaCase
 , OverloadedStrings
+, ScopedTypeVariables
 , TupleSections #-}
 
 module AppMain (
@@ -44,8 +45,7 @@ et31 = do
                          , voices = voices
                          , xyShift = (0,0)
                          , fingers = mempty
-                         , lit = mempty
-                             -- M.singleton 2 $ S.singleton LedFromAnchor
+                         , lit = M.singleton 2 $ S.singleton LedFromAnchor
                          , sustainOn = False
                          , sustained = mempty
                          }
@@ -58,14 +58,13 @@ et31 = do
       Right osc -> let switch = readSwitchOSC osc
                    in  handleSwitch windows mst switch
 
-  let loop :: IO State
-      loop = getChar >>= \case
-        'q' -> do close inbox
-                  mapM_ free (M.elems voices)
-                  killThread responder
-                  st <- readMVar mst
-                  send toMonome $ allLedOsc "/monome" LedOff
-                  return
-                    $ st { voices = mempty } -- PITFALL : more readable
+  let (loop :: IO State) = getChar >>= \case
+        'q' -> do
+          close inbox
+          mapM_ free (M.elems voices)
+          killThread responder
+          st <- readMVar mst
+          send toMonome $ allLedOsc "/monome" LedOff
+          return $ st { voices = mempty } -- PITFALL: less info, more reasable
         _   -> loop
   loop

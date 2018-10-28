@@ -14,6 +14,7 @@ drawPitchClass :: LedRelay
                -> Led
                -> PitchClass -- ^ what to light up
                -> IO ()
-drawPitchClass toKeyboardWindow xyShift led pitchClass = mapM_ f xys
-  where xys = enharmonicToXYs $ addPair (et31ToLowXY pitchClass) xyShift
-        f = toKeyboardWindow . (,led)
+drawPitchClass toKeyboardWindow xyShift led pitchClass = do
+  let xys = enharmonicToXYs $ addPair (et31ToLowXY pitchClass) xyShift
+      f = toKeyboardWindow . (,led)
+  mapM_ f xys

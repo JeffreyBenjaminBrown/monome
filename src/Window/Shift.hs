@@ -31,7 +31,7 @@ downOctave = (13,14)
 
 shiftWindow = Window {
   windowLabel = label
-  , windowContains = \(x,y) -> numBetween x 13 15 && numBetween y 14 15
+  , windowContains = \(x,y) -> numBetween 13 15 x && numBetween 14 15 y
   , windowInit = \_ toShiftWindow -> colorArrows toShiftWindow
   , windowHandler = handler
 }

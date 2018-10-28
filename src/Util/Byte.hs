@@ -18,7 +18,7 @@ fi :: (Integral a, Num b) => a -> b
 fi = fromIntegral
 
 numBetween :: Real a => a -> a -> a -> Bool
-numBetween x low high = x >= low && x <= high
+numBetween low high x = x >= low && x <= high
 
 addPair :: (Int,Int) -> (Int,Int) -> (Int,Int)
 addPair (a,b) (c,d) = (a+c, b+d)

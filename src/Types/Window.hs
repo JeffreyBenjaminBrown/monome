@@ -38,6 +38,9 @@ colorIfHere toMonome ws w = f where
 data Window = Window {
     windowLabel :: String
   , windowContains :: (X,Y) -> Bool
+    -- ^ PITFALL: A monome will respond to out-of-bounds (x,y) values.
+    -- Every Window therefore needs a nontrivial windowContains field,
+    -- even the background Window.
   , windowInit :: MVar State -> LedRelay -> IO ()
   , windowHandler :: MVar State
     -> LedRelay -- ^ control Leds via this, not raw `send` commands

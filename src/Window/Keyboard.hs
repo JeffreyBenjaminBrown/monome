@@ -23,7 +23,8 @@ label = "keyboard window"
 
 keyboardWindow =  Window {
   windowLabel = label
-  , windowContains = const True
+  , windowContains = \(x,y) -> let pred = numBetween 0 15
+                               in pred x && pred y 
   , windowInit = \mst toKeyboard -> do
       st <- readMVar mst
       mapM_ (drawPitchClass toKeyboard (xyShift st) LedOn) $ M.keys $ lit st
@@ -56,12 +57,11 @@ handler mst toKeyboard _ press @ (xy,sw) = do
       newKeys = S.fromList $ M.keys $ nl
       toDark = S.difference oldKeys newKeys
       toLight = S.difference newKeys oldKeys
-  putStrLn "\nlit:" >> mapM_ (putStrLn . show) (M.toList $ lit st)
-  putStrLn "\nnl:"  >> mapM_ (putStrLn . show) (M.toList nl)
+      st' = st { fingers = newFingers
+               , lit = nl }
   mapM_ (drawPitchClass toKeyboard (xyShift st) LedOff) toDark
   mapM_ (drawPitchClass toKeyboard (xyShift st) LedOn) toLight
-  putMVar mst $ st { fingers = newFingers
-                   , lit = nl }
+  putMVar mst st'
 
 newLit :: ((X,Y), Switch)
        -> PitchClass
