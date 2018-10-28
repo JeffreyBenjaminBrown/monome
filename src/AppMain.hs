@@ -43,10 +43,11 @@ et31 = do
                          , toMonome = toMonome
                          , voices = voices
                          , xyShift = (0,0)
-                         , fingers = S.empty
-                         , lit = M.singleton 2 $ S.singleton LedFromAnchor
+                         , fingers = mempty
+                         , lit = mempty
+                             -- M.singleton 2 $ S.singleton LedFromAnchor
                          , sustainOn = False
-                         , sustained = S.empty
+                         , sustained = mempty
                          }
 
   runWindowInit mst windows

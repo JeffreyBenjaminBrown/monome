@@ -1,3 +1,7 @@
+* git branch structure
+master -> ledRelay: done
+master -> enharmonicLeds -> topLeftOrigin
+  that is, before finishing enharmonicLeds, I'm taking a break to put the origin where it belongs
 * TODO next: in Keyboard.hs, find where things turn off
 so that the anchor does not
 * state

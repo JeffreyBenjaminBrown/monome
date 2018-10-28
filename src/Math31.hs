@@ -33,14 +33,14 @@ et31ToFreq f = 2**(fi f / 31)
 -- 13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,0]
 -- (notice the 0 at the end).
 xyToEt31 :: (X,Y) -> Pitch
-xyToEt31 (x,y) = ((-x) + 6 * y)
+xyToEt31 (x,y) = 6 * x + y
 
 et31ToLowXY :: PitchClass -> (X,Y)
-et31ToLowXY i = let i' = mod i 31
-  in (15 - mod i' 6, div i' 6)
+et31ToLowXY i = (div j 6, mod j 6)
+  where j = mod i 31
 
 enharmonicToXYs :: (X,Y) -> [(X,Y)]
-enharmonicToXYs (x,y) =
-  filter (\(x,y) -> numBetween x 0 15 && numBetween y 0 15)
-  $ [(x + x' * 6 + y' * (-1), y + x' * 1 + y' * 5 )
-    | x' <- [-2..2], y' <- [-3..3] ]
+enharmonicToXYs xy = map (addPair low) wideGrid
+  where low = et31ToLowXY $ xyToEt31 xy
+        wideGrid = [ (5*i - j, i + 6*j )
+                   | i <- [0..3] , j <- [-1..2] ]

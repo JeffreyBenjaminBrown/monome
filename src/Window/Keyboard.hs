@@ -56,11 +56,10 @@ handler mst toKeyboard _ press @ (xy,sw) = do
       newKeys = S.fromList $ M.keys $ nl
       toDark = S.difference oldKeys newKeys
       toLight = S.difference newKeys oldKeys
-      cheatShift = addPair (xyShift st) (-3,2) -- TODO ? Why do I need this?
   putStrLn "\nlit:" >> mapM_ (putStrLn . show) (M.toList $ lit st)
   putStrLn "\nnl:"  >> mapM_ (putStrLn . show) (M.toList nl)
-  mapM_ (drawPitchClass toKeyboard cheatShift LedOff) toDark
-  mapM_ (drawPitchClass toKeyboard cheatShift LedOn) toLight
+  mapM_ (drawPitchClass toKeyboard (xyShift st) LedOff) toDark
+  mapM_ (drawPitchClass toKeyboard (xyShift st) LedOn) toLight
   putMVar mst $ st { fingers = newFingers
                    , lit = nl }
 

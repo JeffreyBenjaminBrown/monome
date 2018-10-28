@@ -22,17 +22,23 @@ import qualified Window.Keyboard
 
 label = "shift window"
 
+rightArrow = (15,15)
+downArrow =  (14,15)
+leftArrow =  (13,15)
+upOctave =   (15,14)
+upArrow =    (14,14)
+downOctave = (13,14)
+
 shiftWindow = Window {
   windowLabel = label
-  , windowContains = \(x,y) -> numBetween x 0 1 && numBetween y 13 15
+  , windowContains = \(x,y) -> numBetween x 13 15 && numBetween y 14 15
   , windowInit = \_ toShiftWindow -> colorArrows toShiftWindow
   , windowHandler = handler
 }
 
 colorArrows :: LedRelay -> IO ()
-colorArrows toShiftWindow = mapM_ f [ (0,15),(0,14),(0,13)
-                               , (1,14) ]
-  where f = toShiftWindow . (,LedOn)
+colorArrows toShiftWindow = let f = toShiftWindow . (,LedOn)
+  in mapM_ f [ upArrow, downArrow, leftArrow, rightArrow ]
 
 handler :: MVar State -> LedRelay -> [Window] -> ((X,Y), Switch) -> IO ()
 handler    _             _           _           (_,  SwitchOff) = return ()
@@ -42,12 +48,12 @@ handler    mst           toShift     ws          (xy, SwitchOn ) = do
                       pred = (==) Window.Keyboard.label . windowLabel
       toKeyboard = colorIfHere (toMonome st) ws keyboard
       shift :: (X,Y) -> (PitchClass, (X,Y))
-      shift xy = case xy of (0,15) -> ( 6, ( 0, 1))
-                            (0,14) -> ( 1, (-1, 0))
-                            (0,13) -> (-6, ( 0, -1))
-                            (1,15) -> ( 0, ( 1, -5)) -- up octave
-                            (1,14) -> (-1, ( 1,  0))
-                            (1,13) -> ( 0, (-1, 5))  -- down octave
+      shift xy | xy == rightArrow = ( 6, ( 1, 0))
+               | xy == downArrow  = ( 1, ( 0, 1))
+               | xy == leftArrow  = (-6, (-1, 0))
+               | xy == upOctave   = ( 0, (-5,-1))
+               | xy == upArrow    = (-1, ( 0,-1))
+               | xy == downOctave = ( 0, ( 5, 1))
       (anchorShift, xyShiftShift) = shift xy
       drawPitchClass' = drawPitchClass toKeyboard $ xyShift st
   mapM_ (drawPitchClass' LedOff                 ) $ M.keys $ lit st

@@ -18,9 +18,11 @@ import Util.Network
 
 label = "sustain window"
 
+theButton = (0,15)
+
 sustainWindow = Window {
   windowLabel = label
-  , windowContains = \(x,y) -> x == 0 && y == 0
+  , windowContains = \(x,y) -> x == fst theButton && y == snd theButton
   , windowInit = \_ _ -> return ()
   , windowHandler = handler
 }
