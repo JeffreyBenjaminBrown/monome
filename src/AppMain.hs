@@ -39,7 +39,6 @@ et31 = do
   toMonome <- sendsTo (unpack localhost) 13993
   voices <- let places = [(a,b) | a <- [0..15], b <- [0..15]]
     in M.fromList . zip places <$> mapM (synth boop) (replicate 256 ())
-  let initialAnchor = 2 :: PitchClass
   mst <- newMVar $ State { inbox = inbox
                          , toMonome = toMonome
                          , voices = voices

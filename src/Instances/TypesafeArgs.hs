@@ -28,7 +28,7 @@
 
 
 module Instances.TypesafeArgs where
- 
+
 import Control.Arrow (first, second)
 import GHC.Exts
 import GHC.TypeLits

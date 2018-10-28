@@ -54,13 +54,17 @@ handler mst toKeyboard _ press @ (xy,sw) = do
         SwitchOff -> S.delete xy $ fingers st
       pitchClass = mod (xyToEt31 $ addPair xy $ negPair $ xyShift st) 31
       nl = newLit (xy,sw) pitchClass (lit st)
-  let oldKeys = S.fromList $ M.keys $ lit st
+      oldKeys = S.fromList $ M.keys $ lit st
       newKeys = S.fromList $ M.keys $ nl
       toDark = S.difference oldKeys newKeys
       toLight = S.difference newKeys oldKeys
-      cheatShift = addPair (xyShift st) (-3,2)
-  mapM_ (\td -> colorAnchors toKeyboard td cheatShift LedOff) toDark
-  mapM_ (\tl -> colorAnchors toKeyboard tl cheatShift LedOn) toLight
+      cheatShift = addPair (xyShift st) (-3,2) -- TODO ? Why do I need this?
+      colorAnchors' :: (X,Y) -> Led -> PitchClass -> IO ()
+      colorAnchors' shift led pc = colorAnchors toKeyboard pc shift led
+  putStrLn "\nlit:" >> mapM_ (putStrLn . show) (M.toList $ lit st)
+  putStrLn "\nnl:"  >> mapM_ (putStrLn . show) (M.toList nl)
+  mapM_ (colorAnchors' cheatShift LedOff) toDark
+  mapM_ (colorAnchors' cheatShift LedOn) toLight
   putMVar mst $ st { fingers = newFingers
                    , lit = nl }
 

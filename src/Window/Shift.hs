@@ -42,7 +42,7 @@ handler    mst           toShift     ws          (xy, SwitchOn ) = do
                       pred = (==) Window.Keyboard.label . windowLabel
       toKeyboard = colorIfHere (toMonome st) ws keyboard
       shift :: (X,Y) -> (PitchClass, (X,Y))
-      shift xy = case xy of (0,15) -> ( 6, ( 0, 1)) 
+      shift xy = case xy of (0,15) -> ( 6, ( 0, 1))
                             (0,14) -> ( 1, (-1, 0))
                             (0,13) -> (-6, ( 0, -1))
                             (1,15) -> ( 0, ( 1, -5)) -- up octave
@@ -53,6 +53,4 @@ handler    mst           toShift     ws          (xy, SwitchOn ) = do
           colorAnchors toKeyboard pitchClass (xyShift st) led
   mapM_ (colorAnchors' LedOff)                  $ M.keys $ lit st
   mapM_ (colorAnchors' LedOn . (+) anchorShift) $ M.keys $ lit st
-  --colorAnchors' toKeyboard (anchor st              ) (xyShift st) LedOff
-  --colorAnchors' toKeyboard (anchor st + anchorShift) (xyShift st) LedOn
   putMVar mst $ st { xyShift = addPair (xyShift st) xyShiftShift }
