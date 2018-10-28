@@ -1,3 +1,5 @@
+* TODO next: in Keyboard.hs, find where things turn off
+so that the anchor does not
 * state
 ** which buttons are down
 ** which lights are on

@@ -52,13 +52,13 @@ handler mst toKeyboard _ press @ (xy,sw) = do
   let newFingers = case sw of
         SwitchOn -> S.insert xy $ fingers st
         SwitchOff -> S.delete xy $ fingers st
-      pitchClass = mod (xyToEt31 $ xy - xyShift st) 31
+      pitchClass = mod (xyToEt31 $ addPair xy $ negPair $ xyShift st) 31
       nl = newLit (xy,sw) pitchClass (lit st)
   let oldKeys = S.fromList $ M.keys $ lit st
       newKeys = S.fromList $ M.keys $ nl
       toDark = S.difference oldKeys newKeys
       toLight = S.difference newKeys oldKeys
-      cheatShift = xyShift st - (2,3) -- TODO ? Why do I need this?
+      cheatShift = addPair (xyShift st) (-3,2)
   mapM_ (\td -> colorAnchors toKeyboard td cheatShift LedOff) toDark
   mapM_ (\tl -> colorAnchors toKeyboard tl cheatShift LedOn) toLight
   putMVar mst $ st { fingers = newFingers

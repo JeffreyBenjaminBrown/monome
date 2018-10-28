@@ -9,7 +9,6 @@ module Window.Shift (
 import Control.Concurrent.MVar
 import qualified Data.List as L
 import qualified Data.Map as M
-import Data.NumInstances
 
 import Math31
 import Types.Window
@@ -56,4 +55,4 @@ handler    mst           toShift     ws          (xy, SwitchOn ) = do
   mapM_ (colorAnchors' LedOn . (+) anchorShift) $ M.keys $ lit st
   --colorAnchors' toKeyboard (anchor st              ) (xyShift st) LedOff
   --colorAnchors' toKeyboard (anchor st + anchorShift) (xyShift st) LedOn
-  putMVar mst $ st { xyShift = xyShift st + xyShiftShift }
+  putMVar mst $ st { xyShift = addPair (xyShift st) xyShiftShift }
