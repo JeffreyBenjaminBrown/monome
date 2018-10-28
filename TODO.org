@@ -10,8 +10,8 @@
 
 Some things to maybe track:
   The keys under your fingers
-  Which pitch classes to light up
-  Which keys are responsible for a lit pitch class
+  Which keys are responsible for each lit pitch class
+    => which pitch class is lit up
 
 When to do things
   Press a button
@@ -51,7 +51,6 @@ The sustain that's programmed so far sustains only things under your fingers whe
 *** redraw entire grid
 *** restore shift to 1
 to remove floating point error
-* bug : excessive shift makes the leds weird
 * separate projects
 ** separate Vivid.Jbb from Vivid
  this will make starting the repl faster
