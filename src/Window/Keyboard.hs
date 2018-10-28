@@ -6,8 +6,8 @@ module Window.Keyboard (
   ) where
 
 import Control.Concurrent.MVar
-import Data.Set as S
-import Data.Map as M
+import qualified Data.Set as S
+import qualified Data.Map as M
 import Vivid
 
 import Synth
@@ -51,23 +51,29 @@ handler mst toKeyboard _ press @ (xy,sw) = do
         SwitchOn -> S.insert xy $ fingers st
         SwitchOff -> S.delete xy $ fingers st
       pitchClass = mod (xyToEt31 $ xy - xyShift st) 31
-  nl <- newLit (xy,sw) pitchClass (lit st)
+      nl = newLit (xy,sw) pitchClass (lit st)
+  let oldKeys = S.fromList $ M.keys $ lit st
+      newKeys = S.fromList $ M.keys $ nl
+      toDark = S.difference oldKeys newKeys
+      toLight = S.difference newKeys oldKeys
+      cheatShift = xyShift st - (2,3) -- TODO ? Why do I need this?
+  mapM_ (\td -> colorAnchors toKeyboard td cheatShift LedOff) toDark
+  mapM_ (\tl -> colorAnchors toKeyboard tl cheatShift LedOn) toLight
   putMVar mst $ st { fingers = newFingers
                    , lit = nl }
 
 newLit :: ((X,Y), Switch)
        -> PitchClass
-       ->     M.Map PitchClass (Set (X,Y))
-       -> IO (M.Map PitchClass (Set (X,Y)))
+       -> M.Map PitchClass (S.Set (X,Y))
+       -> M.Map PitchClass (S.Set (X,Y))
 newLit (xy,SwitchOn) pitchClass m
   | M.lookup pitchClass m == Nothing =
-      return $ M.insert pitchClass (S.singleton xy) m
+      M.insert pitchClass (S.singleton xy) m
   | Just reasons <- M.lookup pitchClass m =
-      return $ M.insert pitchClass (S.insert xy reasons) m
+      M.insert pitchClass (S.insert xy reasons) m
 newLit (xy,SwitchOff) pitchClass m
-  | M.lookup pitchClass m == Nothing = return m -- should not happen
+  | M.lookup pitchClass m == Nothing = m -- should not happen
   | Just reasons <- M.lookup pitchClass m =
-      return $ case S.size reasons of
-                 0 -> M.delete pitchClass m -- should not happen
-                 1 -> M.delete pitchClass m
-                 _ -> M.insert pitchClass (S.delete xy reasons) m
+      case S.size reasons < 2 of -- size < 1 should not happen
+        True -> M.delete pitchClass m
+        False -> M.insert pitchClass (S.delete xy reasons) m

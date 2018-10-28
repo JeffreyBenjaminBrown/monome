@@ -63,3 +63,4 @@ Monome
 *** use symlinks between them as needed
 e.g. from Monome to Synths
 * bug: the relation from anchor to xy-space is not the relation from xy-space to pitchClass.
+** cheatShift = xyShift st - 15 -- TODO ? Why do I need this?
