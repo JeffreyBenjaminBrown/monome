@@ -81,6 +81,7 @@ newLit (xy,SwitchOn) pcNow _ m
 newLit (xy,SwitchOff) _ mpcThen m
   | mpcThen == Nothing = m
   | Just pc <- mpcThen = let Just reasons = M.lookup pc m
+      -- TODO (#safety) Check that that's really what's being deleted.
       in case S.size reasons < 2 of -- size < 1 should not happen
         True -> M.delete pc m
-        False -> M.insert pc (S.delete  (LedFromSwitch xy) reasons) m
+        False -> M.insert pc (S.delete (LedFromSwitch xy) reasons) m

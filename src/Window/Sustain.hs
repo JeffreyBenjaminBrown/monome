@@ -31,14 +31,6 @@ sustainWindow = Window {
   , windowHandler = handler
 }
 
--- TODO (#feature) : erase (remove from 'lit', redraw keyboard) when it stops
--- TODO (#feature) "draw" (add to 'lit') a chord when it beccomes sustained
--- drawChord :: Set (X,Y)
---           -> Switch -- ^ the latest state of `sustained`
---           -> M.Map PitchClass LedReason
---           -> M.Map PitchClass LedReason
--- drawChord fingers SwitchOff = id
-
 insertOneSustainedNote :: ((X,Y), PitchClass)
                        -> M.Map PitchClass (S.Set LedReason)
                        -> M.Map PitchClass (S.Set LedReason)
@@ -47,6 +39,17 @@ insertOneSustainedNote (xy, pc) m
       M.insert pc (S.singleton $ LedFromSustain xy) m
   | Just reasons <- M.lookup pc m =
       M.insert pc (S.insert (LedFromSustain xy) reasons) m
+
+deleteOneSustainedNote :: ((X,Y), PitchClass)
+                       -> M.Map PitchClass (S.Set LedReason)
+                       -> M.Map PitchClass (S.Set LedReason)
+deleteOneSustainedNote (xy, pc) m
+  | M.lookup pc m == Nothing = m -- should not happen
+  | Just reasons <- M.lookup pc m =
+      -- TODO (#safety) Check that that's really what's being deleted.
+      case S.size reasons < 2 of -- size < 1 should not happen
+        True -> M.delete pc m
+        False -> M.insert pc (S.delete (LedFromSustain xy) reasons) m
 
 handler :: MVar State -> LedRelay -> [Window] -> ((X,Y), Switch) -> IO ()
 handler _   _  _ (_ , SwitchOff) = return ()
@@ -69,10 +72,10 @@ handler mst toSustainWindow _ (xy, SwitchOn ) = do
     True -> do
       drawSustainWindow LedOn
 
-  let lit'
-        | sustainOn' =
-          foldr insertOneSustainedNote (lit st) $ M.toList $ fingers st
-        | not sustainOn' = lit st
+  let lit' | sustainOn' =
+             foldr insertOneSustainedNote (lit st) $ M.toList $ fingers st
+           | not sustainOn' =
+             foldr deleteOneSustainedNote (lit st) $ S.toList $ sustained st
       st' = st { sustainOn = sustainOn'
                , sustained = sustained'
                , lit       = lit'      }
