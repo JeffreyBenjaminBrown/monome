@@ -2,7 +2,7 @@
 master -> ledRelay: done
 master -> enharmonicLeds -> topLeftOrigin
   that is, before finishing enharmonicLeds, I'm taking a break to put the origin where it belongs
-* TODO interrupting: keep reverse maps
+* TODO interrupting : fix the typef of `voices` and `sustained`
 voices should be dynamic
   if they are indexed instead by (X,Y), then the meaning of "sustained"
   becomes muddy

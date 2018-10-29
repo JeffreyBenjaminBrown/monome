@@ -45,7 +45,7 @@ handler mst toSustainWindow _ (xy, SwitchOn ) = do
   st <- takeMVar mst -- PITFALL: old state, opposite value of `sustainOn`
   let sustainWasOn = sustainOn st
       sustained' = if sustainWasOn then S.empty
-                   else S.fromList $ M.keys $ fingers st
+                   else S.fromList $ M.toList $ fingers st
 
   -- redraw the sustain window, silence anything that needs it
   let drawSustainWindow = curry toSustainWindow xy
@@ -54,7 +54,8 @@ handler mst toSustainWindow _ (xy, SwitchOn ) = do
       let quiet xy = set ((M.!) (voices st) xy) (0 :: I "amp")
       drawSustainWindow LedOff
       mapM_ quiet $
-        S.difference (sustained st) $ S.fromList $ M.keys $ fingers st
+        S.difference (S.map fst $ sustained st)
+                     (S.fromList $ M.keys $ fingers st)
     False -> drawSustainWindow LedOn >> return ()
 
   let st' = st { sustainOn = not sustainWasOn

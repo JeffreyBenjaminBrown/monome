@@ -33,7 +33,7 @@ keyboardWindow =  Window {
 soundKey :: State -> ((X,Y), Switch) -> IO ()
 soundKey st (xy, sw) = do
   let pitchClass = xyToEt31 xy - xyToEt31 (xyShift st)
-  case S.member xy $ sustained st of
+  case S.member xy $ S.map fst $ sustained st of
     True -> return ()
     False ->
       let freq = 100 * et31ToFreq pitchClass

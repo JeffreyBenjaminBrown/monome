@@ -19,7 +19,8 @@ data State = State {
   , fingers :: M.Map (X,Y) PitchClass
   , lit :: M.Map PitchClass (S.Set LedReason)
   , sustainOn :: Bool
-  , sustained :: S.Set (X,Y) -- ^ PITFALL: Conceptually, the thing sustained
-    -- is a PitchClass, but in practice it's a voice, which is indexed
-    -- via the key that originally launched it.
+  , sustained :: S.Set ((X,Y), PitchClass)
+    -- ^ PITFALL: Conceptually, the thing sustained is a PitchClass,
+    -- in practice it's a voice, which is indexed via the key that
+    -- originally launched it.
   } deriving (Show, Eq)
