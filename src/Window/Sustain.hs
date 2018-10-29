@@ -31,9 +31,13 @@ sustainWindow = Window {
   , windowHandler = handler
 }
 
---newLit :: Set (X,Y) -> Switch -> M.Map PitchClass LedReason
---                              -> M.Map PitchClass LedReason
---xnewLit _ SwitchOff = id
+-- TODO (#feature) : erase (remove from 'lit', redraw keyboard) when it stops
+-- TODO (#feature) "draw" (add to 'lit') a chord when it beccomes sustained
+-- drawChord :: Set (X,Y)
+--           -> Switch -- ^ the latest state of `sustained`
+--           -> M.Map PitchClass LedReason
+--           -> M.Map PitchClass LedReason
+-- drawChord fingers SwitchOff = id
 
 handler :: MVar State -> LedRelay -> [Window] -> ((X,Y), Switch) -> IO ()
 handler _   _  _ (_ , SwitchOff) = return ()
@@ -42,14 +46,14 @@ handler mst toSustainWindow _ (xy, SwitchOn ) = do
   let sustained' = if sustainOn st then S.empty else fingers st
 
   -- redraw the sustain window
-  let draw = flip $ curry toSustainWindow
+  let drawSustainWindow = curry toSustainWindow xy
   case sustainOn st of
     True -> do -- Sustain is off now. Free some voices, dark the led.
       let sy xy = (M.!) (voices st) xy
           quiet xy = set (sy xy) (0 :: I "amp")
-      draw LedOff xy
+      drawSustainWindow LedOff
       mapM_ quiet $ S.difference (sustained st) (fingers st)
-    False -> draw LedOn xy >> return ()
+    False -> drawSustainWindow LedOn >> return ()
 
   let st' = st { sustainOn = not $ sustainOn st
                , sustained = sustained'

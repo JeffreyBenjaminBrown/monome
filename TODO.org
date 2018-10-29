@@ -2,6 +2,10 @@
 master -> ledRelay: done
 master -> enharmonicLeds -> topLeftOrigin
   that is, before finishing enharmonicLeds, I'm taking a break to put the origin where it belongs
+* TODO interrupting: keep reverse maps
+fingers should be a map from (X,Y) to PitchClass
+sustained should be a set of Pitches, not (X,Y)
+dependentPitchClass should not exist
 * TODO ongoing : redraw everything upon shift
 There is a bad interaction between the keyboard and shift.
 If I play a chord, shift the board, then release the chord, the LEDs stay lit. They move appropriately during the shift, though.
