@@ -6,9 +6,9 @@ module Window.Sustain (
   ) where
 
 import Control.Concurrent.MVar
-import Data.List as L
-import Data.Map as M
-import Data.Set as S
+import qualified Data.List as L
+import qualified Data.Map as M
+import qualified Data.Set as S
 import Vivid
 
 import Math31
@@ -39,6 +39,15 @@ sustainWindow = Window {
 --           -> M.Map PitchClass LedReason
 -- drawChord fingers SwitchOff = id
 
+insertOneSustainedNote :: ((X,Y), PitchClass)
+                       -> M.Map PitchClass (S.Set LedReason)
+                       -> M.Map PitchClass (S.Set LedReason)
+insertOneSustainedNote (xy, pc) m
+  | M.lookup pc m == Nothing =
+      M.insert pc (S.singleton $ LedFromSustain xy) m
+  | Just reasons <- M.lookup pc m =
+      M.insert pc (S.insert (LedFromSustain xy) reasons) m
+
 handler :: MVar State -> LedRelay -> [Window] -> ((X,Y), Switch) -> IO ()
 handler _   _  _ (_ , SwitchOff) = return ()
 handler mst toSustainWindow _ (xy, SwitchOn ) = do
@@ -52,13 +61,20 @@ handler mst toSustainWindow _ (xy, SwitchOn ) = do
   case sustainOn' of
     False -> do -- Sustain is off now. Free some voices, dark the led.
       let quiet xy = set ((M.!) (voices st) xy) (0 :: I "amp")
+          sustainedAndNotFingered = S.difference (S.map fst $ sustained st)
+                                    (S.fromList $ M.keys $ fingers st)
       drawSustainWindow LedOff
-      mapM_ quiet $
-        S.difference (S.map fst $ sustained st)
-                     (S.fromList $ M.keys $ fingers st)
-    True -> drawSustainWindow LedOn >> return ()
+      mapM_ quiet $ sustainedAndNotFingered
 
-  let st' = st { sustainOn = sustainOn'
-               , sustained = sustained' }
+    True -> do
+      drawSustainWindow LedOn
+
+  let lit'
+        | sustainOn' =
+          foldr insertOneSustainedNote (lit st) $ M.toList $ fingers st
+        | not sustainOn' = lit st
+      st' = st { sustainOn = sustainOn'
+               , sustained = sustained'
+               , lit       = lit'      }
 
   putMVar mst st'
