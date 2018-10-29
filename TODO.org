@@ -3,7 +3,9 @@ master -> ledRelay: done
 master -> enharmonicLeds -> topLeftOrigin
   that is, before finishing enharmonicLeds, I'm taking a break to put the origin where it belongs
 * TODO interrupting: keep reverse maps
-fingers should be a map from (X,Y) to PitchClass
+voices should be dynamic
+  if they are indexed instead by (X,Y), then the meaning of "sustained"
+  becomes muddy
 sustained should be a set of Pitches, not (X,Y)
 dependentPitchClass should not exist
 * TODO ongoing : redraw everything upon shift

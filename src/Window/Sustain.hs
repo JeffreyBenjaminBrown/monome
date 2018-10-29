@@ -47,12 +47,11 @@ handler mst toSustainWindow _ (xy, SwitchOn ) = do
       sustained' = if sustainWasOn then S.empty
                    else S.fromList $ M.keys $ fingers st
 
-  -- redraw the sustain window
+  -- redraw the sustain window, silence anything that needs it
   let drawSustainWindow = curry toSustainWindow xy
   case sustainWasOn of
     True -> do -- Sustain is off now. Free some voices, dark the led.
-      let sy xy = (M.!) (voices st) xy
-          quiet xy = set (sy xy) (0 :: I "amp")
+      let quiet xy = set ((M.!) (voices st) xy) (0 :: I "amp")
       drawSustainWindow LedOff
       mapM_ quiet $
         S.difference (sustained st) $ S.fromList $ M.keys $ fingers st

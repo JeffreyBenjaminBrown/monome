@@ -31,14 +31,15 @@ keyboardWindow =  Window {
   , windowHandler = handler }
 
 soundKey :: State -> ((X,Y), Switch) -> IO ()
-soundKey st (xy, sw)
-  | S.member xy (sustained st) = return ()
-  | otherwise =
-    let freq = 100 * (et31ToFreq
-                      $ xyToEt31 xy - xyToEt31 (xyShift st))
-        voice = (M.!) (voices st) xy
-    in set voice ( toI freq                         :: I "freq"
-                 , toI $ 0.15 * fi (switchToInt sw) :: I "amp" )
+soundKey st (xy, sw) = do
+  let pitchClass = xyToEt31 xy - xyToEt31 (xyShift st)
+  case S.member xy $ sustained st of
+    True -> return ()
+    False ->
+      let freq = 100 * et31ToFreq pitchClass
+          voice = (M.!) (voices st) xy
+      in set voice ( toI freq                         :: I "freq"
+                   , toI $ 0.15 * fi (switchToInt sw) :: I "amp" )
 
 handler :: MVar State
         -> LedRelay
@@ -61,7 +62,7 @@ handler mst toKeyboard _ press @ (xy,sw) = do
       newKeys = S.fromList $ M.keys $ nl
       toDark = S.difference oldKeys newKeys
       toLight = S.difference newKeys oldKeys
-  putStrLn . show $ fingers'
+  -- putStrLn . show $ fingers' -- handy spot to print
   mapM_ (drawPitchClass toKeyboard (xyShift st) LedOff) toDark
   mapM_ (drawPitchClass toKeyboard (xyShift st) LedOn) toLight
   putMVar mst $ st { fingers = fingers'
