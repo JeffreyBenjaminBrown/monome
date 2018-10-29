@@ -48,21 +48,23 @@ handler :: MVar State
 handler mst toKeyboard _ press @ (xy,sw) = do
   st <- takeMVar mst
   soundKey st press
-  let newFingers = case sw of
-        SwitchOn -> S.insert xy $ fingers st
-        SwitchOff -> S.delete xy $ fingers st
+  let
       pitchClassNow = mod (xyToEt31 $ addPair xy $ negPair $ xyShift st) 31
         -- what that key represents currently.
-      pitchClassBefore = dependentPitchClass (lit st) $ LedFromSwitch xy
+      pitchClassThen = dependentPitchClass (lit st) $ LedFromSwitch xy
         -- pitches that key lit up in the past
-      nl = newLit (xy,sw) pitchClassNow pitchClassBefore $ lit st
+      fingers' = case sw of
+        SwitchOn -> M.insert xy pitchClassNow $ fingers st
+        SwitchOff -> M.delete xy $ fingers st
+      nl = newLit (xy,sw) pitchClassNow pitchClassThen $ lit st
       oldKeys = S.fromList $ M.keys $ lit st
       newKeys = S.fromList $ M.keys $ nl
       toDark = S.difference oldKeys newKeys
       toLight = S.difference newKeys oldKeys
+  putStrLn . show $ fingers'
   mapM_ (drawPitchClass toKeyboard (xyShift st) LedOff) toDark
   mapM_ (drawPitchClass toKeyboard (xyShift st) LedOn) toLight
-  putMVar mst $ st { fingers = newFingers
+  putMVar mst $ st { fingers = fingers'
                    , lit = nl }
 
 newLit :: ((X,Y), Switch)

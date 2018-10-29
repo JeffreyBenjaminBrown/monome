@@ -16,7 +16,7 @@ data State = State {
   , toMonome :: Socket -- ^ PITFALL : some function arguments share this name
   , voices :: M.Map (X,Y) (Synth BoopParams)
   , xyShift :: (X,Y) -- ^ this is relative -- a vector, not a point
-  , fingers :: S.Set (X,Y)
+  , fingers :: M.Map (X,Y) PitchClass
   , lit :: M.Map PitchClass (S.Set LedReason)
   , sustainOn :: Bool
   , sustained :: S.Set (X,Y)

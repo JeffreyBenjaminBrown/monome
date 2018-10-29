@@ -43,19 +43,22 @@ handler :: MVar State -> LedRelay -> [Window] -> ((X,Y), Switch) -> IO ()
 handler _   _  _ (_ , SwitchOff) = return ()
 handler mst toSustainWindow _ (xy, SwitchOn ) = do
   st <- takeMVar mst -- PITFALL: old state, opposite value of `sustainOn`
-  let sustained' = if sustainOn st then S.empty else fingers st
+  let sustainWasOn = sustainOn st
+      sustained' = if sustainWasOn then S.empty
+                   else S.fromList $ M.keys $ fingers st
 
   -- redraw the sustain window
   let drawSustainWindow = curry toSustainWindow xy
-  case sustainOn st of
+  case sustainWasOn of
     True -> do -- Sustain is off now. Free some voices, dark the led.
       let sy xy = (M.!) (voices st) xy
           quiet xy = set (sy xy) (0 :: I "amp")
       drawSustainWindow LedOff
-      mapM_ quiet $ S.difference (sustained st) (fingers st)
+      mapM_ quiet $
+        S.difference (sustained st) $ S.fromList $ M.keys $ fingers st
     False -> drawSustainWindow LedOn >> return ()
 
-  let st' = st { sustainOn = not $ sustainOn st
+  let st' = st { sustainOn = not sustainWasOn
                , sustained = sustained'
                }
 
