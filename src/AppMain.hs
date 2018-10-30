@@ -34,21 +34,23 @@ import Window.Sustain
 -- Key presses are handled by the first window containing them.
 windows = [sustainWindow, shiftWindow, keyboardWindow]
 
-et31 :: IO State
-et31 = do
+et31 :: Maybe PitchClass -> IO State
+et31 mbAnchor = do
   inbox <- receivesAt "127.0.0.1" 11111
   toMonome <- sendsTo (unpack localhost) 13993
   voices <- let places = [(a,b) | a <- [0..15], b <- [0..15]]
     in M.fromList . zip places <$> mapM (synth boop) (replicate 256 ())
-  mst <- newMVar $ State { inbox = inbox
-                         , toMonome = toMonome
-                         , voices = voices
-                         , xyShift = (0,0)
-                         , fingers = mempty
-                         , lit = M.singleton 2 $ S.singleton LedFromAnchor
-                         , sustainOn = False
-                         , sustained = mempty
-                         }
+  mst <- newMVar $ State {
+    inbox = inbox
+    , toMonome = toMonome
+    , voices = voices
+    , xyShift = (0,0)
+    , fingers = mempty
+    , lit = let f anchor = M.singleton anchor $ S.singleton LedFromAnchor
+            in maybe mempty f mbAnchor
+    , sustainOn = False
+    , sustained = mempty
+    }
 
   runWindowInit mst windows
 
