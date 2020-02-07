@@ -26,6 +26,7 @@ library
   exposed-modules:
                   AppMain
                 , Device
+                , HandTest
                 , Instances
                 , Mailbox
                 , Math31

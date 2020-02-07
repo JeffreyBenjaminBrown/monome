@@ -18,9 +18,9 @@ import Util.Network
 -- Also accumulates a list of OSC messages.
 -- Useful when running `requestDeviceList` or `requestDeviceInfo`
 -- from another repl.
-mailbox :: IO [OSC]
-mailbox = do
-  s <- receivesAt "127.0.0.1" 11111
+mailbox :: Int -> IO [OSC]
+mailbox port = do
+  s <- receivesAt "127.0.0.1" port
   acc <- newMVar []
   let loop :: IO [OSC]
       loop = getChar >>= \case 'q' -> close s >> readMVar acc >>= return

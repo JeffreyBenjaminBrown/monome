@@ -1,10 +1,19 @@
+* TODO rename mailbox -> listenAndEcho
+* Montevideo - Monome Tidal Vivid
+** Things to represent on the monome
+synth param
+rhythm
+chord
+melody
+* ? sustain to middle of bottom, and duplicate at both top corners
+so that usually something can touch it
 * TODO redraw keyboard upon releasing sustain
 => make a function to draw the whole keyboard
 * TODO dependentPitchClass should not exist
 * TODO sustain: two buttons, "add these" and "release all"
 "add these" stays in effect until it is released.
 "release all" works as soon as it's touched; holding on it does nothing.
-* TODO interrupting branch : fix the typef of `voices` and `sustained`
+* TODO interrupting branch : fix the type of `voices` and `sustained`
 voices should be dynamic
   if they are indexed instead by (X,Y), then the meaning of "sustained"
   becomes muddy

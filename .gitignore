@@ -6,3 +6,5 @@ python/aiosc/
 hosc/
 serialosc.html
 git-comment.txt
+handy.txt
+.emacs.desktop*

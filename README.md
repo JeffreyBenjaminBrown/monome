@@ -32,12 +32,14 @@ From that REPL, run `et31`. The monome should light up, and start responding to 
 
 Someday maybe this will be automatic but it's easy enough to do by hand for now; it only requires a little human reading of the [serialosc protocol](https://monome.org/docs/osc/), which fortunately is very human-readable.
 
-From the `monome/` folder, start a REPL as before, by running `stack ghci`. In that REPL, run the command `mailbox`. This will listen for OSC messages, at port 11111.
+The OSC communcation occurs over "ports", all of them on "localhost" (127.0.0.1). [Serialosc](https://github.com/monome/serialosc), the software that communicates between the monome and other stuff, sends on address 12002. (There mimght be a way to change that if you need to; you could ask those guys.)
+
+From the `monome/` folder, start a REPL as before, by running `stack ghci`. In that REPL, run the command `mailbox 8000`. This will listen for OSC messages, at port 8000. (You could use another value instead of 8000 if you want.)
 
 Start a second REPL, and run this:
 ```
 toSerialosc <- sendsTo (unpack localhost) 12002
-send toSerialosc $ requestDeviceList 11111
+send toSerialosc $ requestDeviceList 8000
 ```
 
 The mailbox in the first REPL should now show something like this:
@@ -50,7 +52,7 @@ find src/ -type f -print0 | xargs -0 sed -i "s/13993/55555/g"
 
 (This causes the code to send to port 55555. An alternative solution would be to tell the monome to listen to port 13993; if you want to do that, the serialosc protocol describes how. Similar alternatives are available to the rest of this section.)
 
-Next we have to find out what prefix your monome is listening to. (I don't know why; maybe two monomes can be listening on the same port?) To do that, go to the second REPL (the one that's not running the mailbox), and run these two commands:
+Next, after replacing that text, we have to find out what prefix your monome is listening to. (I don't know why; maybe two monomes can be listening on the same port?) To do that, go to the second REPL (the one that's not running the mailbox), and run these two commands:
 ```
 toMonome <- sendsTo (unpack localhost) 13993
 send toMonome $ requestDeviceInfo 11111
