@@ -9,7 +9,6 @@ import qualified Data.Set as S
 import Monome.Math31
 import Monome.Types.Button
 import Monome.Types.Window
-import Monome.Types.State
 import Monome.Util.Byte
 
 

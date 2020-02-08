@@ -1,13 +1,7 @@
 module Monome.Types.Window where
 
-import qualified Data.Map as M
-import qualified Data.Set as S
-
 import Control.Concurrent.MVar
-import Vivid
 
-import Monome.Synth
-import Monome.Math31
 import Monome.Types.Button
 import Monome.Types.State
 import Monome.Util.Network
@@ -26,13 +20,14 @@ belongsHere allWindows w = f where
   obscured :: (X,Y) -> Bool
   obscured xy = or $ map ($ xy) $ map windowContains obscurers
   f :: ((X,Y), Led) -> Bool
-  f (xy,_) = not (obscured xy) && windowContains w xy
+  f (btn,_) = not (obscured btn) && windowContains w btn
 
-relayIfHere :: Socket -> [Window] -> Window -> LedRelay
-relayIfHere toMonome ws w = f where
+relayIfHere :: Socket -- ^ probably to the monome
+            -> [Window] -> Window -> LedRelay
+relayIfHere dest ws w = f where
   f :: ((X,Y),Led) -> IO ()
   f msg = if belongsHere ws w msg
-    then (send toMonome $ ledOsc "/monome" msg) >> return ()
+    then (send dest $ ledOsc "/monome" msg) >> return ()
     else return ()
 
 data Window = Window {
@@ -61,16 +56,16 @@ runWindowInit mst allWindows = do
   mapM_ (\w -> windowInit w mst $ toWindow w) allWindows
 
 handleSwitch :: [Window] -> MVar State -> ((X,Y), Switch) -> IO ()
-handleSwitch               allWindows mst (xy,sw) =
-  handleSwitch' allWindows allWindows mst (xy,sw) where
+handleSwitch               allWindows mst (btn0,sw) =
+  handleSwitch' allWindows allWindows mst (btn0,sw) where
   -- `handleSwitch'` keeps the complete list of windows in its first arg,
   -- while iteratively discarding the head of its second.
   handleSwitch' :: [Window] -> [Window] -> MVar State
                 -> ((X, Y), Switch) -> IO ()
   handleSwitch' allWindows []         _   _           = return ()
-  handleSwitch' allWindows (w:ws)     mst sw @ (xy,_) = do
+  handleSwitch' allWindows (w:ws)     mst sw @ (btn,_) = do
     st <- readMVar mst
-    case windowContains w xy of
+    case windowContains w btn of
       True -> let ledRelay = relayIfHere (toMonome st) allWindows w
               in windowHandler w mst ledRelay allWindows sw
       False -> handleSwitch' allWindows ws mst sw

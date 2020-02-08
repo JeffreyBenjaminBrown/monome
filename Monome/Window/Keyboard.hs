@@ -10,7 +10,6 @@ import qualified Data.Map as M
 import qualified Data.Set as S
 import Vivid
 
-import Monome.Synth
 import Monome.Types.Window
 import Monome.Types.Button
 import Monome.Types.State

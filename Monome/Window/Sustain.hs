@@ -6,7 +6,6 @@ module Monome.Window.Sustain (
   ) where
 
 import Control.Concurrent.MVar
-import qualified Data.List as L
 import qualified Data.Map as M
 import qualified Data.Set as S
 import Vivid
@@ -15,9 +14,6 @@ import Monome.Math31
 import Monome.Types.Window
 import Monome.Types.Button
 import Monome.Types.State
-import Monome.Util.Network
-import Monome.Window.Common
-import qualified Monome.Window.Keyboard
 
 
 label = "sustain window"

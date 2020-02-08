@@ -11,9 +11,6 @@ module Monome.Math31 (
   , enharmonicToXYs
   ) where
 
-import Vivid
-
-import Monome.Synth
 import Monome.Types.Button
 import Monome.Util.Byte
 
@@ -40,7 +37,7 @@ et31ToLowXY i = (div j 6, mod j 6)
   where j = mod i 31
 
 enharmonicToXYs :: (X,Y) -> [(X,Y)]
-enharmonicToXYs xy = map (addPair low) wideGrid
-  where low = et31ToLowXY $ xyToEt31 xy
+enharmonicToXYs btn = map (addPair low) wideGrid
+  where low = et31ToLowXY $ xyToEt31 btn
         wideGrid = [ (5*i - j, i + 6*j )
                    | i <- [0..3] , j <- [-1..2] ]

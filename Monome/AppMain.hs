@@ -11,7 +11,6 @@ module Monome.AppMain (
 
 import Control.Concurrent (forkIO, killThread)
 import Control.Concurrent.MVar
-import Control.Monad (forever)
 import qualified Data.Map as M
 import qualified Data.Set as S
 import Vivid

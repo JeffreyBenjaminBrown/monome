@@ -25,7 +25,7 @@ readDeviceID ( OSC "/serialosc/device" [ OSC_S name
   = DeviceID { deviceIDName = name
              , deviceIDType = monomeType
              , deviceIDPort = fromIntegral port }
-
+readDeviceID x = error $ "readDeviceID: unexpected message: " ++ show x
 
 -- | A monome (distinct form serialosc!) responds to /sys/info messages
 -- with this information.
@@ -54,13 +54,26 @@ readDevice [a,b,c,d,e,f] = Device {
   where
     readDeviceName :: OSC -> String
     readDeviceName (OSC "/sys/id" [OSC_S name]) = unpack name
+    readDeviceName x = error $ "readDeviceName: can't interpret " ++ show x
+
     readDeviceSize :: OSC -> (X,Y)
     readDeviceSize (OSC "/sys/size" [OSC_I x, OSC_I y]) = (fi x, fi y)
+    readDeviceSize x = error $ "readDeviceSize: can't interpret " ++ show x
+
     readDeviceHost :: OSC -> HostName
     readDeviceHost (OSC "/sys/host" [OSC_S name]) = unpack name
+    readDeviceHost x = error $ "readDeviceHost: can't interpret " ++ show x
+
     readDevicePort :: OSC -> Int
     readDevicePort (OSC "/sys/port" [OSC_I port]) = fi port
+    readDevicePort x = error $ "readDevicePort: can't interpret " ++ show x
+
     readDevicePrefix :: OSC -> String
     readDevicePrefix (OSC "/sys/prefix" [OSC_S prefix]) = unpack prefix
+    readDevicePrefix x =
+      error $ "readDevicePrefix: can't interpret " ++ show x
+
     readDeviceRotation :: OSC -> Int
     readDeviceRotation (OSC "/sys/rotation" [OSC_I rotation]) = fi rotation
+    readDeviceRotation x =
+      error $ "readDeviceRotation: can't interpret " ++ show x

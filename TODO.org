@@ -1,3 +1,4 @@
+* TODO eliminate ghci warnings from -Wall
 * TODO rename mailbox -> listenAndEcho
 * Montevideo - Monome Tidal Vivid
 ** Things to represent on the monome

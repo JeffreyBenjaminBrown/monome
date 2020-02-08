@@ -11,7 +11,6 @@ module Monome.Types.Button (
 import Vivid.OSC
 
 import Monome.Util.Byte
-import Monome.Util.Network (HostName)
 import Monome.OSCMessage
 
 
@@ -30,11 +29,13 @@ switchToInt SwitchOff = 0
 switchFromInt :: Int -> Switch
 switchFromInt 0 = SwitchOff
 switchFromInt 1 = SwitchOn
+switchFromInt x = error $ "switchFromInt: " ++ show x
+                  ++ " is niether 0 nor 1."
 
 readSwitchOSC :: OSC -> ((X,Y), Switch)
 readSwitchOSC (OSC "/monome/grid/key" [OSC_I x, OSC_I y, OSC_I s]) =
   ((fi x, fi y), switchFromInt $ fi s)
-
+readSwitchOSC x = error $ "readSwitchOSC: bad message: " ++ show x
 
 -- | The state of a monome LED
 data Led = LedOn | LedOff
@@ -47,6 +48,7 @@ ledToInt LedOn = 1
 ledFromInt :: Int -> Led
 ledFromInt 0 = LedOff
 ledFromInt 1 = LedOn
+ledFromInt x = error $ "ledFromInt: " ++ show x ++ " is neither 0 nor 1."
 
 
 -- | The act of changing a monome LED's Light

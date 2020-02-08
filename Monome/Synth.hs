@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -fno-warn-type-defaults #-}
 {-# LANGUAGE DataKinds, ExtendedDefaultRules #-}
 
 module Monome.Synth (
@@ -10,8 +11,8 @@ import Vivid
 
 type BoopParams = '["freq","amp"]
 
--- PITFALL: A default freq of 0 might seem natural, but that causes
--- a popping sounds when it's changed.
+-- | PITFALL: A default freq of 0 might seem natural,
+-- but that causes a popping sounds when it's changed.
 boop :: SynthDef BoopParams
 boop = sd ( 100 :: I "freq"
           , 0 :: I "amp"

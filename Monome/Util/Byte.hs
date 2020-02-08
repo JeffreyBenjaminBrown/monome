@@ -17,7 +17,7 @@ import Data.ByteString.Char8 (pack, unpack)
 fi :: (Integral a, Num b) => a -> b
 fi = fromIntegral
 
-numBetween :: Real a => a -> a -> a -> Bool
+numBetween :: (Num a, Ord a) => a -> a -> a -> Bool
 numBetween low high x = x >= low && x <= high
 
 addPair :: (Int,Int) -> (Int,Int) -> (Int,Int)

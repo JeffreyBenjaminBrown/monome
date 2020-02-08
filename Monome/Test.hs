@@ -6,7 +6,6 @@ import Test.HUnit
 
 import Monome.Window.Common
 import Monome.Types.Button
-import Monome.Types.State
 import Monome.Types.Window
 
 

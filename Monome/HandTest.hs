@@ -3,18 +3,11 @@
 
 module Monome.HandTest where
 
-import Data.ByteString (ByteString)
 import Data.ByteString.Char8 (unpack)
-import Control.Monad (forever)
-import qualified Network.Socket as NS
 import qualified Network.Socket.ByteString as NSB
 import Vivid.OSC
 
-import Monome.Math31
-import Monome.OSCMessage
-import Monome.Types.Button
 import Monome.Types.Device
-import Monome.Util.Byte
 import Monome.Util.Network
 
 
