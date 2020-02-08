@@ -52,7 +52,7 @@ instance Eq Window where
 runWindowInit :: MVar State -> [Window] -> IO ()
 runWindowInit mst allWindows = do
   st <- readMVar mst
-  let toWindow w = relayIfHere (toMonome st) allWindows w
+  let toWindow w = relayIfHere (stToMonome st) allWindows w
   mapM_ (\w -> windowInit w mst $ toWindow w) allWindows
 
 handleSwitch :: [Window] -> MVar State -> ((X,Y), Switch) -> IO ()
@@ -66,6 +66,6 @@ handleSwitch               allWindows mst (btn0,sw) =
   handleSwitch' allWindows (w:ws)     mst sw @ (btn,_) = do
     st <- readMVar mst
     case windowContains w btn of
-      True -> let ledRelay = relayIfHere (toMonome st) allWindows w
+      True -> let ledRelay = relayIfHere (stToMonome st) allWindows w
               in windowHandler w mst ledRelay allWindows sw
       False -> handleSwitch' allWindows ws mst sw

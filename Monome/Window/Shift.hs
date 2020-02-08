@@ -54,9 +54,9 @@ handler    mst           toShift     ws          (xy, SwitchOn ) = do
   st <- takeMVar mst
   let Just keyboard = L.find pred ws where -- unsafe but it must be in there
         pred = (==) Kbd.label . windowLabel
-      toKeyboard = relayIfHere (toMonome st) ws keyboard
-      st' = st { xyShift = addPair (xyShift st) (shift xy) }
-      draw st = drawPitchClass toKeyboard $ xyShift st
-  mapM_ (draw st  LedOff) $ M.keys $ lit st
-  mapM_ (draw st' LedOn ) $ M.keys $ lit st'
+      toKeyboard = relayIfHere (stToMonome st) ws keyboard
+      st' = st { stXyShift = addPair (stXyShift st) (shift xy) }
+      draw st = drawPitchClass toKeyboard $ stXyShift st
+  mapM_ (draw st  LedOff) $ M.keys $ stLit st
+  mapM_ (draw st' LedOn ) $ M.keys $ stLit st'
   putMVar mst st'

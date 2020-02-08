@@ -51,17 +51,17 @@ handler :: MVar State -> LedRelay -> [Window] -> ((X,Y), Switch) -> IO ()
 handler _   _  _ (_ , SwitchOff) = return ()
 handler mst toSustainWindow _ (xy, SwitchOn ) = do
   st <- takeMVar mst -- PITFALL: old state, opposite value of `sustainOn`
-  let sustainOn' = not $ sustainOn st
+  let sustainOn' = not $ stSustainOn st
       sustained' = if not sustainOn' then S.empty
-                   else S.fromList $ M.toList $ fingers st
+                   else S.fromList $ M.toList $ stFingers st
 
   -- redraw the sustain window, silence anything that needs it
   let drawSustainWindow = curry toSustainWindow xy
   case sustainOn' of
     False -> do -- Turn sustain off: Free some voices, dark the led.
-      let quiet xy = set ((M.!) (voices st) xy) (0 :: I "amp")
-          sustainedAndNotFingered = S.difference (S.map fst $ sustained st)
-                                    (S.fromList $ M.keys $ fingers st)
+      let quiet xy = set ((M.!) (stVoices st) xy) (0 :: I "amp")
+          sustainedAndNotFingered = S.difference (S.map fst $ stSustained st)
+                                    (S.fromList $ M.keys $ stFingers st)
       drawSustainWindow LedOff
       mapM_ quiet $ sustainedAndNotFingered
 
@@ -69,11 +69,13 @@ handler mst toSustainWindow _ (xy, SwitchOn ) = do
       drawSustainWindow LedOn
 
   let lit' | sustainOn' =
-             foldr insertOneSustainedNote (lit st) $ M.toList $ fingers st
-           | not sustainOn' =
-             foldr deleteOneSustainedNote (lit st) $ S.toList $ sustained st
-      st' = st { sustainOn = sustainOn'
-               , sustained = sustained'
-               , lit       = lit'      }
+             foldr insertOneSustainedNote (stLit st)
+             $ M.toList $ stFingers st
+           | otherwise =
+             foldr deleteOneSustainedNote (stLit st)
+             $ S.toList $ stSustained st
+      st' = st { stSustainOn = sustainOn'
+               , stSustained = sustained'
+               , stLit       = lit'      }
 
   putMVar mst st'

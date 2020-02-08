@@ -11,15 +11,15 @@ import Monome.Util.Network
 
 
 data State = State {
-    inbox :: Socket
-  , toMonome :: Socket -- ^ PITFALL : some function arguments share this name
-  , voices :: M.Map (X,Y) (Synth BoopParams)
-  , xyShift :: (X,Y) -- ^ this is relative -- a vector, not a point
-  , fingers :: M.Map (X,Y) PitchClass
-  , lit :: M.Map PitchClass (S.Set LedReason)
-  , sustainOn :: Bool
-  , sustained :: S.Set ((X,Y), PitchClass)
-    -- ^ PITFALL: Conceptually, the thing sustained is a PitchClass,
-    -- in practice it's a voice, which is indexed via the key that
+    stInbox :: Socket
+  , stToMonome :: Socket -- ^ PITFALL : some function arguments share this name
+  , stVoices :: M.Map (X,Y) (Synth BoopParams)
+  , stXyShift :: (X,Y) -- ^ this is relative -- a vector, not a point
+  , stFingers :: M.Map (X,Y) PitchClass
+  , stLit :: M.Map PitchClass (S.Set LedReason)
+  , stSustainOn :: Bool
+  , stSustained :: S.Set ((X,Y), PitchClass)
+    -- ^ PITFALL: In spirit, the thing sustained is a PitchClass,
+    -- but in truth it's a voice, which is indexed via the key that
     -- originally launched it.
   } deriving (Show, Eq)
