@@ -1,4 +1,4 @@
-module Util.Byte (
+module Monome.Util.Byte (
   ByteString
   , pack
   , unpack

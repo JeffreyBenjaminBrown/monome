@@ -1,6 +1,6 @@
 {-# LANGUAGE DataKinds #-}
 
-module Window.Keyboard (
+module Monome.Window.Keyboard (
   keyboardWindow
   , label
   ) where
@@ -10,13 +10,13 @@ import qualified Data.Map as M
 import qualified Data.Set as S
 import Vivid
 
-import Synth
-import Types.Window
-import Types.Button
-import Types.State
-import Util.Byte
-import Math31
-import Window.Common
+import Monome.Synth
+import Monome.Types.Window
+import Monome.Types.Button
+import Monome.Types.State
+import Monome.Util.Byte
+import Monome.Math31
+import Monome.Window.Common
 
 
 label = "keyboard window"
@@ -29,17 +29,6 @@ keyboardWindow =  Window {
       st <- readMVar mst
       mapM_ (drawPitchClass toKeyboard (xyShift st) LedOn) $ M.keys $ lit st
   , windowHandler = handler }
-
-soundKey :: State -> ((X,Y), Switch) -> IO ()
-soundKey st (xy, sw) = do
-  let pitchClass = xyToEt31 xy - xyToEt31 (xyShift st)
-  case S.member xy $ S.map fst $ sustained st of
-    True -> return ()
-    False ->
-      let freq = 100 * et31ToFreq pitchClass
-          voice = (M.!) (voices st) xy
-      in set voice ( toI freq                         :: I "freq"
-                   , toI $ 0.15 * fi (switchToInt sw) :: I "amp" )
 
 handler :: MVar State
         -> LedRelay
@@ -68,8 +57,19 @@ handler mst toKeyboard _ press @ (xy,sw) = do
   putMVar mst $ st { fingers = fingers'
                    , lit = nl }
 
+soundKey :: State -> ((X,Y), Switch) -> IO ()
+soundKey st (xy, sw) = do
+  let pitchClass = xyToEt31 xy - xyToEt31 (xyShift st)
+  case S.member xy $ S.map fst $ sustained st of
+    True -> return () -- it's already sounding due to sustain
+    False ->
+      let freq = 100 * et31ToFreq pitchClass
+          voice = (M.!) (voices st) xy
+      in set voice ( toI freq                         :: I "freq"
+                   , toI $ 0.15 * fi (switchToInt sw) :: I "amp" )
+
 newLit :: ((X,Y), Switch)
-       -> PitchClass -- ^ what xy represents now
+       -> PitchClass       -- ^ what xy represents now
        -> Maybe PitchClass -- ^ what xy represented when it was pressed
        -> M.Map PitchClass (S.Set LedReason)
        -> M.Map PitchClass (S.Set LedReason)

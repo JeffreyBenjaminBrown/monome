@@ -3,15 +3,15 @@ LambdaCase
 , OverloadedStrings #-}
 
 
-module Mailbox where
+module Monome.Mailbox where
 
 import Control.Concurrent (forkIO)
 import Control.Concurrent.MVar
 import Control.Monad (forever)
 import Vivid.OSC
 
-import Util.Byte
-import Util.Network
+import Monome.Util.Byte
+import Monome.Util.Network
 
 
 -- ^ Tries to read as OSC, then prints (as OSC or otherwise).

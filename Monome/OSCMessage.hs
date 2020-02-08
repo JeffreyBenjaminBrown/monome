@@ -1,11 +1,11 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module OSCMessage where
+module Monome.OSCMessage where
 
 import Vivid.OSC
 
-import Util.Byte
-import Util.Network (localhost)
+import Monome.Util.Byte
+import Monome.Util.Network (localhost)
 
 
 -- | PITFALL: The monome will respond to out-of-bounds (x,y) values.

@@ -1,6 +1,6 @@
 {-# LANGUAGE TupleSections, ScopedTypeVariables #-}
 
-module Window.Shift (
+module Monome.Window.Shift (
   shiftWindow
   , colorArrows
   , label
@@ -10,14 +10,14 @@ import Control.Concurrent.MVar
 import qualified Data.List as L
 import qualified Data.Map as M
 
-import Math31
-import Types.Window
-import Types.Button
-import Types.State
-import Util.Byte
-import Util.Network
-import Window.Common (drawPitchClass)
-import qualified Window.Keyboard
+import Monome.Math31
+import Monome.Types.Window
+import Monome.Types.Button
+import Monome.Types.State
+import Monome.Util.Byte
+import Monome.Util.Network
+import Monome.Window.Common (drawPitchClass)
+import qualified Monome.Window.Keyboard as Kbd
 
 
 label = "shift window"
@@ -55,7 +55,7 @@ handler    _             _           _           (_,  SwitchOff) = return ()
 handler    mst           toShift     ws          (xy, SwitchOn ) = do
   st <- takeMVar mst
   let Just keyboard = L.find pred ws where -- unsafe but it must be in there
-        pred = (==) Window.Keyboard.label . windowLabel
+        pred = (==) Kbd.label . windowLabel
       toKeyboard = relayIfHere (toMonome st) ws keyboard
       st' = st { xyShift = addPair (xyShift st) (shift xy) }
       draw st = drawPitchClass toKeyboard $ xyShift st

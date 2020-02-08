@@ -24,28 +24,26 @@ source-repository head
 
 library
   exposed-modules:
-                  AppMain
-                , Device
-                , HandTest
-                , Instances
-                , Mailbox
-                , Math31
-                , OSCMessage
-                , Test
-                , Types.Button
-                , Types.Device
-                , Types.State
-                , Types.Window
-                , Util.Byte
-                , Util.Network
-                , Window.Common
-                , Window.Keyboard
-                , Window.Shift
-                , Window.Sustain
+                  Monome.AppMain
+                , Monome.Device
+                , Monome.HandTest
+                , Monome.Instances
+                , Monome.Mailbox
+                , Monome.Math31
+                , Monome.OSCMessage
+                , Monome.Test
+                , Monome.Types.Button
+                , Monome.Types.Device
+                , Monome.Types.State
+                , Monome.Types.Window
+                , Monome.Util.Byte
+                , Monome.Util.Network
+                , Monome.Window.Common
+                , Monome.Window.Keyboard
+                , Monome.Window.Shift
+                , Monome.Window.Sustain
   other-modules:
       Paths_monome
-  hs-source-dirs:
-      src
   build-depends:
                 base
               , bytestring

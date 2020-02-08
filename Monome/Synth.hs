@@ -1,6 +1,6 @@
 {-# LANGUAGE DataKinds, ExtendedDefaultRules #-}
 
-module Synth (
+module Monome.Synth (
   BoopParams
   , boop
   ) where
@@ -18,6 +18,6 @@ boop = sd ( 100 :: I "freq"
           ) $ do
   p <- pulse (freq_ (V::V "freq"))
   s <- saw (freq_ (V::V "freq"))
-  s1 <- lag (in_ (V::V "amp"), lagSecs_ 0.03) ~* (p ~+ s)
+  s1 <- lag (in_ (V::V "amp"), lagSecs_ 0.03) ~* (p ~+ s ~/ 5)
     -- The lag smooths out discontinuities in the change in "amp".
   out 0 [s1, s1]

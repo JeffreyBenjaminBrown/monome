@@ -1,4 +1,4 @@
-module Types.Window where
+module Monome.Types.Window where
 
 import qualified Data.Map as M
 import qualified Data.Set as S
@@ -6,11 +6,11 @@ import qualified Data.Set as S
 import Control.Concurrent.MVar
 import Vivid
 
-import Synth
-import Math31
-import Types.Button
-import Types.State
-import Util.Network
+import Monome.Synth
+import Monome.Math31
+import Monome.Types.Button
+import Monome.Types.State
+import Monome.Util.Network
 
 
 -- | `LedRelay` is for preventing one Window from writing to
@@ -42,7 +42,8 @@ data Window = Window {
     -- Every Window therefore needs a nontrivial windowContains field,
     -- even the background Window.
   , windowInit :: MVar State -> LedRelay -> IO ()
-  , windowHandler :: MVar State
+  , windowHandler -- ^ Acts on messages from the monome.
+    :: MVar State
     -> LedRelay -- ^ control Leds via this, not raw `send` commands
     -> [Window] -- ^ to construct an LedRelay to another Window, if needed
       -- PIFALL: Should be a list of all Windows -- not just, say, later ones.
@@ -64,6 +65,8 @@ handleSwitch               allWindows mst (xy,sw) =
   handleSwitch' allWindows allWindows mst (xy,sw) where
   -- `handleSwitch'` keeps the complete list of windows in its first arg,
   -- while iteratively discarding the head of its second.
+  handleSwitch' :: [Window] -> [Window] -> MVar State
+                -> ((X, Y), Switch) -> IO ()
   handleSwitch' allWindows []         _   _           = return ()
   handleSwitch' allWindows (w:ws)     mst sw @ (xy,_) = do
     st <- readMVar mst

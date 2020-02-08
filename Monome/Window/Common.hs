@@ -1,16 +1,16 @@
 {-# LANGUAGE TupleSections #-}
 
-module Window.Common where
+module Monome.Window.Common where
 
 import qualified Data.Map as M
 import qualified Data.Maybe as Mb
 import qualified Data.Set as S
 
-import Math31
-import Types.Button
-import Types.Window
-import Types.State
-import Util.Byte
+import Monome.Math31
+import Monome.Types.Button
+import Monome.Types.Window
+import Monome.Types.State
+import Monome.Util.Byte
 
 
 drawPitchClass :: LedRelay

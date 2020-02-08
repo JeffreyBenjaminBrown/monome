@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings
 , TupleSections #-}
 
-module HandTest where
+module Monome.HandTest where
 
 import Data.ByteString (ByteString)
 import Data.ByteString.Char8 (unpack)
@@ -10,12 +10,12 @@ import qualified Network.Socket as NS
 import qualified Network.Socket.ByteString as NSB
 import Vivid.OSC
 
-import Math31
-import OSCMessage
-import Types.Button
-import Types.Device
-import Util.Byte
-import Util.Network
+import Monome.Math31
+import Monome.OSCMessage
+import Monome.Types.Button
+import Monome.Types.Device
+import Monome.Util.Byte
+import Monome.Util.Network
 
 
 -- | = Send a message to something
@@ -30,7 +30,8 @@ testToPort port = do
 -- toSerialosc <- sendsTo (unpack localhost) 12002
 -- send toSerialosc $ requestDeviceList 8000
 
--- toMonome <- sendsTo (unpack localhost) 11298
+-- To get the right port number for toMonome, run the previous two lines.
+-- toMonome <- sendsTo (unpack localhost) 15226
 -- send toMonome $ requestDeviceInfo 8000
 
 -- send toMonome $ fade "/monome" 7 7 7

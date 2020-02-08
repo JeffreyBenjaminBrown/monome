@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Types.Button (
+module Monome.Types.Button (
   X, Y
   , Switch(..), Led(..), LedReason(..)
   , readSwitchOSC, switchToInt, switchFromInt
@@ -10,9 +10,9 @@ module Types.Button (
 
 import Vivid.OSC
 
-import Util.Byte
-import Util.Network (HostName)
-import OSCMessage
+import Monome.Util.Byte
+import Monome.Util.Network (HostName)
+import Monome.OSCMessage
 
 
 type X = Int
@@ -58,7 +58,8 @@ allLedOsc prefix led = allLeds prefix $ ledToInt led
 
 
 -- | The reason an Led is lit.
-data LedReason = LedFromSwitch {xy :: (X,Y)}
-               | LedFromSustain {xy :: (X,Y)}
-               | LedFromAnchor
+data LedReason =
+    LedFromSwitch  {xy :: (X,Y)}
+  | LedFromSustain {xy :: (X,Y)}
+  | LedFromAnchor -- ^ Some "visual anchor" pitches are always on.
   deriving (Show, Eq, Ord)

@@ -1,6 +1,6 @@
 {-# LANGUAGE DataKinds #-}
 
-module Window.Sustain (
+module Monome.Window.Sustain (
   sustainWindow
   , label
   ) where
@@ -11,13 +11,13 @@ import qualified Data.Map as M
 import qualified Data.Set as S
 import Vivid
 
-import Math31
-import Types.Window
-import Types.Button
-import Types.State
-import Util.Network
-import Window.Common
-import qualified Window.Keyboard
+import Monome.Math31
+import Monome.Types.Window
+import Monome.Types.Button
+import Monome.Types.State
+import Monome.Util.Network
+import Monome.Window.Common
+import qualified Monome.Window.Keyboard
 
 
 label = "sustain window"
@@ -62,7 +62,7 @@ handler mst toSustainWindow _ (xy, SwitchOn ) = do
   -- redraw the sustain window, silence anything that needs it
   let drawSustainWindow = curry toSustainWindow xy
   case sustainOn' of
-    False -> do -- Sustain is off now. Free some voices, dark the led.
+    False -> do -- Turn sustain off: Free some voices, dark the led.
       let quiet xy = set ((M.!) (voices st) xy) (0 :: I "amp")
           sustainedAndNotFingered = S.difference (S.map fst $ sustained st)
                                     (S.fromList $ M.keys $ fingers st)

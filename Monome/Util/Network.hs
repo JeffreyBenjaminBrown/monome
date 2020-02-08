@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Util.Network where
+module Monome.Util.Network where
 
 import Data.ByteString (ByteString)
 import Data.ByteString.Char8 (unpack)

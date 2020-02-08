@@ -3,7 +3,7 @@
 , OverloadedStrings
 , TupleSections #-}
 
-module Math31 (
+module Monome.Math31 (
   Pitch, PitchClass
   , et31ToFreq
   , xyToEt31
@@ -13,9 +13,9 @@ module Math31 (
 
 import Vivid
 
-import Synth
-import Types.Button
-import Util.Byte
+import Monome.Synth
+import Monome.Types.Button
+import Monome.Util.Byte
 
 
 -- | PitchClass and Pitch differ in that PitchClass 0 should be

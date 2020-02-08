@@ -1,14 +1,14 @@
-module Types.State where
+module Monome.Types.State where
 
 import Data.Map as M
 import Data.Set as S
 import Vivid
 
-import Math31 (Pitch, PitchClass)
-import Synth
-import Types.Button
-import Util.Byte
-import Util.Network
+import Monome.Math31 (Pitch, PitchClass)
+import Monome.Synth
+import Monome.Types.Button
+import Monome.Util.Byte
+import Monome.Util.Network
 
 
 data State = State {

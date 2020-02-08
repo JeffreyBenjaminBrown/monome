@@ -1,13 +1,13 @@
-module Test (tests) where
+module Monome.Test (tests) where
 
 import Data.Map as M
 import Data.Set as S
 import Test.HUnit
 
-import Window.Common
-import Types.Button
-import Types.State
-import Types.Window
+import Monome.Window.Common
+import Monome.Types.Button
+import Monome.Types.State
+import Monome.Types.Window
 
 
 tests = runTestTT $ TestList [

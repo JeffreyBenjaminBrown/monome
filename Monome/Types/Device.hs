@@ -1,15 +1,15 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Types.Device (
+module Monome.Types.Device (
   DeviceID(..), readDeviceID,
   Device(..), readDevice
   ) where
 
 import Vivid.OSC
 
-import Types.Button
-import Util.Byte
-import Util.Network
+import Monome.Types.Button
+import Monome.Util.Byte
+import Monome.Util.Network
 
 
 -- | SerialOsc responds to /serialosc/list messages with this information.
