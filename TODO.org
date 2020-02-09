@@ -1,9 +1,19 @@
-* TODO should this be Pitch, not PitchClass?
-stFingers :: M.Map (X,Y) PitchClass
-* TODO Window.Sustain: un-draw sustained pitches
-see TODO item in that code
-* TODO redraw keyboard upon releasing sustain
-=> make a function to draw the whole keyboard
+* TODO isolate IO
+** why
+It will make updating the screen easier.
+It will make testing easier.
+** how
+In sound, rather than sending to SC,
+change the state to have a collection of messages to send.
+In video, rather than sending to monome,
+make each window keep a "last sent" and a "to show" set of LED assignments,
+and compute the difference when needed.
+* TODO sustained pitches should not disable keys
+Currently, because each voice is identified with a key,
+if that voice is sustained, that key cannot sound a new note,
+even when it no longer represents the same pitch.
+* TODO bug: turning sustain off can destroy the anchor
+* TODO flash the anchor
 * TODO dependentPitchClass should not exist
 * TODO sustain: two buttons, "add these" and "release all"
 "add these" stays in effect until it is released.

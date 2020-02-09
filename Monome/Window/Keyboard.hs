@@ -13,7 +13,7 @@ import Control.Concurrent.MVar
 import qualified Data.Map as M
 import qualified Data.Set as S
 import           Data.Set (Set)
-import Vivid
+import Vivid hiding (pitch)
 
 import Monome.Types.Window
 import Monome.Types.Button
