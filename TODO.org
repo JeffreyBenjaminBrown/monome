@@ -1,3 +1,5 @@
+* TODO Window.hs needs some comments
+I'll have to see how things in it are used downstream.
 * TODO redraw keyboard upon releasing sustain
 => make a function to draw the whole keyboard
 * TODO dependentPitchClass should not exist

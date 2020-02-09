@@ -21,6 +21,7 @@ data State = State {
   , stFingers :: M.Map (X,Y) PitchClass
   , stLit :: M.Map PitchClass (S.Set LedBecause)
   , stSustainOn :: Bool
+    -- ^ TODO ? This could be eliminated by making the next field a Maybe.
   , stSustained :: S.Set ((X,Y), PitchClass)
     -- ^ PITFALL: In spirit, the thing sustained is a PitchClass,
     -- but it's represented as a voice,

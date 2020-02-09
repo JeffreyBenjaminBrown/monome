@@ -56,7 +56,7 @@ et31 mbAnchor = do
     , stSustained = mempty
     }
 
-  runWindowInit mst windows
+  initAllWindows mst windows
 
   responder <- forkIO $ forever $ do
     decodeOSC <$> recv inbox 4096 >>= \case

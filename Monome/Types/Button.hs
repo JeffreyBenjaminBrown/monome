@@ -53,10 +53,11 @@ ledFromInt 1 = LedOn
 ledFromInt x = error $ "ledFromInt: " ++ show x ++ " is neither 0 nor 1."
 
 
--- | The act of changing a monome LED's Light
+-- | Tells the monome to turn on an LED. See Test/HandTest.hs.
 ledOsc :: String -> ((X,Y), Led) -> ByteString
 ledOsc prefix ((x, y), led) = onoff prefix x y $ ledToInt led
 
+-- | Tells the monome to turn on every LED. See Test/HandTest.hs.
 allLedOsc :: String -> Led -> ByteString
 allLedOsc prefix led = allLeds prefix $ ledToInt led
 

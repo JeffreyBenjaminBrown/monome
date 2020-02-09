@@ -7,9 +7,7 @@ import Monome.Types.State
 import Monome.Network.Util
 
 
--- | `LedRelay` is for preventing one Window from writing to
--- the `Led`s of another `Window`.
-type LedRelay = ((X,Y), Led) -> IO ()
+type LedRelay  = ((X,Y), Led) -> IO ()
 type LedFilter = ((X,Y), Led) -> Bool
 
 -- | PITFALL: in `belongsHere allWindows w _`,
@@ -34,7 +32,8 @@ relayIfHere dest ws w = f where
 type WindowLabel = String
 
 data Window = Window {
-    windowLabel :: WindowLabel
+    windowLabel :: WindowLabel -- ^ PITFALL: Must be unique across windows,
+    -- or the Eq instance fails.
   , windowContains :: (X,Y) -> Bool
     -- ^ PITFALL: A monome will respond to out-of-bounds (x,y) values.
     -- Every Window therefore needs a nontrivial windowContains field,
@@ -42,8 +41,8 @@ data Window = Window {
   , windowInit :: MVar State -> LedRelay -> IO ()
   , windowHandler -- ^ Acts on messages from the monome.
     :: MVar State
-    -> LedRelay -- ^ control Leds via this, not raw `send` commands
-    -> [Window] -- ^ to construct an LedRelay to another Window, if needed
+    -> LedRelay -- ^ Control Leds via this, not raw `send` commands.
+    -> [Window] -- ^ To construct an LedRelay to another Window, if needed.
       -- PIFALL: Should be a list of all Windows -- not just, say, later ones.
     -> ((X,Y), Switch) -- ^ the incoming button press|release
     -> IO ()
@@ -52,8 +51,8 @@ data Window = Window {
 instance Eq Window where
   (==) a b = windowLabel a == windowLabel b
 
-runWindowInit :: MVar State -> [Window] -> IO ()
-runWindowInit mst allWindows = do
+initAllWindows :: MVar State -> [Window] -> IO ()
+initAllWindows mst allWindows = do
   st <- readMVar mst
   let toWindow w = relayIfHere (stToMonome st) allWindows w
   mapM_ (\w -> windowInit w mst $ toWindow w) allWindows
