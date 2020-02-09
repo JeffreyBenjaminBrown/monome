@@ -17,11 +17,11 @@ tests = runTestTT $ TestList [
 
 testDependentPitchClass :: Test
 testDependentPitchClass = TestCase $ do
-  let m = M.singleton 10 $ S.singleton $ LedFromSwitch (1,1)
+  let m = M.singleton 10 $ S.singleton $ LedBecauseSwitch (1,1)
   assertBool "dependentPitchClass finds it" $
-    dependentPitchClass m (LedFromSwitch (1,1)) == Just 10
+    dependentPitchClass m (LedBecauseSwitch (1,1)) == Just 10
   assertBool "dependentPitchClass does not find it" $
-    dependentPitchClass m  (LedFromSwitch (1,0)) == Nothing
+    dependentPitchClass m  (LedBecauseSwitch (1,0)) == Nothing
 
 testBelongsHere :: Test
 testBelongsHere = TestCase $ do

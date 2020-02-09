@@ -19,7 +19,7 @@ data State = State {
     -- Tom of Vivid thinks so.
   , stXyShift :: (X,Y) -- ^ this is relative -- a vector, not a point
   , stFingers :: M.Map (X,Y) PitchClass
-  , stLit :: M.Map PitchClass (S.Set LedReason)
+  , stLit :: M.Map PitchClass (S.Set LedBecause)
   , stSustainOn :: Bool
   , stSustained :: S.Set ((X,Y), PitchClass)
     -- ^ PITFALL: In spirit, the thing sustained is a PitchClass,

@@ -31,25 +31,25 @@ sustainWindow = Window {
 }
 
 insertOneSustainedNote :: ((X,Y), PitchClass)
-                       -> M.Map PitchClass (S.Set LedReason)
-                       -> M.Map PitchClass (S.Set LedReason)
+                       -> M.Map PitchClass (S.Set LedBecause)
+                       -> M.Map PitchClass (S.Set LedBecause)
 insertOneSustainedNote (xy, pc) m
   | M.lookup pc m == Nothing =
-      M.insert pc (S.singleton $ LedFromSustain xy) m
+      M.insert pc (S.singleton $ LedBecauseSustain xy) m
   | Just reasons <- M.lookup pc m =
-      M.insert pc (S.insert (LedFromSustain xy) reasons) m
+      M.insert pc (S.insert (LedBecauseSustain xy) reasons) m
   | otherwise = error "insertOneSustainedNote: should be impossible."
 
 deleteOneSustainedNote :: ((X,Y), PitchClass)
-                       -> M.Map PitchClass (S.Set LedReason)
-                       -> M.Map PitchClass (S.Set LedReason)
+                       -> M.Map PitchClass (S.Set LedBecause)
+                       -> M.Map PitchClass (S.Set LedBecause)
 deleteOneSustainedNote (xy, pc) m
   | M.lookup pc m == Nothing = m -- should not happen
   | Just reasons <- M.lookup pc m =
       -- TODO (#safety) Check that that's really what's being deleted.
       case S.size reasons < 2 of -- size < 1 should not happen
         True -> M.delete pc m
-        False -> M.insert pc (S.delete (LedFromSustain xy) reasons) m
+        False -> M.insert pc (S.delete (LedBecauseSustain xy) reasons) m
   | otherwise = error "deleteOneSustainedNote: should be impossible."
 
 handler :: MVar State -> LedRelay -> [Window] -> ((X,Y), Switch) -> IO ()

@@ -45,7 +45,7 @@ handler mst toKeyboard _ press @ (xy,sw) = do
   let
       pitchClassNow = mod (xyToEt31 $ addPair xy $ negPair $ stXyShift st) 31
         -- what that key represents currently.
-      pitchClassThen = dependentPitchClass (stLit st) $ LedFromSwitch xy
+      pitchClassThen = dependentPitchClass (stLit st) $ LedBecauseSwitch xy
         -- pitches that key lit up in the past
       fingers' = case sw of
         SwitchOn -> M.insert xy pitchClassNow $ stFingers st
@@ -75,13 +75,13 @@ soundKey st (xy, sw) = do
 newLit :: ((X,Y), Switch)
        -> PitchClass       -- ^ what xy represents now
        -> Maybe PitchClass -- ^ what xy represented when it was pressed
-       -> M.Map PitchClass (S.Set LedReason)
-       -> M.Map PitchClass (S.Set LedReason)
+       -> M.Map PitchClass (S.Set LedBecause)
+       -> M.Map PitchClass (S.Set LedBecause)
 newLit (xy,SwitchOn) pcNow mpcThen m
   | M.lookup pcNow m == Nothing =
-      M.insert pcNow (S.singleton $ LedFromSwitch xy) m
+      M.insert pcNow (S.singleton $ LedBecauseSwitch xy) m
   | Just reasons <- M.lookup pcNow m =
-      M.insert pcNow (S.insert (LedFromSwitch xy) reasons) m
+      M.insert pcNow (S.insert (LedBecauseSwitch xy) reasons) m
   | otherwise = error $ "newLit: unexpected input: " ++ show (xy, SwitchOn)
     ++ "," ++ show pcNow ++ "," ++ show mpcThen ++ "," ++ show m
 newLit (xy,SwitchOff) pcNow mpcThen m
@@ -90,6 +90,6 @@ newLit (xy,SwitchOff) pcNow mpcThen m
       -- TODO (#safety) Check that that's really what's being deleted.
       in case S.size reasons < 2 of -- size < 1 should not happen
         True -> M.delete pc m
-        False -> M.insert pc (S.delete (LedFromSwitch xy) reasons) m
+        False -> M.insert pc (S.delete (LedBecauseSwitch xy) reasons) m
   | otherwise = error $ "newLit: unexpected input: " ++ show (xy, SwitchOff)
     ++ "," ++ show pcNow ++ "," ++ show mpcThen ++ "," ++ show m

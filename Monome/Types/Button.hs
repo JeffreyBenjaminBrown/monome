@@ -2,7 +2,7 @@
 
 module Monome.Types.Button (
   X, Y
-  , Switch(..), Led(..), LedReason(..)
+  , Switch(..), Led(..), LedBecause(..)
   , readSwitchOSC, switchToInt, switchFromInt
   , ledToInt, ledFromInt
   , ledOsc, allLedOsc
@@ -62,8 +62,8 @@ allLedOsc prefix led = allLeds prefix $ ledToInt led
 
 
 -- | The reason an Led is lit.
-data LedReason =
-    LedFromSwitch  {ledReasonXy :: (X,Y)}
-  | LedFromSustain {ledReasonXy :: (X,Y)}
-  | LedFromAnchor -- ^ Some "visual anchor" pitches are always on.
+data LedBecause =
+    LedBecauseSwitch  (X,Y)
+  | LedBecauseSustain (X,Y)
+  | LedBecauseAnchor -- ^ Some "visual anchor" pitches are always on.
   deriving (Show, Eq, Ord)

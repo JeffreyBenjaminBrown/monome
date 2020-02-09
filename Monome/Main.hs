@@ -50,7 +50,7 @@ et31 mbAnchor = do
     , stVoices = voices
     , stXyShift = (0,0)
     , stFingers = mempty
-    , stLit = let f anchor = M.singleton anchor $ S.singleton LedFromAnchor
+    , stLit = let f anchor = M.singleton anchor $ S.singleton LedBecauseAnchor
               in maybe mempty f mbAnchor
     , stSustainOn = False
     , stSustained = mempty
