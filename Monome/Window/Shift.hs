@@ -1,7 +1,7 @@
 {-# LANGUAGE TupleSections, ScopedTypeVariables #-}
 
 module Monome.Window.Shift (
-  shiftWindow
+    shiftWindow
   , colorArrows
   , label
   ) where
@@ -59,7 +59,8 @@ handler :: MVar State -> LedRelay -> [Window] -> ((X,Y), Switch) -> IO ()
 handler    _             _           _           (_,  SwitchOff) = return ()
 handler    mst           _           ws          (xy, SwitchOn ) = do
   st0 <- takeMVar mst
-  let Just keyboard = L.find pred ws where -- unsafe but it must be in there
+  let Just (keyboard :: Window) = L.find pred ws where
+        -- Pitfall: Assumes the window will be found.
         pred = (==) Kbd.label . windowLabel
       toKeyboard = relayIfHere (stToMonome st0) ws keyboard
       st' = st0 { stXyShift = addPair (stXyShift st0) (shift xy) }

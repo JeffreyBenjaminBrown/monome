@@ -44,13 +44,14 @@ handler mst toSustainWindow _ (xy0, SwitchOn) = do
   -- redraw the sustain window, silence anything that needs it
   let drawSustainWindow = curry toSustainWindow xy0
   case sustainOn' of
-    False -> do -- Turn sustain off: Free some voices, dark the led.
+    False -> do -- Turn sustain off.
+      -- TODO : Un-draw sustained pitches not under fingers.
       let quiet xy = set ((M.!) (stVoices st) xy) (0 :: I "amp")
           sustainedAndNotFingered = S.difference
             (S.map fst $ stSustained st)
             (S.fromList $ M.keys $ stFingers st)
-        in mapM_ quiet sustainedAndNotFingered
-      drawSustainWindow LedOff
+        in mapM_ quiet sustainedAndNotFingered -- Silence some voices.
+      drawSustainWindow LedOff -- Darken the sustain button.
     True -> drawSustainWindow LedOn
 
   let lit' | sustainOn' =

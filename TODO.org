@@ -1,4 +1,7 @@
 * TODO rename Led -> LedState
+* TODO Led and Switch should be synonyms for Bool
+It would simplify, e.g., Window.Sustain.handle
+* TODO resume at Window.Shift
 * TODO redraw keyboard upon releasing sustain
 => make a function to draw the whole keyboard
 * TODO dependentPitchClass should not exist
@@ -16,8 +19,6 @@ synth param
 rhythm
 chord
 melody
-* maybe Led and Switch should be synonyms for Bool
-It would simplify, e.g., Window.Sustain.handle
 * TODO MAYBE
 ** sustain to middle of bottom, and duplicate at both top corners
  so that usually something can touch it
