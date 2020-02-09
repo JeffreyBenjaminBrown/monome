@@ -8,7 +8,6 @@ module Monome.Window.Shift (
 
 import Prelude hiding (pred)
 import Control.Concurrent.MVar
-import qualified Data.List as L
 import qualified Data.Map as M
 
 import Monome.Types.Window
@@ -59,9 +58,8 @@ handler :: MVar State -> LedRelay -> [Window] -> ((X,Y), Switch) -> IO ()
 handler    _             _           _           (_,  False) = return ()
 handler    mst           _           ws          (xy, True ) = do
   st0 <- takeMVar mst
-  let Just (keyboard :: Window) = L.find pred ws where
-        -- Pitfall: Assumes the window will be found.
-        pred = (==) Kbd.label . windowLabel
+  let keyboard = maybe err id $ findWindow ws Kbd.label
+        where err = error "Window.Shift.handler: keyboard window not found."
       toKeyboard = relayIfHere (stToMonome st0) ws keyboard
       st' = st0 { stXyShift = addPair (stXyShift st0) (shift xy) }
       draw st = drawPitchClass toKeyboard $ stXyShift st

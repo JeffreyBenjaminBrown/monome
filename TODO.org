@@ -1,4 +1,5 @@
-* TODO resume at Window.Shift
+* TODO Window.Sustain: un-draw sustained pitches
+see TODO item in that code
 * TODO redraw keyboard upon releasing sustain
 => make a function to draw the whole keyboard
 * TODO dependentPitchClass should not exist

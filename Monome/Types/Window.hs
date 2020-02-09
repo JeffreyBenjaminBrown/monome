@@ -1,6 +1,7 @@
 module Monome.Types.Window where
 
 import Control.Concurrent.MVar
+import qualified Data.List as L
 
 import Monome.Types.Button
 import Monome.Types.State
@@ -75,3 +76,8 @@ handleSwitch a b c =
       True -> let ledRelay = relayIfHere (stToMonome st) allWindows w
               in windowRoutine w mst ledRelay allWindows sw
       False -> go allWindows ws mst sw
+
+findWindow :: [Window] -> WindowLabel -> Maybe Window
+findWindow ws l = L.find pred ws where
+  -- Pitfall: Assumes the window will be found.
+  pred = (==) l . windowLabel

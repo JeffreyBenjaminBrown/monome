@@ -35,9 +35,11 @@ sustainWindow = Window {
 handler :: MVar State -> LedRelay -> [Window] -> ((X,Y), Switch) -> IO ()
 handler _   _               _ (_ , False) = return ()
 handler mst toSustainWindow _ (xy0, True) = do
-  st <- takeMVar mst -- PITFALL: old state; has opposite `stSustainOn` value
-  let sustainOn' :: Bool = not $ stSustainOn st
-      sustained' :: S.Set ((X,Y), PitchClass) =
+  st <- takeMVar mst
+  let sustainOn' :: Bool = -- new sustain state
+        not $
+        stSustainOn st -- old sustain state
+      sustained' :: S.Set ((X,Y), PitchClass) = -- new sustained pitches
         if not sustainOn' then S.empty
         else S.fromList $ M.toList $ stFingers st
 
@@ -46,6 +48,7 @@ handler mst toSustainWindow _ (xy0, True) = do
   case sustainOn' of
     False -> do -- Turn sustain off.
       -- TODO : Un-draw sustained pitches not under fingers.
+      -- Find the keyboard window, like Shift.hs does.
       let quiet xy = set ((M.!) (stVoices st) xy) (0 :: I "amp")
           sustainedAndNotFingered = S.difference
             (S.map fst $ stSustained st)
