@@ -12,7 +12,8 @@ import Monome.Network.Util
 type LedRelay = ((X,Y), Led) -> IO ()
 type LedFilter = ((X,Y), Led) -> Bool
 
--- | PITFALL: `allWindows` should be literally all of them, including `w`.
+-- | PITFALL: in `belongsHere allWindows w _`,
+-- `allWindows` should include literally all of them, even `w`.
 belongsHere :: [Window] -> Window -> LedFilter
 belongsHere allWindows w = f where
   obscurers = takeWhile (/= w) allWindows

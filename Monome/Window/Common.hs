@@ -4,7 +4,7 @@ module Monome.Window.Common where
 
 import Prelude hiding (pred)
 import qualified Data.Map as M
-import qualified Data.Maybe as Mb
+import           Data.Maybe
 import qualified Data.Set as S
 
 import Monome.Math31
@@ -27,6 +27,7 @@ drawPitchClass toKeyboardWindow xyShift led pitchClass = do
 dependentPitchClass :: M.Map PitchClass (S.Set LedReason)
                     -> LedReason -> Maybe PitchClass
 dependentPitchClass m ldr = fst <$> mPair
-  where pred = S.member ldr . snd
-        mPair = Mb.listToMaybe $ filter pred $ M.toList m
-  -- if I'm right, laziness => `fst` makes this stop at the first result
+  where
+    mPair = listToMaybe $ filter pred $ M.toList m
+      where
+        pred = S.member ldr . snd

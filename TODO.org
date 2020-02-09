@@ -1,14 +1,3 @@
-* TODO group Test, HandTest in a folder
-* TODO eliminate ghci warnings from -Wall
-* TODO rename mailbox -> listenAndEcho
-* Montevideo - Monome Tidal Vivid
-** Things to represent on the monome
-synth param
-rhythm
-chord
-melody
-* ? sustain to middle of bottom, and duplicate at both top corners
-so that usually something can touch it
 * TODO redraw keyboard upon releasing sustain
 => make a function to draw the whole keyboard
 * TODO dependentPitchClass should not exist
@@ -20,8 +9,17 @@ voices should be dynamic
   if they are indexed instead by (X,Y), then the meaning of "sustained"
   becomes muddy
 sustained should be a set of Pitches, not (X,Y)
-* maybe Led and Switch should be synonyms for Bool
-so that I can call not on them, or condition on them
+* Montevideo - Monome Tidal Vivid
+** Things to represent on the monome
+synth param
+rhythm
+chord
+melody
+* TODO MAYBE
+** sustain to middle of bottom, and duplicate at both top corners
+ so that usually something can touch it
+** maybe Led and Switch should be synonyms for Bool
+ so that I can call not on them, or condition on them
 * features
 ** show sustained notes
 ** add to ongoing sustained group

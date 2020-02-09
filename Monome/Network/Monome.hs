@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Monome.Network.OSCMessage where
+module Monome.Network.Monome where
 
 import Vivid.OSC
 

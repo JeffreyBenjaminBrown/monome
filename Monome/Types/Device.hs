@@ -33,7 +33,7 @@ readDeviceID x = error $ "readDeviceID: unexpected message: " ++ show x
 -- A device's DeviceInfo.deviceName = its DeviceID.deviceIDName.
 -- That is the only pooint where `Device` and `DeviceID` overlap.
 data Device = Device {
-  deviceName :: String
+    deviceName :: String
   , deviceSize :: (X,Y)
   , deviceHost :: HostName   -- ^ Where it sends to.
   , devicePort :: Int        -- ^ Where it sends to.

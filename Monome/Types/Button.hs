@@ -11,7 +11,7 @@ module Monome.Types.Button (
 import Vivid.OSC
 
 import Monome.Util
-import Monome.Network.OSCMessage
+import Monome.Network.Monome
 
 
 type X = Int

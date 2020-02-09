@@ -15,12 +15,12 @@ import Monome.Types.Button
 import Monome.Util
 
 
--- | PitchClass and Pitch differ in that PitchClass 0 should be
--- inndistinguishable from PitchClass 31, whereas Pitch 31 is
--- an octave higher than Pitch 0.
+-- | Pitch is isomorphic to the integers.
+-- PitchClass is isomorphic to the integers modulo 31.
+-- That is, PitchClass 0 is identical to PitchClass 31,
+-- whereas Pitch 31 is an octave above Pitch 0.
 type Pitch = Int
 type PitchClass = Int
-
 
 et31ToFreq :: Pitch -> Float
 et31ToFreq f = 2**(fi f / 31)
