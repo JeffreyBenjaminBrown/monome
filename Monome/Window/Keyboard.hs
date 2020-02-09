@@ -12,6 +12,7 @@ import Prelude hiding (pred)
 import Control.Concurrent.MVar
 import qualified Data.Map as M
 import qualified Data.Set as S
+import           Data.Set (Set)
 import Vivid
 
 import Monome.Types.Window
@@ -50,21 +51,21 @@ handler mst toKeyboard _ press @ (xy,sw) = do
         -- what the key represents currently
       pcThen :: Maybe PitchClass =
         ledBecause_toPitchClass (stLit st) $ LedBecauseSwitch xy
-        -- a pitch the key lit up in the past
+        -- what the key represented when it was pressed,
+        -- if it is now being released
       fingers' = case sw of
         SwitchOn -> M.insert xy pcNow $ stFingers st
         SwitchOff -> M.delete xy $ stFingers st
-      nl = updateStLit (xy,sw) pcNow pcThen $ stLit st
-      oldKeys = S.fromList $ M.keys $ stLit st
-      newKeys = S.fromList $ M.keys $ nl
-      toDark = S.difference oldKeys newKeys
-      toLight = S.difference newKeys oldKeys
+      lit' :: LitPitches = updateStLit (xy,sw) pcNow pcThen $ stLit st
+      oldKeys :: Set PitchClass = S.fromList $ M.keys $ stLit st
+      newKeys :: Set PitchClass = S.fromList $ M.keys $ lit'
+      toDark  :: Set PitchClass = S.difference oldKeys newKeys
+      toLight :: Set PitchClass = S.difference newKeys oldKeys
 
-  -- putStrLn . show $ fingers' -- handy spot to print
   mapM_ (drawPitchClass toKeyboard (stXyShift st) LedOff) toDark
-  mapM_ (drawPitchClass toKeyboard (stXyShift st) LedOn) toLight
+  mapM_ (drawPitchClass toKeyboard (stXyShift st) LedOn)  toLight
   putMVar mst $ st { stFingers = fingers'
-                   , stLit = nl }
+                   , stLit = lit' }
 
 soundKey :: State -> ((X,Y), Switch) -> IO ()
 soundKey st (xy, sw) = do

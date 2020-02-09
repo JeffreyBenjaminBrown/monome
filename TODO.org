@@ -1,3 +1,4 @@
+* TODO rename Led -> LedState
 * TODO redraw keyboard upon releasing sustain
 => make a function to draw the whole keyboard
 * TODO dependentPitchClass should not exist

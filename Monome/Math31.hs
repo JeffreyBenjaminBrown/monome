@@ -24,7 +24,11 @@ import Monome.Util
 type Pitch      = Int
 type PitchClass = Int
 type LitPitches = Map PitchClass (Set LedBecause)
-  -- ^ The Set is a Set because an LED could be on for multiple reasons.
+  -- ^ For each pitch class that is lit,
+  -- we need to know why -- e.g. if it's being sustained,
+  -- then we should not darken it when the finger on it is lifted,
+  -- and if it's an anchor, we should never darken it.
+  -- The Set is a Set because an LED could be on for multiple reasons.
 
 et31ToFreq :: Pitch -> Float
 et31ToFreq f = 2**(fi f / 31)
