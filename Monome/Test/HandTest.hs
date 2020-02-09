@@ -27,7 +27,7 @@ testToPort port = do
 -- toMonome <- sendsTo (unpack localhost) 15226
 -- send toMonome $ requestDeviceInfo 8000
 
--- send toMonome $ fade "/monome" 7 7 7
+-- send toMonome $ fade "/monome" 0 1 7
 -- send toMonome $ ledOsc "/monome" ((6,6) , LedOn)
 
 -- mapM (send toMonome . ledOsc "/monome" . (,LedOn)) $ enharmonicToXYs (0,15)

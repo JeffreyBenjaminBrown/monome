@@ -14,6 +14,8 @@ import Monome.Util
 import Monome.Network.Monome
 
 
+-- | PITFALL: X rises from left to right, but Y rises from top to bottom.
+-- Thus (0,1) is just under the top-left corner.
 type X = Int
 type Y = Int
 

@@ -31,6 +31,8 @@ upOctave =   (15,14)
 upArrow =    (14,14)
 downOctave = (13,14)
 
+-- | PITFALL: Remember (see Button.hs),
+-- higher Y => lower (closer to you) on the monome.
 shift :: (X,Y) -> (X,Y)
 shift xy | xy == rightArrow = ( 1, 0)
          | xy == downArrow  = ( 0, 1)
@@ -43,7 +45,7 @@ shift xy | xy == rightArrow = ( 1, 0)
 -- | = the window
 shiftWindow :: Window
 shiftWindow = Window {
-  windowLabel = label
+    windowLabel = label
   , windowContains = \(x,y) -> numBetween 13 15 x && numBetween 14 15 y
   , windowInit = \_ toShiftWindow -> colorArrows toShiftWindow
   , windowHandler = handler

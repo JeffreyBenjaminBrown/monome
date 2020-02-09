@@ -32,10 +32,14 @@ et31ToFreq f = 2**(fi f / 31)
 xyToEt31 :: (X,Y) -> Pitch
 xyToEt31 (x,y) = 6 * x + y
 
+-- | The numerically lowest (closest to the top-left corner)
+-- member of a pitch class, if the monome is not shifted (modulo octaves).
 et31ToLowXY :: PitchClass -> (X,Y)
 et31ToLowXY i = (div j 6, mod j 6)
   where j = mod i 31
 
+-- | A (maybe proper) superset of all keys that sound the same note
+-- (modulo octave) visible on the monome.
 enharmonicToXYs :: (X,Y) -> [(X,Y)]
 enharmonicToXYs btn = map (addPair low) wideGrid
   where low = et31ToLowXY $ xyToEt31 btn

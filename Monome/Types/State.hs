@@ -14,6 +14,9 @@ data State = State {
     stInbox :: Socket
   , stToMonome :: Socket
   , stVoices :: M.Map (X,Y) (Synth BoopParams)
+    -- ^ TODO ? This is expensive, precluding the use of big synths.
+    -- Maybe I could make them dynamically without much speed penalty.
+    -- Tom of Vivid thinks so.
   , stXyShift :: (X,Y) -- ^ this is relative -- a vector, not a point
   , stFingers :: M.Map (X,Y) PitchClass
   , stLit :: M.Map PitchClass (S.Set LedReason)
