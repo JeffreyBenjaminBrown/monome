@@ -6,7 +6,7 @@
 , ScopedTypeVariables
 , TupleSections #-}
 
-module Monome.AppMain (
+module Monome.Main (
   et31
   ) where
 
@@ -18,9 +18,9 @@ import Vivid
 import Vivid.OSC
 
 import Monome.Math31
-import Monome.Util.Byte
-import Monome.Util.Network
-import Monome.Synth
+import Monome.Util
+import Monome.Network.Util
+import Monome.Synth.Boop
 import Monome.Types.Window
 import Monome.Types.Button
 import Monome.Types.State

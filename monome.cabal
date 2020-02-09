@@ -24,24 +24,23 @@ source-repository head
 
 library
   exposed-modules:
-                  Monome.AppMain
-                , Monome.Device
-                , Monome.HandTest
-                , Monome.Instances
-                , Monome.Mailbox
-                , Monome.Math31
-                , Monome.OSCMessage
-                , Monome.Test
-                , Monome.Types.Button
-                , Monome.Types.Device
-                , Monome.Types.State
-                , Monome.Types.Window
-                , Monome.Util.Byte
-                , Monome.Util.Network
-                , Monome.Window.Common
-                , Monome.Window.Keyboard
-                , Monome.Window.Shift
-                , Monome.Window.Sustain
+      Monome.Instances.TypesafeArgs
+    , Monome.Main
+    , Monome.Math31
+    , Monome.Network.Mailbox
+    , Monome.Network.OSCMessage
+    , Monome.Network.Util
+    , Monome.Test.HandTest
+    , Monome.Test.Test
+    , Monome.Types.Button
+    , Monome.Types.Device
+    , Monome.Types.State
+    , Monome.Types.Window
+    , Monome.Util
+    , Monome.Window.Common
+    , Monome.Window.Keyboard
+    , Monome.Window.Shift
+    , Monome.Window.Sustain
   other-modules:
       Paths_monome
   build-depends:

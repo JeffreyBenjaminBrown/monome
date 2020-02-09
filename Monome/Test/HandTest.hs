@@ -1,13 +1,13 @@
 {-# LANGUAGE OverloadedStrings
 , TupleSections #-}
 
-module Monome.HandTest where
+module Monome.Test.HandTest where
 
 import qualified Network.Socket.ByteString as NSB
 import Vivid.OSC
 
 import Monome.Types.Device
-import Monome.Util.Network
+import Monome.Network.Util
 
 
 -- | = Send a message to something

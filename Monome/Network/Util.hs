@@ -1,7 +1,7 @@
 {-# OPTIONS_GHC -fno-warn-type-defaults #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Monome.Util.Network where
+module Monome.Network.Util where
 
 import Data.ByteString (ByteString)
 import Data.ByteString.Char8 (unpack)

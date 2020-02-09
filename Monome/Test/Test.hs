@@ -1,4 +1,4 @@
-module Monome.Test (tests) where
+module Monome.Test.Test (tests) where
 
 import Data.Map as M
 import Data.Set as S

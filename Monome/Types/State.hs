@@ -5,9 +5,9 @@ import Data.Set as S
 import Vivid
 
 import Monome.Math31
-import Monome.Synth
+import Monome.Synth.Boop
 import Monome.Types.Button
-import Monome.Util.Network
+import Monome.Network.Util
 
 
 data State = State {

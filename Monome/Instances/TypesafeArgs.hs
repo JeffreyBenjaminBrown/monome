@@ -4,6 +4,8 @@
 -- With minor changes, this is a simple duplication of
 -- Vivid.Synthdef.TypesafeArgs
 
+{-# OPTIONS_GHC -fno-warn-orphans #-}
+
 {-# LANGUAGE NoIncoherentInstances #-}
 -- {-# LANGUAGE ConstraintKinds -}
 {-# LANGUAGE DataKinds #-}
@@ -29,14 +31,7 @@
 
 module Monome.Instances.TypesafeArgs where
 
-import Control.Arrow (first, second)
-import GHC.Exts
 import GHC.TypeLits
-import qualified Data.Map as Map
-import Data.Proxy
-import Data.Type.Bool
--- import System.Random -- For a Random instance
-
 import Vivid
 
 

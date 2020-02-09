@@ -1,7 +1,7 @@
 {-# OPTIONS_GHC -fno-warn-type-defaults #-}
 {-# LANGUAGE DataKinds, ExtendedDefaultRules #-}
 
-module Monome.Synth (
+module Monome.Synth.Boop (
   BoopParams
   , boop
   ) where

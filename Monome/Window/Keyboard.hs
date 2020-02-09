@@ -15,7 +15,7 @@ import Vivid
 import Monome.Types.Window
 import Monome.Types.Button
 import Monome.Types.State
-import Monome.Util.Byte
+import Monome.Util
 import Monome.Math31
 import Monome.Window.Common
 

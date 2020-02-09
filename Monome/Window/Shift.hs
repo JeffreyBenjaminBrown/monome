@@ -14,7 +14,7 @@ import qualified Data.Map as M
 import Monome.Types.Window
 import Monome.Types.Button
 import Monome.Types.State
-import Monome.Util.Byte
+import Monome.Util
 import Monome.Window.Common (drawPitchClass)
 import qualified Monome.Window.Keyboard as Kbd
 

@@ -12,7 +12,7 @@ module Monome.Math31 (
   ) where
 
 import Monome.Types.Button
-import Monome.Util.Byte
+import Monome.Util
 
 
 -- | PitchClass and Pitch differ in that PitchClass 0 should be

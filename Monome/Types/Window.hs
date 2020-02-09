@@ -4,7 +4,7 @@ import Control.Concurrent.MVar
 
 import Monome.Types.Button
 import Monome.Types.State
-import Monome.Util.Network
+import Monome.Network.Util
 
 
 -- | `LedRelay` is for preventing one Window from writing to

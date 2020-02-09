@@ -10,7 +10,7 @@ import qualified Data.Set as S
 import Monome.Math31
 import Monome.Types.Button
 import Monome.Types.Window
-import Monome.Util.Byte
+import Monome.Util
 
 
 drawPitchClass :: LedRelay

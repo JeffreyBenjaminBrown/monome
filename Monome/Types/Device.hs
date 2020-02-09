@@ -8,8 +8,8 @@ module Monome.Types.Device (
 import Vivid.OSC
 
 import Monome.Types.Button
-import Monome.Util.Byte
-import Monome.Util.Network
+import Monome.Util
+import Monome.Network.Util
 
 
 -- | SerialOsc responds to /serialosc/list messages with this information.
