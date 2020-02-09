@@ -32,7 +32,7 @@ keyboardWindow =  Window {
       st <- readMVar mst
       mapM_ (drawPitchClass toKeyboard (stXyShift st) LedOn)
         $ M.keys $ stLit st
-  , windowHandler = handler }
+  , windowRoutine = handler }
 
 handler :: MVar State
         -> LedRelay

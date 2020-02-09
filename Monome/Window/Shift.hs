@@ -48,7 +48,7 @@ shiftWindow = Window {
     windowLabel = label
   , windowContains = \(x,y) -> numBetween 13 15 x && numBetween 14 15 y
   , windowInit = \_ toShiftWindow -> colorArrows toShiftWindow
-  , windowHandler = handler
+  , windowRoutine = handler
 }
 
 colorArrows :: LedRelay -> IO ()

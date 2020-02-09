@@ -62,7 +62,7 @@ allLedOsc :: String -> Led -> ByteString
 allLedOsc prefix led = allLeds prefix $ ledToInt led
 
 
--- | The reason an Led is lit.
+-- | The reason an LED is lit.
 data LedBecause =
     LedBecauseSwitch  (X,Y)
   | LedBecauseSustain (X,Y)

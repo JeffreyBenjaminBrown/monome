@@ -10,8 +10,9 @@ import Monome.Network.Util
 type LedRelay  = ((X,Y), Led) -> IO ()
 type LedFilter = ((X,Y), Led) -> Bool
 
--- | PITFALL: in `belongsHere allWindows w _`,
--- `allWindows` should include literally all of them, even `w`.
+-- | `belongsHere allWindows w _` returns a `Filter` that returns `True`
+-- if `(X,Y)` belongs in `w` and none of the `Window`s preceding `w`.
+-- PITFALL: `allWindows` should include literally all of them, even `w`.
 belongsHere :: [Window] -> Window -> LedFilter
 belongsHere allWindows w = f where
   obscurers = takeWhile (/= w) allWindows
@@ -21,7 +22,10 @@ belongsHere allWindows w = f where
   f :: ((X,Y), Led) -> Bool
   f (btn,_) = not (obscured btn) && windowContains w btn
 
-relayIfHere :: Socket -- ^ probably to the monome
+-- | `relayIfHere dest ws w` returns a `LedRelay` which,
+-- if the coordinate falls in `w` and in no other `Window` before `w` in `ws`,
+-- sends the message to the `Socket`.
+relayIfHere :: Socket
             -> [Window] -> Window -> LedRelay
 relayIfHere dest ws w = f where
   f :: ((X,Y),Led) -> IO ()
@@ -39,7 +43,7 @@ data Window = Window {
     -- Every Window therefore needs a nontrivial windowContains field,
     -- even the background Window.
   , windowInit :: MVar State -> LedRelay -> IO ()
-  , windowHandler -- ^ Acts on messages from the monome.
+  , windowRoutine -- ^ Acts on messages from the monome.
     :: MVar State
     -> LedRelay -- ^ Control Leds via this, not raw `send` commands.
     -> [Window] -- ^ To construct an LedRelay to another Window, if needed.
@@ -57,6 +61,7 @@ initAllWindows mst allWindows = do
   let toWindow w = relayIfHere (stToMonome st) allWindows w
   mapM_ (\w -> windowInit w mst $ toWindow w) allWindows
 
+-- | called every time a monome button is pressed or released
 handleSwitch     :: [Window] -> MVar State -> ((X,Y), Switch) -> IO ()
 handleSwitch a b c =
   go       a a b c where
@@ -68,5 +73,5 @@ handleSwitch a b c =
     st <- readMVar mst
     case windowContains w btn of
       True -> let ledRelay = relayIfHere (stToMonome st) allWindows w
-              in windowHandler w mst ledRelay allWindows sw
+              in windowRoutine w mst ledRelay allWindows sw
       False -> go allWindows ws mst sw

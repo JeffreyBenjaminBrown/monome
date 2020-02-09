@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds #-}
 
 module Monome.Window.Sustain (
-  sustainWindow
+    sustainWindow
   , label
   ) where
 
@@ -25,9 +25,9 @@ theButton = (0,15)
 sustainWindow :: Window
 sustainWindow = Window {
     windowLabel = label
-  , windowContains = \(x,y) -> x == fst theButton && y == snd theButton
+  , windowContains = (==) theButton
   , windowInit = \_ _ -> return ()
-  , windowHandler = handler
+  , windowRoutine = handler
 }
 
 insertOneSustainedNote :: ((X,Y), PitchClass)
@@ -43,30 +43,32 @@ insertOneSustainedNote (xy, pc) m
 deleteOneSustainedNote :: ((X,Y), PitchClass)
                        -> M.Map PitchClass (S.Set LedBecause)
                        -> M.Map PitchClass (S.Set LedBecause)
-deleteOneSustainedNote (xy, pc) m
-  | M.lookup pc m == Nothing = m -- should not happen
-  | Just reasons <- M.lookup pc m =
+deleteOneSustainedNote (xy, pc) m =
+  case M.lookup pc m of
+    Nothing -> m -- TODO ? Should this throw an error? It shouldn't happen.
+    Just reasons =
       -- TODO (#safety) Check that that's really what's being deleted.
       case S.size reasons < 2 of -- size < 1 should not happen
         True -> M.delete pc m
         False -> M.insert pc (S.delete (LedBecauseSustain xy) reasons) m
-  | otherwise = error "deleteOneSustainedNote: should be impossible."
 
 handler :: MVar State -> LedRelay -> [Window] -> ((X,Y), Switch) -> IO ()
 handler _   _  _ (_ , SwitchOff) = return ()
-handler mst toSustainWindow _ (xy0, SwitchOn ) = do
-  st <- takeMVar mst -- PITFALL: old state, opposite value of `sustainOn`
-  let sustainOn' = not $ stSustainOn st
-      sustained' = if not sustainOn' then S.empty
-                   else S.fromList $ M.toList $ stFingers st
+handler mst toSustainWindow _ (xy0, SwitchOn) = do
+  st0 <- takeMVar mst -- PITFALL: old state; has opposite `stSustainOn` value
+  let sustainOn' :: Bool = not $ stSustainOn st0
+      sustained' :: Set ((X,Y), PitchClass) =
+        if not sustainOn' then S.empty
+        else S.fromList $ M.toList $ stFingers st0
 
   -- redraw the sustain window, silence anything that needs it
   let drawSustainWindow = curry toSustainWindow xy0
   case sustainOn' of
     False -> do -- Turn sustain off: Free some voices, dark the led.
       let quiet xy = set ((M.!) (stVoices st) xy) (0 :: I "amp")
-          sustainedAndNotFingered = S.difference (S.map fst $ stSustained st)
-                                    (S.fromList $ M.keys $ stFingers st)
+          sustainedAndNotFingered = S.difference
+            (S.map fst $ stSustained st0)
+            (S.fromList $ M.keys $ stFingers st0)
       drawSustainWindow LedOff
       mapM_ quiet $ sustainedAndNotFingered
 
