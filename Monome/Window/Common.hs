@@ -26,8 +26,7 @@ drawPitchClass toKeyboardWindow xyShift led pitchClass = do
 
 -- TODO (#speed) Instead, keep a map from xy to pitchclass
 ledBecause_toPitchClass ::
-  M.Map PitchClass (S.Set LedBecause)
-    -- ^ a set, because an LED could be on for multiple reasons
+  LitPitches
   -> LedBecause
   -> Maybe PitchClass
 ledBecause_toPitchClass m ldr =

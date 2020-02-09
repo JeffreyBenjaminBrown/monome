@@ -80,8 +80,8 @@ soundKey st (xy, sw) = do
 updateStLit :: ((X,Y), Switch)
        -> PitchClass       -- ^ what xy represents now
        -> Maybe PitchClass -- ^ what xy represented when it was pressed
-       -> M.Map PitchClass (S.Set LedBecause)
-       -> M.Map PitchClass (S.Set LedBecause)
+       -> LitPitches
+       -> LitPitches
 updateStLit (xy,SwitchOn) pcNow mpcThen m
   | M.lookup pcNow m == Nothing =
       M.insert pcNow (S.singleton $ LedBecauseSwitch xy) m

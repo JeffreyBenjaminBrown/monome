@@ -4,13 +4,15 @@
 , TupleSections #-}
 
 module Monome.Math31 (
-  Pitch, PitchClass
+  Pitch, PitchClass, LitPitches
   , et31ToFreq
   , xyToEt31
   , et31ToLowXY
   , enharmonicToXYs
   ) where
 
+import Data.Map (Map)
+import Data.Set (Set)
 import Monome.Types.Button
 import Monome.Util
 
@@ -19,8 +21,10 @@ import Monome.Util
 -- PitchClass is isomorphic to the integers modulo 31.
 -- That is, PitchClass 0 is identical to PitchClass 31,
 -- whereas Pitch 31 is an octave above Pitch 0.
-type Pitch = Int
+type Pitch      = Int
 type PitchClass = Int
+type LitPitches = Map PitchClass (Set LedBecause)
+  -- ^ The Set is a Set because an LED could be on for multiple reasons.
 
 et31ToFreq :: Pitch -> Float
 et31ToFreq f = 2**(fi f / 31)
