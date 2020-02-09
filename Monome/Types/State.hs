@@ -19,6 +19,9 @@ data State = State {
     -- Tom of Vivid thinks so.
   , stXyShift :: (X,Y) -- ^ this is relative -- a vector, not a point
   , stFingers :: M.Map (X,Y) PitchClass
+    -- ^ Where each finger is, and what it's lighting up.
+    -- Note that this doesn't track what pitch it started.
+    -- Since voices are indexed by (X,Y), that's okay.
   , stLit :: LitPitches
   , stSustainOn :: Bool
     -- ^ TODO ? This could be eliminated by making the next field a Maybe.

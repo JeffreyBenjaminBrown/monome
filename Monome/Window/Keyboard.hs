@@ -69,11 +69,11 @@ handler mst toKeyboard _ press @ (xy,sw) = do
 
 soundKey :: State -> ((X,Y), Switch) -> IO ()
 soundKey st (xy, sw) = do
-  let pitchClass = xyToEt31 xy - xyToEt31 (stXyShift st)
+  let pitch = xyToEt31 xy - xyToEt31 (stXyShift st)
   case S.member xy $ S.map fst $ stSustained st of
     True -> return () -- it's already sounding due to sustain
     False ->
-      let freq = 100 * et31ToFreq pitchClass
+      let freq = 100 * et31ToFreq pitch
           voice = (M.!) (stVoices st) xy
       in set voice ( toI freq                  :: I "freq"
                    , toI $ 0.15 * boolToInt sw :: I "amp" )

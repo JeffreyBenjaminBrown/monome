@@ -1,5 +1,6 @@
 module Monome.Types.Window where
 
+import Prelude hiding (pred)
 import Control.Concurrent.MVar
 import qualified Data.List as L
 

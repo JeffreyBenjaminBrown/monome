@@ -9,13 +9,16 @@ module Monome.Window.Sustain (
 
 import Control.Concurrent.MVar
 import qualified Data.Map as M
+import           Data.Set (Set)
 import qualified Data.Set as S
 import Vivid
 
-import Monome.Math31
-import Monome.Types.Window
-import Monome.Types.Button
-import Monome.Types.State
+import           Monome.Math31
+import           Monome.Types.Window
+import           Monome.Types.Button
+import           Monome.Types.State
+import           Monome.Window.Common (drawPitchClass)
+import qualified Monome.Window.Keyboard as Kbd
 
 
 label :: WindowLabel
@@ -33,28 +36,41 @@ sustainWindow = Window {
 }
 
 handler :: MVar State -> LedRelay -> [Window] -> ((X,Y), Switch) -> IO ()
-handler _   _               _ (_ , False) = return ()
-handler mst toSustainWindow _ (xy0, True) = do
+handler    _             _           _           (_ , False) = return ()
+handler    mst           toSustain   ws          (xy0, True) = do
   st <- takeMVar mst
   let sustainOn' :: Bool = -- new sustain state
         not $
         stSustainOn st -- old sustain state
-      sustained' :: S.Set ((X,Y), PitchClass) = -- new sustained pitches
+      sustained' :: Set ((X,Y), PitchClass) = -- new sustained pitches
         if not sustainOn' then S.empty
         else S.fromList $ M.toList $ stFingers st
+      drawSustainWindow = curry toSustain xy0
 
-  -- redraw the sustain window, silence anything that needs it
-  let drawSustainWindow = curry toSustainWindow xy0
-  case sustainOn' of
+  case sustainOn' of -- IO: lights and sound
     False -> do -- Turn sustain off.
-      -- TODO : Un-draw sustained pitches not under fingers.
-      -- Find the keyboard window, like Shift.hs does.
+      let sustainedAndNotFingeredXYs :: Set (X,Y) =
+            S.difference (S.map fst $ stSustained st)
+                         (S.fromList $ M.keys $ stFingers st)
+          sustainedAndNotFingeredPCs :: Set PitchClass =
+            S.map snd $ S.filter f $ stSustained st where
+              f :: ((X,Y), PitchClass) -> Bool
+              f (b,_) = S.member b sustainedAndNotFingeredXYs
+
+      -- Silence some voices.
       let quiet xy = set ((M.!) (stVoices st) xy) (0 :: I "amp")
-          sustainedAndNotFingered = S.difference
-            (S.map fst $ stSustained st)
-            (S.fromList $ M.keys $ stFingers st)
-        in mapM_ quiet sustainedAndNotFingered -- Silence some voices.
-      drawSustainWindow False -- Darken the sustain button.
+      mapM_ quiet sustainedAndNotFingeredXYs
+
+      -- Un-draw sustained pitches not under fingers.
+      let keyboard = maybe err id $ findWindow ws Kbd.label where
+            err = error "Window.Shift.handler: keyboard window not found."
+          toKeyboard = relayIfHere (stToMonome st) ws keyboard
+          draw = drawPitchClass toKeyboard $ stXyShift st
+      mapM_ (draw False) $ S.toList sustainedAndNotFingeredPCs
+
+      -- Darken the sustain button.
+      drawSustainWindow False
+
     True -> drawSustainWindow True
 
   let lit' | sustainOn' =
