@@ -47,9 +47,9 @@ handler mst toKeyboard _ press @ (xy,sw) = do
 
   let pcNow :: PitchClass =
         mod (xyToEt31 $ addPair xy $ negPair $ stXyShift st) 31
-        -- what the key represents currently.
+        -- what the key represents currently
       pcThen :: Maybe PitchClass =
-        dependentPitchClass (stLit st) $ LedBecauseSwitch xy
+        ledBecause_toPitchClass (stLit st) $ LedBecauseSwitch xy
         -- a pitch the key lit up in the past
       fingers' = case sw of
         SwitchOn -> M.insert xy pcNow $ stFingers st
