@@ -1,10 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Monome.Types.Button (
-  X, Y
-  , Switch(..), Led(..), LedBecause(..)
-  , readSwitchOSC, switchToInt, switchFromInt
-  , ledToInt, ledFromInt
+  X, Y, Switch, Led, LedBecause(..)
+  , readSwitchOSC, boolToInt, boolFromInt
   , ledOsc, allLedOsc
   ) where
 
@@ -21,45 +19,33 @@ type Y = Int
 
 
 -- | The mechanical state of a monome button
-data Switch = SwitchOn | SwitchOff
-  deriving (Show, Eq, Ord)
+type Switch = Bool
 
-switchToInt :: Num a => Switch -> a
-switchToInt SwitchOn = 1
-switchToInt SwitchOff = 0
+boolToInt :: Num a => Bool -> a
+boolToInt True = 1
+boolToInt False = 0
 
-switchFromInt :: Int -> Switch
-switchFromInt 0 = SwitchOff
-switchFromInt 1 = SwitchOn
-switchFromInt x = error $ "switchFromInt: " ++ show x
+boolFromInt :: Int -> Bool
+boolFromInt 0 = False
+boolFromInt 1 = True
+boolFromInt x = error $ "boolFromInt: " ++ show x
                   ++ " is niether 0 nor 1."
 
 readSwitchOSC :: OSC -> ((X,Y), Switch)
 readSwitchOSC (OSC "/monome/grid/key" [OSC_I x, OSC_I y, OSC_I s]) =
-  ((fi x, fi y), switchFromInt $ fi s)
+  ((fi x, fi y), boolFromInt $ fi s)
 readSwitchOSC x = error $ "readSwitchOSC: bad message: " ++ show x
 
 -- | The state of a monome LED
-data Led = LedOn | LedOff
-  deriving (Show, Eq, Ord)
-
-ledToInt :: Led -> Int
-ledToInt LedOff = 0
-ledToInt LedOn = 1
-
-ledFromInt :: Int -> Led
-ledFromInt 0 = LedOff
-ledFromInt 1 = LedOn
-ledFromInt x = error $ "ledFromInt: " ++ show x ++ " is neither 0 nor 1."
-
+type Led = Bool
 
 -- | Tells the monome to turn on an LED. See Test/HandTest.hs.
 ledOsc :: String -> ((X,Y), Led) -> ByteString
-ledOsc prefix ((x, y), led) = onoff prefix x y $ ledToInt led
+ledOsc prefix ((x, y), led) = onoff prefix x y $ boolToInt led
 
 -- | Tells the monome to turn on every LED. See Test/HandTest.hs.
 allLedOsc :: String -> Led -> ByteString
-allLedOsc prefix led = allLeds prefix $ ledToInt led
+allLedOsc prefix led = allLeds prefix $ boolToInt led
 
 
 -- | The reason an LED is lit.

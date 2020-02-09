@@ -1,6 +1,3 @@
-* TODO rename Led -> LedState
-* TODO Led and Switch should be synonyms for Bool
-It would simplify, e.g., Window.Sustain.handle
 * TODO resume at Window.Shift
 * TODO redraw keyboard upon releasing sustain
 => make a function to draw the whole keyboard

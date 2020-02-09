@@ -30,10 +30,10 @@ testBelongsHere = TestCase $ do
       w3 = Window "w3" (\(_,_) -> True)  mempty mempty
       ws = [w1,w2,w3]
   assertBool "caught by w1 before reaching w3" $
-    not $ belongsHere ws w3 ((1,0),LedOn)
+    not $ belongsHere ws w3 ((1,0),True)
   assertBool "caught by w2 before reaching w3" $
-    not $ belongsHere ws w3 ((5,6),LedOn)
+    not $ belongsHere ws w3 ((5,6),True)
   assertBool "should reach w3, which contains it" $
-    belongsHere ws w3 ((0,0),LedOn)
+    belongsHere ws w3 ((0,0),True)
   assertBool "should reach w2, but w2 does not contain it" $
-    not $ belongsHere ws w2 ((1,2),LedOn)
+    not $ belongsHere ws w2 ((1,2),True)

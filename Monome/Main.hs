@@ -70,7 +70,7 @@ et31 mbAnchor = do
           mapM_ free (M.elems voices)
           killThread responder
           st <- readMVar mst
-          _ <- send toMonome $ allLedOsc "/monome" LedOff
+          _ <- send toMonome $ allLedOsc "/monome" False
           return $ st { stVoices = mempty } -- PITFALL: ?
         _   -> loop
   loop

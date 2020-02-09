@@ -33,8 +33,8 @@ sustainWindow = Window {
 }
 
 handler :: MVar State -> LedRelay -> [Window] -> ((X,Y), Switch) -> IO ()
-handler _   _  _ (_ , SwitchOff) = return ()
-handler mst toSustainWindow _ (xy0, SwitchOn) = do
+handler _   _               _ (_ , False) = return ()
+handler mst toSustainWindow _ (xy0, True) = do
   st <- takeMVar mst -- PITFALL: old state; has opposite `stSustainOn` value
   let sustainOn' :: Bool = not $ stSustainOn st
       sustained' :: S.Set ((X,Y), PitchClass) =
@@ -51,8 +51,8 @@ handler mst toSustainWindow _ (xy0, SwitchOn) = do
             (S.map fst $ stSustained st)
             (S.fromList $ M.keys $ stFingers st)
         in mapM_ quiet sustainedAndNotFingered -- Silence some voices.
-      drawSustainWindow LedOff -- Darken the sustain button.
-    True -> drawSustainWindow LedOn
+      drawSustainWindow False -- Darken the sustain button.
+    True -> drawSustainWindow True
 
   let lit' | sustainOn' =
              foldr insertOneSustainedNote (stLit st)

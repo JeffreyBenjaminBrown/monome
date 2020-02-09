@@ -33,7 +33,7 @@ keyboardWindow =  Window {
                                in pred x && pred y
   , windowInit = \mst toKeyboard -> do
       st <- readMVar mst
-      mapM_ (drawPitchClass toKeyboard (stXyShift st) LedOn)
+      mapM_ (drawPitchClass toKeyboard (stXyShift st) True)
         $ M.keys $ stLit st
   , windowRoutine = handler }
 
@@ -54,16 +54,16 @@ handler mst toKeyboard _ press @ (xy,sw) = do
         -- what the key represented when it was pressed,
         -- if it is now being released
       fingers' = case sw of
-        SwitchOn -> M.insert xy pcNow $ stFingers st
-        SwitchOff -> M.delete xy $ stFingers st
+        True  -> M.insert xy pcNow $ stFingers st
+        False -> M.delete xy $ stFingers st
       lit' :: LitPitches = updateStLit (xy,sw) pcNow pcThen $ stLit st
       oldKeys :: Set PitchClass = S.fromList $ M.keys $ stLit st
       newKeys :: Set PitchClass = S.fromList $ M.keys $ lit'
       toDark  :: Set PitchClass = S.difference oldKeys newKeys
       toLight :: Set PitchClass = S.difference newKeys oldKeys
 
-  mapM_ (drawPitchClass toKeyboard (stXyShift st) LedOff) toDark
-  mapM_ (drawPitchClass toKeyboard (stXyShift st) LedOn)  toLight
+  mapM_ (drawPitchClass toKeyboard (stXyShift st) False) toDark
+  mapM_ (drawPitchClass toKeyboard (stXyShift st) True)  toLight
   putMVar mst $ st { stFingers = fingers'
                    , stLit = lit' }
 
@@ -75,8 +75,8 @@ soundKey st (xy, sw) = do
     False ->
       let freq = 100 * et31ToFreq pitchClass
           voice = (M.!) (stVoices st) xy
-      in set voice ( toI freq                    :: I "freq"
-                   , toI $ 0.15 * switchToInt sw :: I "amp" )
+      in set voice ( toI freq                  :: I "freq"
+                   , toI $ 0.15 * boolToInt sw :: I "amp" )
 
 
 updateStLit :: ((X,Y), Switch)
@@ -87,7 +87,7 @@ updateStLit :: ((X,Y), Switch)
 
 -- | When a button is newly pressed,
 -- it adds anoother LedBecause to the LitPitches.
-updateStLit (xy,SwitchOn) pcNow _ m =
+updateStLit (xy,True) pcNow _ m =
   M.insert pcNow new m where
   new = case M.lookup pcNow m of
     Nothing ->      S.singleton $ LedBecauseSwitch xy
@@ -97,7 +97,7 @@ updateStLit (xy,SwitchOn) pcNow _ m =
 -- since pressing it. If that's so, then the pitch it triggered is elsewhere,
 -- and illuminated. This removes the pitch from the LitPitches,
 -- so that the appropriate pitch class will be darkened.
-updateStLit (xy,SwitchOff) _ mpcThen m =
+updateStLit (xy,False) _ mpcThen m =
   case mpcThen of
     Nothing -> m
     Just pc ->

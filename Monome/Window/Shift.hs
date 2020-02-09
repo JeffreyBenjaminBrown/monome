@@ -52,12 +52,12 @@ shiftWindow = Window {
 }
 
 colorArrows :: LedRelay -> IO ()
-colorArrows toShiftWindow = let f = toShiftWindow . (,LedOn)
+colorArrows toShiftWindow = let f = toShiftWindow . (,True)
   in mapM_ f [ upArrow, downArrow, leftArrow, rightArrow ]
 
 handler :: MVar State -> LedRelay -> [Window] -> ((X,Y), Switch) -> IO ()
-handler    _             _           _           (_,  SwitchOff) = return ()
-handler    mst           _           ws          (xy, SwitchOn ) = do
+handler    _             _           _           (_,  False) = return ()
+handler    mst           _           ws          (xy, True ) = do
   st0 <- takeMVar mst
   let Just (keyboard :: Window) = L.find pred ws where
         -- Pitfall: Assumes the window will be found.
@@ -65,6 +65,6 @@ handler    mst           _           ws          (xy, SwitchOn ) = do
       toKeyboard = relayIfHere (stToMonome st0) ws keyboard
       st' = st0 { stXyShift = addPair (stXyShift st0) (shift xy) }
       draw st = drawPitchClass toKeyboard $ stXyShift st
-  mapM_ (draw st0 LedOff) $ M.keys $ stLit st0
-  mapM_ (draw st' LedOn ) $ M.keys $ stLit st'
+  mapM_ (draw st0 False) $ M.keys $ stLit st0
+  mapM_ (draw st' True ) $ M.keys $ stLit st'
   putMVar mst st'

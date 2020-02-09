@@ -28,9 +28,9 @@ testToPort port = do
 -- send toMonome $ requestDeviceInfo 8000
 
 -- send toMonome $ fade "/monome" 0 1 7
--- send toMonome $ ledOsc "/monome" ((6,6) , LedOn)
+-- send toMonome $ ledOsc "/monome" ((6,6) , True)
 
--- mapM (send toMonome . ledOsc "/monome" . (,LedOn)) $ enharmonicToXYs (0,15)
+-- mapM (send toMonome . ledOsc "/monome" . (,True)) $ enharmonicToXYs (0,15)
   
 d :: Device
 d = readDevice [
