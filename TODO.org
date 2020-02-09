@@ -15,11 +15,11 @@ synth param
 rhythm
 chord
 melody
+* maybe Led and Switch should be synonyms for Bool
+It would simplify, e.g., Window.Sustain.handle
 * TODO MAYBE
 ** sustain to middle of bottom, and duplicate at both top corners
  so that usually something can touch it
-** maybe Led and Switch should be synonyms for Bool
- so that I can call not on them, or condition on them
 * features
 ** show sustained notes
 ** add to ongoing sustained group
