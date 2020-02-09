@@ -77,26 +77,31 @@ soundKey st (xy, sw) = do
       in set voice ( toI freq                    :: I "freq"
                    , toI $ 0.15 * switchToInt sw :: I "amp" )
 
+
 updateStLit :: ((X,Y), Switch)
        -> PitchClass       -- ^ what xy represents now
-       -> Maybe PitchClass -- ^ what xy represented when it was pressed
+       -> Maybe PitchClass -- ^ what xy represented when it was last pressed
        -> LitPitches
        -> LitPitches
-updateStLit (xy,SwitchOn) pcNow mpcThen m
-  | M.lookup pcNow m == Nothing =
-      M.insert pcNow (S.singleton $ LedBecauseSwitch xy) m
-  | Just reasons <- M.lookup pcNow m =
-      M.insert pcNow (S.insert (LedBecauseSwitch xy) reasons) m
-  | otherwise = error $ "updateStLit: unexpected input: "
-    ++ show (xy, SwitchOn)
-    ++ "," ++ show pcNow ++ "," ++ show mpcThen ++ "," ++ show m
-updateStLit (xy,SwitchOff) pcNow mpcThen m
-  | mpcThen == Nothing = m
-  | Just pc <- mpcThen = let Just reasons = M.lookup pc m
+
+-- | When a button is newly pressed,
+-- it adds anoother LedBecause to the LitPitches.
+updateStLit (xy,SwitchOn) pcNow _ m =
+  M.insert pcNow new m where
+  new = case M.lookup pcNow m of
+    Nothing ->      S.singleton $ LedBecauseSwitch xy
+    Just reasons -> S.insert (LedBecauseSwitch xy) reasons
+
+-- | When a key is released, it might be that we've used the arrows
+-- since pressing it. If that's so, then the pitch it triggered is elsewhere,
+-- and illuminated. This removes the pitch from the LitPitches,
+-- so that the appropriate pitch class will be darkened.
+updateStLit (xy,SwitchOff) _ mpcThen m =
+  case mpcThen of
+    Nothing -> m
+    Just pc ->
       -- TODO (#safety) Check that that's really what's being deleted.
+      let Just reasons = M.lookup pc m
       in case S.size reasons < 2 of -- size < 1 should not happen
         True -> M.delete pc m
         False -> M.insert pc (S.delete (LedBecauseSwitch xy) reasons) m
-  | otherwise = error $ "updateStLit: unexpected input: "
-    ++ show (xy, SwitchOff)
-    ++ "," ++ show pcNow ++ "," ++ show mpcThen ++ "," ++ show m
