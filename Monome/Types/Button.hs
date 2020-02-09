@@ -24,7 +24,7 @@ type Y = Int
 data Switch = SwitchOn | SwitchOff
   deriving (Show, Eq, Ord)
 
-switchToInt :: Switch -> Int
+switchToInt :: Num a => Switch -> a
 switchToInt SwitchOn = 1
 switchToInt SwitchOff = 0
 

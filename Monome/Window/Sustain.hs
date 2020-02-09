@@ -1,4 +1,6 @@
-{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DataKinds
+, ScopedTypeVariables
+#-}
 
 module Monome.Window.Sustain (
     sustainWindow
@@ -33,11 +35,11 @@ sustainWindow = Window {
 handler :: MVar State -> LedRelay -> [Window] -> ((X,Y), Switch) -> IO ()
 handler _   _  _ (_ , SwitchOff) = return ()
 handler mst toSustainWindow _ (xy0, SwitchOn) = do
-  st0 <- takeMVar mst -- PITFALL: old state; has opposite `stSustainOn` value
-  let sustainOn' :: Bool = not $ stSustainOn st0
-      sustained' :: Set ((X,Y), PitchClass) =
+  st <- takeMVar mst -- PITFALL: old state; has opposite `stSustainOn` value
+  let sustainOn' :: Bool = not $ stSustainOn st
+      sustained' :: S.Set ((X,Y), PitchClass) =
         if not sustainOn' then S.empty
-        else S.fromList $ M.toList $ stFingers st0
+        else S.fromList $ M.toList $ stFingers st
 
   -- redraw the sustain window, silence anything that needs it
   let drawSustainWindow = curry toSustainWindow xy0
@@ -45,8 +47,8 @@ handler mst toSustainWindow _ (xy0, SwitchOn) = do
     False -> do -- Turn sustain off: Free some voices, dark the led.
       let quiet xy = set ((M.!) (stVoices st) xy) (0 :: I "amp")
           sustainedAndNotFingered = S.difference
-            (S.map fst $ stSustained st0)
-            (S.fromList $ M.keys $ stFingers st0)
+            (S.map fst $ stSustained st)
+            (S.fromList $ M.keys $ stFingers st)
         in mapM_ quiet sustainedAndNotFingered
       drawSustainWindow LedOff
     True -> drawSustainWindow LedOn
@@ -60,7 +62,6 @@ handler mst toSustainWindow _ (xy0, SwitchOn) = do
       st' = st { stSustainOn = sustainOn'
                , stSustained = sustained'
                , stLit       = lit'      }
-
   putMVar mst st'
 
 insertOneSustainedNote :: ((X,Y), PitchClass)
@@ -79,7 +80,7 @@ deleteOneSustainedNote :: ((X,Y), PitchClass)
 deleteOneSustainedNote (xy, pc) m =
   case M.lookup pc m of
     Nothing -> m -- TODO ? Should this throw an error? It shouldn't happen.
-    Just reasons =
+    Just reasons ->
       -- TODO (#safety) Check that that's really what's being deleted.
       case S.size reasons < 2 of -- size < 1 should not happen
         True -> M.delete pc m
