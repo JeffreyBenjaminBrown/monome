@@ -6,6 +6,7 @@ module Monome.Window.Shift (
   , label
   ) where
 
+import Prelude hiding (pred)
 import Control.Concurrent.MVar
 import qualified Data.List as L
 import qualified Data.Map as M
@@ -18,9 +19,11 @@ import Monome.Window.Common (drawPitchClass)
 import qualified Monome.Window.Keyboard as Kbd
 
 
+label :: WindowLabel
 label = "shift window"
 
 -- | = the arrows
+rightArrow, downArrow, leftArrow, upOctave, upArrow, downOctave :: (X,Y)
 rightArrow = (15,15)
 downArrow =  (14,15)
 leftArrow =  (13,15)
@@ -35,8 +38,10 @@ shift xy | xy == rightArrow = ( 1, 0)
          | xy == upOctave   = (-5,-1)
          | xy == upArrow    = ( 0,-1)
          | xy == downOctave = ( 5, 1)
+         | otherwise = error $ "shift: unexpected input: " ++ show xy
 
 -- | = the window
+shiftWindow :: Window
 shiftWindow = Window {
   windowLabel = label
   , windowContains = \(x,y) -> numBetween 13 15 x && numBetween 14 15 y
@@ -50,13 +55,13 @@ colorArrows toShiftWindow = let f = toShiftWindow . (,LedOn)
 
 handler :: MVar State -> LedRelay -> [Window] -> ((X,Y), Switch) -> IO ()
 handler    _             _           _           (_,  SwitchOff) = return ()
-handler    mst           toShift     ws          (xy, SwitchOn ) = do
-  st <- takeMVar mst
+handler    mst           _           ws          (xy, SwitchOn ) = do
+  st0 <- takeMVar mst
   let Just keyboard = L.find pred ws where -- unsafe but it must be in there
         pred = (==) Kbd.label . windowLabel
-      toKeyboard = relayIfHere (stToMonome st) ws keyboard
-      st' = st { stXyShift = addPair (stXyShift st) (shift xy) }
+      toKeyboard = relayIfHere (stToMonome st0) ws keyboard
+      st' = st0 { stXyShift = addPair (stXyShift st0) (shift xy) }
       draw st = drawPitchClass toKeyboard $ stXyShift st
-  mapM_ (draw st  LedOff) $ M.keys $ stLit st
+  mapM_ (draw st0 LedOff) $ M.keys $ stLit st0
   mapM_ (draw st' LedOn ) $ M.keys $ stLit st'
   putMVar mst st'

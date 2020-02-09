@@ -1,3 +1,4 @@
+* TODO group Test, HandTest in a folder
 * TODO eliminate ghci warnings from -Wall
 * TODO rename mailbox -> listenAndEcho
 * Montevideo - Monome Tidal Vivid

@@ -30,8 +30,10 @@ relayIfHere dest ws w = f where
     then (send dest $ ledOsc "/monome" msg) >> return ()
     else return ()
 
+type WindowLabel = String
+
 data Window = Window {
-    windowLabel :: String
+    windowLabel :: WindowLabel
   , windowContains :: (X,Y) -> Bool
     -- ^ PITFALL: A monome will respond to out-of-bounds (x,y) values.
     -- Every Window therefore needs a nontrivial windowContains field,
@@ -55,17 +57,16 @@ runWindowInit mst allWindows = do
   let toWindow w = relayIfHere (stToMonome st) allWindows w
   mapM_ (\w -> windowInit w mst $ toWindow w) allWindows
 
-handleSwitch :: [Window] -> MVar State -> ((X,Y), Switch) -> IO ()
-handleSwitch               allWindows mst (btn0,sw) =
-  handleSwitch' allWindows allWindows mst (btn0,sw) where
-  -- `handleSwitch'` keeps the complete list of windows in its first arg,
+handleSwitch     :: [Window] -> MVar State -> ((X,Y), Switch) -> IO ()
+handleSwitch a b c =
+  go       a a b c where
+  -- `go` keeps the complete list of windows in its first arg,
   -- while iteratively discarding the head of its second.
-  handleSwitch' :: [Window] -> [Window] -> MVar State
-                -> ((X, Y), Switch) -> IO ()
-  handleSwitch' allWindows []         _   _           = return ()
-  handleSwitch' allWindows (w:ws)     mst sw @ (btn,_) = do
+  go :: [Window] -> [Window] -> MVar State -> ((X, Y), Switch) -> IO ()
+  go    _           []          _             _            = return ()
+  go    allWindows  (w:ws)      mst           sw @ (btn,_) = do
     st <- readMVar mst
     case windowContains w btn of
       True -> let ledRelay = relayIfHere (stToMonome st) allWindows w
               in windowHandler w mst ledRelay allWindows sw
-      False -> handleSwitch' allWindows ws mst sw
+      False -> go allWindows ws mst sw

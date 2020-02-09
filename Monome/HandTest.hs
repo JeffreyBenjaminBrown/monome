@@ -3,7 +3,6 @@
 
 module Monome.HandTest where
 
-import Data.ByteString.Char8 (unpack)
 import qualified Network.Socket.ByteString as NSB
 import Vivid.OSC
 
@@ -13,6 +12,7 @@ import Monome.Util.Network
 
 -- | = Send a message to something
 
+testToPort :: Show a => a -> IO Int
 testToPort port = do
   s <- toPort port
   NSB.send s $ encodeOSC $ OSC "/testing" [ OSC_S "testing" ]
@@ -32,6 +32,7 @@ testToPort port = do
 
 -- mapM (send toMonome . ledOsc "/monome" . (,LedOn)) $ enharmonicToXYs (0,15)
   
+d :: Device
 d = readDevice [
   OSC "/sys/id" [OSC_S "m0000102"]
   , OSC "/sys/size" [OSC_I 16,OSC_I 16]

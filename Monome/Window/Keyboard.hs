@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -fno-warn-type-defaults #-}
 {-# LANGUAGE DataKinds #-}
 
 module Monome.Window.Keyboard (
@@ -5,6 +6,7 @@ module Monome.Window.Keyboard (
   , label
   ) where
 
+import Prelude hiding (pred)
 import Control.Concurrent.MVar
 import qualified Data.Map as M
 import qualified Data.Set as S
@@ -18,10 +20,12 @@ import Monome.Math31
 import Monome.Window.Common
 
 
+label :: WindowLabel
 label = "keyboard window"
 
+keyboardWindow :: Window
 keyboardWindow =  Window {
-  windowLabel = label
+    windowLabel = label
   , windowContains = \(x,y) -> let pred = numBetween 0 15
                                in pred x && pred y
   , windowInit = \mst toKeyboard -> do
@@ -73,15 +77,19 @@ newLit :: ((X,Y), Switch)
        -> Maybe PitchClass -- ^ what xy represented when it was pressed
        -> M.Map PitchClass (S.Set LedReason)
        -> M.Map PitchClass (S.Set LedReason)
-newLit (xy,SwitchOn) pcNow _ m
+newLit (xy,SwitchOn) pcNow mpcThen m
   | M.lookup pcNow m == Nothing =
       M.insert pcNow (S.singleton $ LedFromSwitch xy) m
   | Just reasons <- M.lookup pcNow m =
       M.insert pcNow (S.insert (LedFromSwitch xy) reasons) m
-newLit (xy,SwitchOff) _ mpcThen m
+  | otherwise = error $ "newLit: unexpected input: " ++ show (xy, SwitchOn)
+    ++ "," ++ show pcNow ++ "," ++ show mpcThen ++ "," ++ show m
+newLit (xy,SwitchOff) pcNow mpcThen m
   | mpcThen == Nothing = m
   | Just pc <- mpcThen = let Just reasons = M.lookup pc m
       -- TODO (#safety) Check that that's really what's being deleted.
       in case S.size reasons < 2 of -- size < 1 should not happen
         True -> M.delete pc m
         False -> M.insert pc (S.delete (LedFromSwitch xy) reasons) m
+  | otherwise = error $ "newLit: unexpected input: " ++ show (xy, SwitchOff)
+    ++ "," ++ show pcNow ++ "," ++ show mpcThen ++ "," ++ show m

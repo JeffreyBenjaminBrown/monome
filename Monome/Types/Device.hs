@@ -77,3 +77,5 @@ readDevice [a,b,c,d,e,f] = Device {
     readDeviceRotation (OSC "/sys/rotation" [OSC_I rotation]) = fi rotation
     readDeviceRotation x =
       error $ "readDeviceRotation: can't interpret " ++ show x
+readDevice x = error $
+  "readDevice: List should have length 5, instead received: " ++ show x

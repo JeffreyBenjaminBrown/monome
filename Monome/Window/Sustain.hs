@@ -16,12 +16,15 @@ import Monome.Types.Button
 import Monome.Types.State
 
 
+label :: WindowLabel
 label = "sustain window"
 
+theButton :: (X,Y)
 theButton = (0,15)
 
+sustainWindow :: Window
 sustainWindow = Window {
-  windowLabel = label
+    windowLabel = label
   , windowContains = \(x,y) -> x == fst theButton && y == snd theButton
   , windowInit = \_ _ -> return ()
   , windowHandler = handler
@@ -35,6 +38,7 @@ insertOneSustainedNote (xy, pc) m
       M.insert pc (S.singleton $ LedFromSustain xy) m
   | Just reasons <- M.lookup pc m =
       M.insert pc (S.insert (LedFromSustain xy) reasons) m
+  | otherwise = error "insertOneSustainedNote: should be impossible."
 
 deleteOneSustainedNote :: ((X,Y), PitchClass)
                        -> M.Map PitchClass (S.Set LedReason)
@@ -46,17 +50,18 @@ deleteOneSustainedNote (xy, pc) m
       case S.size reasons < 2 of -- size < 1 should not happen
         True -> M.delete pc m
         False -> M.insert pc (S.delete (LedFromSustain xy) reasons) m
+  | otherwise = error "deleteOneSustainedNote: should be impossible."
 
 handler :: MVar State -> LedRelay -> [Window] -> ((X,Y), Switch) -> IO ()
 handler _   _  _ (_ , SwitchOff) = return ()
-handler mst toSustainWindow _ (xy, SwitchOn ) = do
+handler mst toSustainWindow _ (xy0, SwitchOn ) = do
   st <- takeMVar mst -- PITFALL: old state, opposite value of `sustainOn`
   let sustainOn' = not $ stSustainOn st
       sustained' = if not sustainOn' then S.empty
                    else S.fromList $ M.toList $ stFingers st
 
   -- redraw the sustain window, silence anything that needs it
-  let drawSustainWindow = curry toSustainWindow xy
+  let drawSustainWindow = curry toSustainWindow xy0
   case sustainOn' of
     False -> do -- Turn sustain off: Free some voices, dark the led.
       let quiet xy = set ((M.!) (stVoices st) xy) (0 :: I "amp")

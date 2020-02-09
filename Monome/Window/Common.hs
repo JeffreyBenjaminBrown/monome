@@ -2,6 +2,7 @@
 
 module Monome.Window.Common where
 
+import Prelude hiding (pred)
 import qualified Data.Map as M
 import qualified Data.Maybe as Mb
 import qualified Data.Set as S

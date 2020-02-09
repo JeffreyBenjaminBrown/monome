@@ -9,11 +9,13 @@ import Monome.Types.Button
 import Monome.Types.Window
 
 
+tests :: IO Counts
 tests = runTestTT $ TestList [
     TestLabel "testBelongsHere" testBelongsHere
   , TestLabel "testDependentPitchClass" testDependentPitchClass
   ]
 
+testDependentPitchClass :: Test
 testDependentPitchClass = TestCase $ do
   let m = M.singleton 10 $ S.singleton $ LedFromSwitch(1,1)
   assertBool "dependentPitchClass finds it" $
@@ -21,10 +23,11 @@ testDependentPitchClass = TestCase $ do
   assertBool "dependentPitchClass does not find it" $
     dependentPitchClass m  (LedFromSwitch (1,0)) == Nothing
 
+testBelongsHere :: Test
 testBelongsHere = TestCase $ do
   let w1 = Window "w1" (\(x,y) -> x > y) mempty mempty
-      w2 = Window "w2" (\(x,y) -> x > 4) mempty mempty
-      w3 = Window "w3" (\(x,y) -> True)  mempty mempty
+      w2 = Window "w2" (\(x,_) -> x > 4) mempty mempty
+      w3 = Window "w3" (\(_,_) -> True)  mempty mempty
       ws = [w1,w2,w3]
   assertBool "caught by w1 before reaching w3" $
     not $ belongsHere ws w3 ((1,0),LedOn)
