@@ -36,29 +36,13 @@ sustainWindow = Window {
 }
 
 handler :: MVar St -> LedRelay -> [Window] -> ((X,Y), Switch) -> IO ()
-handler    _             _           _           (_ , False) = return ()
-handler    mst           toSustain   ws          (xy0, True) = do
+handler    _          _           _           (_ , False) = return ()
+handler    mst        toSustain   ws          (xy0, True) = do
   st <- takeMVar mst
-  let sustainOn' :: Bool = -- new sustain state
-        not $
-        stSustainOn st -- old sustain state
-      sustained' :: Set ((X,Y), PitchClass) = -- new sustained pitches
-        if not sustainOn' then S.empty
-        else S.fromList $ M.toList $ stFingers st
-      drawSustainWindow = curry toSustain xy0
-
-      lit' | sustainOn' =
-             foldr insertOneSustainedNote (stLit st)
-             $ M.elems $ stFingers st
-           | otherwise =
-             foldr deleteOneSustainedNote (stLit st)
-             $ S.toList $ S.map snd $ stSustained st
-      st' = st { stSustainOn = sustainOn'
-               , stSustained = sustained'
-               , stLit       = lit'      }
+  let st' = updateSt st
   putMVar mst st'
 
-  case sustainOn' of -- IO: lights and sound
+  case stSustainOn st' of -- IO: lights and sound
     False -> do -- Turn sustain off.
       let
         voicesToSilence :: Set (X,Y) =
@@ -73,7 +57,7 @@ handler    mst           toSustain   ws          (xy0, True) = do
             S.filter (not . mustStayLit) $ voicesToSilence_pcs
             where
               mustStayLit :: PitchClass -> Bool
-              mustStayLit pc = case M.lookup pc lit' of
+              mustStayLit pc = case M.lookup pc $ stLit st' of
                 Nothing -> False
                 Just s -> if null s
                   then error "Sustain handler: null value in LitPitches."
@@ -95,21 +79,43 @@ handler    mst           toSustain   ws          (xy0, True) = do
       mapM_ (draw False) $ S.toList keysToDarken
 
       -- Darken the sustain button.
-      drawSustainWindow False
+      curry toSustain xy0 False
 
-    True -> drawSustainWindow True
+    -- Light the sustain button.
+    True -> curry toSustain xy0 True
+
+-- | When the sustain button is toggled --
+-- which happens only when it is pressed, not when it is released --
+-- the sustainOn value flips, and the set of sustained pitches changes.
+updateSt :: St -> St
+updateSt st = let
+  sustainOn' :: Bool = -- new sustain state
+    not $ stSustainOn st
+  sustained' :: Set ((X,Y), PitchClass) = -- new sustained pitches
+    if not sustainOn' then S.empty
+    else S.fromList $ M.toList $ stFingers st
+
+  lit' | sustainOn' =
+         foldr insertOneSustainedNote (stLit st)
+         $ M.elems $ stFingers st
+       | otherwise =
+         foldr deleteOneSustainedNote (stLit st)
+         $ S.toList $ S.map snd $ stSustained st
+  in st { stSustainOn = sustainOn'
+        , stSustained = sustained'
+        , stLit       = lit'      }
 
 insertOneSustainedNote, deleteOneSustainedNote
   :: PitchClass -> LitPitches -> LitPitches
 insertOneSustainedNote pc m =
-  case M.lookup pc m of
-    Nothing ->      M.insert pc (S.singleton LedBecauseSustain) m
-    Just reasons -> M.insert pc (S.insert LedBecauseSustain reasons) m
+  let reasons :: Set LedBecause =
+        maybe S.empty id $ M.lookup pc m
+  in M.insert pc (S.insert LedBecauseSustain reasons) m
 deleteOneSustainedNote pc m =
   case M.lookup pc m of
     Nothing -> m -- TODO ? Should this throw an error? It shouldn't happen.
-    Just reasons ->
-      -- TODO (#safety) Check that that's really what's being deleted.
-      case S.size reasons < 2 of -- TODO ? verify size < 1 (should not happen)
-        True -> M.delete pc m
-        False -> M.insert pc (S.delete LedBecauseSustain reasons) m
+    Just reasons -> let
+      reasons' = S.delete LedBecauseSustain reasons
+      in if null reasons'
+         then M.delete pc m
+         else M.insert pc reasons' m
