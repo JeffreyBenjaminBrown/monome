@@ -35,7 +35,7 @@ sustainWindow = Window {
   , windowRoutine = handler
 }
 
-handler :: MVar State -> LedRelay -> [Window] -> ((X,Y), Switch) -> IO ()
+handler :: MVar St -> LedRelay -> [Window] -> ((X,Y), Switch) -> IO ()
 handler    _             _           _           (_ , False) = return ()
 handler    mst           toSustain   ws          (xy0, True) = do
   st <- takeMVar mst

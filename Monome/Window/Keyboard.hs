@@ -37,7 +37,7 @@ keyboardWindow =  Window {
         $ M.keys $ stLit st
   , windowRoutine = handler }
 
-handler :: MVar State
+handler :: MVar St
         -> LedRelay
         -> [Window]
         -> ((X,Y), Switch)
@@ -67,7 +67,7 @@ handler mst toKeyboard _ press @ (xy,sw) = do
   putMVar mst $ st { stFingers = fingers'
                    , stLit = lit' }
 
-soundKey :: State -> ((X,Y), Switch) -> IO ()
+soundKey :: St -> ((X,Y), Switch) -> IO ()
 soundKey st (xy, sw) = do
   let pitch = xyToEt31 xy - xyToEt31 (stXyShift st)
   case S.member xy $ S.map fst $ stSustained st of

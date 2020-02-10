@@ -44,9 +44,9 @@ data Window = Window {
     -- ^ PITFALL: A monome will respond to out-of-bounds (x,y) values.
     -- Every Window therefore needs a nontrivial windowContains field,
     -- even the background Window.
-  , windowInit :: MVar State -> LedRelay -> IO ()
+  , windowInit :: MVar St -> LedRelay -> IO ()
   , windowRoutine -- ^ Acts on messages from the monome.
-    :: MVar State
+    :: MVar St
     -> LedRelay -- ^ Control Leds via this, not raw `send` commands.
     -> [Window] -- ^ To construct an LedRelay to another Window, if needed.
       -- PIFALL: Should be a list of all Windows -- not just, say, later ones.
@@ -57,19 +57,19 @@ data Window = Window {
 instance Eq Window where
   (==) a b = windowLabel a == windowLabel b
 
-initAllWindows :: MVar State -> [Window] -> IO ()
+initAllWindows :: MVar St -> [Window] -> IO ()
 initAllWindows mst allWindows = do
   st <- readMVar mst
   let toWindow w = relayIfHere (stToMonome st) allWindows w
   mapM_ (\w -> windowInit w mst $ toWindow w) allWindows
 
 -- | called every time a monome button is pressed or released
-handleSwitch     :: [Window] -> MVar State -> ((X,Y), Switch) -> IO ()
+handleSwitch     :: [Window] -> MVar St -> ((X,Y), Switch) -> IO ()
 handleSwitch a b c =
   go       a a b c where
   -- `go` keeps the complete list of windows in its first arg,
   -- while iteratively discarding the head of its second.
-  go :: [Window] -> [Window] -> MVar State -> ((X, Y), Switch) -> IO ()
+  go :: [Window] -> [Window] -> MVar St -> ((X, Y), Switch) -> IO ()
   go    _           []          _             _            = return ()
   go    allWindows  (w:ws)      mst           sw @ (btn,_) = do
     st <- readMVar mst

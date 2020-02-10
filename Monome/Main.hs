@@ -35,7 +35,7 @@ import Monome.Window.Sustain
 windows :: [Window]
 windows = [sustainWindow, shiftWindow, keyboardWindow]
 
-et31 :: Maybe PitchClass -> IO State
+et31 :: Maybe PitchClass -> IO St
 et31 mbAnchor = do
   inbox <- receivesAt "127.0.0.1" 8000
     -- I don't know why it's port 8000, or why it used to be 11111.
@@ -44,7 +44,7 @@ et31 mbAnchor = do
   voices :: M.Map (X, Y) (Synth BoopParams) <-
     let places = [(a,b) | a <- [0..15], b <- [0..15]]
     in M.fromList . zip places <$> mapM (synth boop) (replicate 256 ())
-  mst <- newMVar $ State {
+  mst <- newMVar $ St {
       stInbox = inbox
     , stToMonome = toMonome
     , stVoices = voices
@@ -64,7 +64,7 @@ et31 mbAnchor = do
       Right osc -> let switch = readSwitchOSC osc
                    in  handleSwitch windows mst switch
 
-  let (loop :: IO State) = getChar >>= \case
+  let (loop :: IO St) = getChar >>= \case
         'q' -> do
           close inbox
           mapM_ free (M.elems voices)

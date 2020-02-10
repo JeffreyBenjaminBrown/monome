@@ -34,7 +34,7 @@ library
     , Monome.Test.Test
     , Monome.Types.Button
     , Monome.Types.Device
-    , Monome.Types.State
+    , Monome.Types.St
     , Monome.Types.Window
     , Monome.Util
     , Monome.Window.Common

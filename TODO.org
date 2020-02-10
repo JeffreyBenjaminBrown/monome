@@ -1,4 +1,6 @@
 * TODO create voices on the fly
+** Currently
+stVoices :: St -> M.Map (X,Y) (Synth BoopParams)
 * TODO sustained pitches should not disable keys
 Currently, because each voice is identified with a key,
 if that voice is sustained, that key cannot sound a new note,

@@ -10,7 +10,7 @@ import Monome.Types.Button
 import Monome.Network.Util
 
 
-data State = State {
+data St = St {
     stInbox :: Socket
   , stToMonome :: Socket
   , stVoices :: M.Map (X,Y) (Synth BoopParams)

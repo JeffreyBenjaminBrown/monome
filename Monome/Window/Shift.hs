@@ -54,7 +54,7 @@ colorArrows :: LedRelay -> IO ()
 colorArrows toShiftWindow = let f = toShiftWindow . (,True)
   in mapM_ f [ upArrow, downArrow, leftArrow, rightArrow ]
 
-handler :: MVar State -> LedRelay -> [Window] -> ((X,Y), Switch) -> IO ()
+handler :: MVar St -> LedRelay -> [Window] -> ((X,Y), Switch) -> IO ()
 handler    _             _           _           (_,  False) = return ()
 handler    mst           _           ws          (xy, True ) = do
   st0 <- takeMVar mst
