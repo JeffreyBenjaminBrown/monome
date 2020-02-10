@@ -37,10 +37,10 @@ windows = [sustainWindow, shiftWindow, keyboardWindow]
 
 et31 :: Maybe PitchClass -> IO State
 et31 mbAnchor = do
-  inbox <- receivesAt "127.0.0.1" 8000 -- I don't know why it's 8000.
-    -- It used to be 11111; I don't know why that was, either.
+  inbox <- receivesAt "127.0.0.1" 8000
+    -- I don't know why it's port 8000, or why it used to be 11111.
   toMonome <- sendsTo (unpack localhost) 15226
-    -- to find the right port number above, see HandTest.hs
+    -- to find the port number above, use the first part of HandTest.hs
   voices :: M.Map (X, Y) (Synth BoopParams) <-
     let places = [(a,b) | a <- [0..15], b <- [0..15]]
     in M.fromList . zip places <$> mapM (synth boop) (replicate 256 ())
