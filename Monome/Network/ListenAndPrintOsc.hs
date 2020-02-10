@@ -4,7 +4,7 @@ LambdaCase
 , ScopedTypeVariables
 #-}
 
-module Monome.Network.Mailbox where
+module Monome.Network.ListenAndPrintOsc where
 
 import Control.Concurrent (forkIO)
 import Control.Concurrent.MVar

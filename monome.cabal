@@ -27,7 +27,7 @@ library
       Monome.Instances.TypesafeArgs
     , Monome.Main
     , Monome.Math31
-    , Monome.Network.Mailbox
+    , Monome.Network.ListenAndPrintOsc
     , Monome.Network.Monome
     , Monome.Network.Util
     , Monome.Test.HandTest

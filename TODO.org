@@ -1,3 +1,8 @@
+* TODO create voices on the fly
+* TODO sustained pitches should not disable keys
+Currently, because each voice is identified with a key,
+if that voice is sustained, that key cannot sound a new note,
+even when it no longer represents the same pitch.
 * TODO isolate IO
 ** why
 It will make updating the screen easier.
@@ -8,10 +13,6 @@ change the state to have a collection of messages to send.
 In video, rather than sending to monome,
 make each window keep a "last sent" and a "to show" set of LED assignments,
 and compute the difference when needed.
-* TODO sustained pitches should not disable keys
-Currently, because each voice is identified with a key,
-if that voice is sustained, that key cannot sound a new note,
-even when it no longer represents the same pitch.
 * TODO flash the anchor
 * TODO dependentPitchClass should not exist
 * TODO sustain: two buttons, "add these" and "release all"
