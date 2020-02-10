@@ -25,7 +25,7 @@ data St = St {
   , stLit :: LitPitches
   , stSustainOn :: Bool
     -- ^ TODO ? This could be eliminated by making the next field a Maybe.
-  , stSustained :: S.Set ((X,Y), PitchClass)
+  , stSustained :: S.Set (X,Y)
     -- ^ PITFALL: In spirit, the thing sustained is a PitchClass,
     -- but it's represented as a voice,
     -- identified by the key that originally launched it.

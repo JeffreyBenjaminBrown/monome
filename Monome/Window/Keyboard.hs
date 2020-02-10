@@ -70,7 +70,7 @@ handler mst toKeyboard _ press @ (xy,sw) = do
 soundKey :: St -> ((X,Y), Switch) -> IO ()
 soundKey st (xy, sw) = do
   let pitch = xyToEt31 xy - xyToEt31 (stXyShift st)
-  case S.member xy $ S.map fst $ stSustained st of
+  case S.member xy $ stSustained st of
     True -> return () -- it's already sounding due to sustain
     False ->
       let freq = 100 * et31ToFreq pitch

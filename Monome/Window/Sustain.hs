@@ -42,10 +42,9 @@ handler    mst           toSustain   ws          (xy0, True) = do
   let sustainOn' :: Bool = -- new sustain state
         not $
         stSustainOn st -- old sustain state
-      sustained' :: Set ((X,Y), PitchClass) = -- new sustained pitches
+      sustained' :: Set (X,Y) = -- new sustained pitches
         if not sustainOn' then S.empty
-        else S.fromList $ M.toList $ stFingers st
-      drawSustainWindow = curry toSustain xy0
+        else M.keysSet $ stFingers st
 
       lit' | sustainOn' =
              foldr insertOneSustainedNote (stLit st)
@@ -64,7 +63,7 @@ handler    mst           toSustain   ws          (xy0, True) = do
         voicesToSilence :: Set (X,Y) =
             -- If a voice was sustained before sustain was released,
             -- and it is not fingered, it should be darkened.
-            S.difference (S.map fst $ stSustained st)
+            S.difference (stSustained st)
                          (S.fromList $ M.keys $ stFingers st)
 
         keysToDarken :: Set PitchClass =
@@ -95,9 +94,9 @@ handler    mst           toSustain   ws          (xy0, True) = do
       mapM_ (draw False) $ S.toList keysToDarken
 
       -- Darken the sustain button.
-      drawSustainWindow False
+      curry toSustain xy0 False
 
-    True -> drawSustainWindow True
+    True -> curry toSustain xy0 True
 
 insertOneSustainedNote, deleteOneSustainedNote
   :: PitchClass -> LitPitches -> LitPitches
