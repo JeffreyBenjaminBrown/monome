@@ -12,7 +12,6 @@ and compute the difference when needed.
 Currently, because each voice is identified with a key,
 if that voice is sustained, that key cannot sound a new note,
 even when it no longer represents the same pitch.
-* TODO bug: turning sustain off can destroy the anchor
 * TODO flash the anchor
 * TODO dependentPitchClass should not exist
 * TODO sustain: two buttons, "add these" and "release all"

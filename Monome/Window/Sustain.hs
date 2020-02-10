@@ -60,24 +60,39 @@ handler    mst           toSustain   ws          (xy0, True) = do
 
   case sustainOn' of -- IO: lights and sound
     False -> do -- Turn sustain off.
-      let sustainedAndNotFingeredXYs :: Set (X,Y) =
+      let
+        voicesToSilence :: Set (X,Y) =
+            -- If a voice was sustained before sustain was released,
+            -- and it is not fingered, it should be darkened.
             S.difference (S.map fst $ stSustained st)
                          (S.fromList $ M.keys $ stFingers st)
-          sustained_notFingered_notAnchored_PCs :: Set PitchClass =
-            S.map snd $ S.filter f $ stSustained st where
-              f :: ((X,Y), PitchClass) -> Bool
-              f (b,_) = S.member b sustainedAndNotFingeredXYs
+
+        keysToDarken :: Set PitchClass =
+            -- `keysToDarken` is nearly equal to `voicesToSilence`,
+            -- but it excludes visual anchors as well as fingered notes.
+            S.filter (not . mustStayLit) $ voicesToSilence_pcs
+            where
+              mustStayLit :: PitchClass -> Bool
+              mustStayLit pc = case M.lookup pc lit' of
+                Nothing -> False
+                Just s -> if null s
+                  then error "Sustain handler: null value in LitPitches."
+                  else True
+              voicesToSilence_pcs :: Set PitchClass =
+                S.map snd $ S.filter f $ stSustained st
+                where f :: ((X,Y), PitchClass) -> Bool
+                      f (b,_) = S.member b voicesToSilence
 
       -- Silence some voices.
       let quiet xy = set ((M.!) (stVoices st) xy) (0 :: I "amp")
-      mapM_ quiet sustainedAndNotFingeredXYs
+      mapM_ quiet voicesToSilence
 
-      -- Darken some keys on the keyboard (which is a different window).
+      -- Darken some of the keyboard (which is a different window).
       let keyboard = maybe err id $ findWindow ws Kbd.label where
             err = error "Window.Shift.handler: keyboard window not found."
           toKeyboard = relayIfHere (stToMonome st) ws keyboard
           draw = drawPitchClass toKeyboard $ stXyShift st
-      mapM_ (draw False) $ S.toList sustained_notFingered_notAnchored_PCs
+      mapM_ (draw False) $ S.toList keysToDarken
 
       -- Darken the sustain button.
       drawSustainWindow False
