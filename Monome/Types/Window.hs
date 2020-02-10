@@ -50,6 +50,8 @@ data Window = Window {
     -> LedRelay -- ^ Control Leds via this, not raw `send` commands.
     -> [Window] -- ^ To construct an LedRelay to another Window, if needed.
       -- PIFALL: Should be a list of all Windows -- not just, say, later ones.
+      -- TODO ? Include the list of windows as part of an St,
+      -- and omit this argument
     -> ((X,Y), Switch) -- ^ the incoming button press|release
     -> IO ()
   }
@@ -82,3 +84,9 @@ findWindow :: [Window] -> WindowLabel -> Maybe Window
 findWindow ws l = L.find pred ws where
   -- Pitfall: Assumes the window will be found.
   pred = (==) l . windowLabel
+
+relayToWindow :: St -> WindowLabel -> [Window] -> LedRelay
+relayToWindow st wl ws = let
+  w = maybe err id $ findWindow ws wl
+    where err = error "Window.Shift.handler: keyboard window not found."
+  in relayIfHere (stToMonome st) ws w

@@ -44,39 +44,17 @@ handler    mst        toSustain   ws          (xy0, True) = do
 
   case stSustainOn st' of -- IO: lights and sound
     False -> do -- Turn sustain off.
-      let
-        voicesToSilence :: Set (X,Y) =
-            -- If a voice was sustained before sustain was released,
-            -- and it is not fingered, it should be darkened.
-            S.difference (S.map fst $ stSustained st)
-                         (S.fromList $ M.keys $ stFingers st)
-
-        keysToDarken :: Set PitchClass =
-            -- `keysToDarken` is nearly equal to `voicesToSilence`,
-            -- but it excludes visual anchors as well as fingered notes.
-            S.filter (not . mustStayLit) $ voicesToSilence_pcs
-            where
-              mustStayLit :: PitchClass -> Bool
-              mustStayLit pc = case M.lookup pc $ stLit st' of
-                Nothing -> False
-                Just s -> if null s
-                  then error "Sustain handler: null value in LitPitches."
-                  else True
-              voicesToSilence_pcs :: Set PitchClass =
-                S.map snd $ S.filter f $ stSustained st
-                where f :: ((X,Y), PitchClass) -> Bool
-                      f (b,_) = S.member b voicesToSilence
+      let voicesToSilence      = get_voicesToSilence st
+          pitchClassesToDarken = get_pitchClassesToDarken st st'
 
       -- Silence some voices.
-      let quiet xy = set ((M.!) (stVoices st) xy) (0 :: I "amp")
-      mapM_ quiet voicesToSilence
+      let silence xy = set ((M.!) (stVoices st) xy) (0 :: I "amp")
+        in mapM_ silence voicesToSilence
 
       -- Darken some of the keyboard (which is a different window).
-      let keyboard = maybe err id $ findWindow ws Kbd.label where
-            err = error "Window.Shift.handler: keyboard window not found."
-          toKeyboard = relayIfHere (stToMonome st) ws keyboard
+      let toKeyboard = relayToWindow st Kbd.label ws
           draw = drawPitchClass toKeyboard $ stXyShift st
-      mapM_ (draw False) $ S.toList keysToDarken
+        in mapM_ (draw False) $ S.toList pitchClassesToDarken
 
       -- Darken the sustain button.
       curry toSustain xy0 False
@@ -84,9 +62,37 @@ handler    mst        toSustain   ws          (xy0, True) = do
     -- Light the sustain button.
     True -> curry toSustain xy0 True
 
+get_voicesToSilence :: St -> Set (X,Y)
+get_voicesToSilence oldSt =
+    -- If a voice was sustained before sustain was released,
+    -- and it is not fingered, it should be darkened.
+    S.difference (S.map fst $ stSustained oldSt)
+                 (S.fromList $ M.keys $ stFingers oldSt)
+
+get_pitchClassesToDarken :: St -> St -> Set PitchClass
+  -- TODO ? speed: This calls `get_voicesToSilence`.
+  -- Would it be faster to pass the result of `get_voicesToSilence`
+  -- as a precomputed argument? (I'm guessing the compiler fogures it out.)
+get_pitchClassesToDarken oldSt newSt =
+  -- `get_pitchClassesToDarken` is nearly equal to `get_voicesToSilence`,
+  -- but it excludes visual anchors as well as fingered notes.
+  S.filter (not . mustStayLit) $ voicesToSilence_pcs
+  where
+    mustStayLit :: PitchClass -> Bool
+    mustStayLit pc = case M.lookup pc $ stLit newSt of
+      Nothing -> False
+      Just s -> if null s
+        then error "Sustain handler: null value in LitPitches."
+        else True
+    voicesToSilence_pcs :: Set PitchClass =
+      S.map snd $ S.filter f $ stSustained oldSt
+      where f :: ((X,Y), PitchClass) -> Bool
+            f (b,_) = S.member b $ get_voicesToSilence oldSt
+
 -- | When the sustain button is toggled --
 -- which happens only when it is pressed, not when it is released --
--- the sustainOn value flips, and the set of sustained pitches changes.
+-- the sustainOn value flips, the set of sustained pitches changes,
+-- and the set of lit keys gains new reasons to be lit.
 updateSt :: St -> St
 updateSt st = let
   sustainOn' :: Bool = -- new sustain state
@@ -105,6 +111,10 @@ updateSt st = let
         , stSustained = sustained'
         , stLit       = lit'      }
 
+-- | When sustain is toggled, the reasons for having LEDs on change.
+-- If it is turned on, some LEDs are now lit for two reasons:
+-- fingers and sustain. If it is turned off,
+-- sustain is no longer a reason to light up any LEDs.
 insertOneSustainedNote, deleteOneSustainedNote
   :: PitchClass -> LitPitches -> LitPitches
 insertOneSustainedNote pc m =
