@@ -1,27 +1,25 @@
-* TODO why does stFingers keep a PitchClass, not a Pitch?
-* TODO why does stSustained keep a PitchClass -- and get it from stFingers?
+* TODO incorporate [Window] into St
 * TODO create voices on the fly
-** TODO Currently
+first change stFingers
+** Currently
 stVoices :: St -> M.Map (X,Y) (Synth BoopParams)
 *** code that modifies voices
 Keyboard.soundKey :: St -> ((X,Y), Switch) -> IO ()
   To modify a voice., it looks up the voice in stVoices.
 Sustain.quiet xy = do set ((M.!) (stVoices st) xy) (0 :: I "amp")
                       mapM_ quiet voicesToSilence
-*** TODO I don't understand St.stSustained
-I saved my work on the unmerged `dropPitchclass_from_stSustained` branch:
-  commit 5cec28d1773b350c9a13afc3dd609aabdfe2f597
-
-I tried to get this to work
-  -  , stSustained :: S.Set ((X,Y), PitchClass)
-  +  , stSustained :: S.Set (X,Y)
-but Sustain.handler seems to need the PitchClass.
-** TODO Instead
-type VoiceId = Int
-data St = ...
-  stVoices :: Map VoiceId (Synth BoopParams).
-  stFingers :: Map (X,Y) Pitch
+*** types
+St = ...
+  stVoices :: M.Map (X,Y) (Synth BoopParams)
+  stFingers :: M.Map (X,Y) PitchClass -- should be pitch, not pitch class
   stLit :: LitPitches = Map PitchClass (Set LedBecause)
+  stSustained :: S.Set ((X,Y), PitchClass) -- should just be a voice ID
+** Instead
+type VoiceId = Int -- in Types/State.hs, its only meaningful context.
+data St = ...
+  stVoices  :: Map VoiceId (Synth BoopParams).
+  stFingers :: Map (X,Y) Pitch
+  stSustained :: S.Set VoiceID
 * TODO sustained pitches should not disable keys
 Currently, because each voice is identified with a key,
 if that voice is sustained, that key cannot sound a new note,

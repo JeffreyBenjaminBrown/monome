@@ -17,9 +17,15 @@ import Monome.Network.Monome
 type X = Int
 type Y = Int
 
+type Switch = Bool -- | Whether a monome button is pressed.
+type Led    = Bool -- | Whether a monome LED is lit.
 
--- | The mechanical state of a monome button
-type Switch = Bool
+-- | The reason a (pitch class of) LED(s) in the keyboard window is lit.
+data LedBecause =
+    LedBecauseSwitch (X,Y)
+  | LedBecauseSustain
+  | LedBecauseAnchor -- ^ Some "visual anchor" pitches are always on.
+  deriving (Show, Eq, Ord)
 
 boolToInt :: Num a => Bool -> a
 boolToInt True = 1
@@ -36,9 +42,6 @@ readSwitchOSC (OSC "/monome/grid/key" [OSC_I x, OSC_I y, OSC_I s]) =
   ((fi x, fi y), boolFromInt $ fi s)
 readSwitchOSC x = error $ "readSwitchOSC: bad message: " ++ show x
 
--- | The state of a monome LED
-type Led = Bool
-
 -- | Tells the monome to turn on an LED. See Test/HandTest.hs.
 ledOsc :: String -> ((X,Y), Led) -> ByteString
 ledOsc prefix ((x, y), led) = onoff prefix x y $ boolToInt led
@@ -46,11 +49,3 @@ ledOsc prefix ((x, y), led) = onoff prefix x y $ boolToInt led
 -- | Tells the monome to turn on every LED. See Test/HandTest.hs.
 allLedOsc :: String -> Led -> ByteString
 allLedOsc prefix led = allLeds prefix $ boolToInt led
-
-
--- | The reason a (pitch class of) LED(s) in the keyboard window is lit.
-data LedBecause =
-    LedBecauseSwitch  (X,Y)
-  | LedBecauseSustain
-  | LedBecauseAnchor -- ^ Some "visual anchor" pitches are always on.
-  deriving (Show, Eq, Ord)
