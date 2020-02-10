@@ -49,10 +49,10 @@ handler    mst           toSustain   ws          (xy0, True) = do
 
       lit' | sustainOn' =
              foldr insertOneSustainedNote (stLit st)
-             $ M.toList $ stFingers st
+             $ M.elems $ stFingers st
            | otherwise =
              foldr deleteOneSustainedNote (stLit st)
-             $ S.toList $ stSustained st
+             $ S.toList $ S.map snd $ stSustained st
       st' = st { stSustainOn = sustainOn'
                , stSustained = sustained'
                , stLit       = lit'      }
@@ -100,16 +100,16 @@ handler    mst           toSustain   ws          (xy0, True) = do
     True -> drawSustainWindow True
 
 insertOneSustainedNote, deleteOneSustainedNote
-  :: ((X,Y), PitchClass) -> LitPitches -> LitPitches
-insertOneSustainedNote (xy, pc) m =
+  :: PitchClass -> LitPitches -> LitPitches
+insertOneSustainedNote pc m =
   case M.lookup pc m of
-    Nothing ->      M.insert pc (S.singleton $ LedBecauseSustain xy) m
-    Just reasons -> M.insert pc (S.insert (LedBecauseSustain xy) reasons) m
-deleteOneSustainedNote (xy, pc) m =
+    Nothing ->      M.insert pc (S.singleton LedBecauseSustain) m
+    Just reasons -> M.insert pc (S.insert LedBecauseSustain reasons) m
+deleteOneSustainedNote pc m =
   case M.lookup pc m of
     Nothing -> m -- TODO ? Should this throw an error? It shouldn't happen.
     Just reasons ->
       -- TODO (#safety) Check that that's really what's being deleted.
       case S.size reasons < 2 of -- TODO ? verify size < 1 (should not happen)
         True -> M.delete pc m
-        False -> M.insert pc (S.delete (LedBecauseSustain xy) reasons) m
+        False -> M.insert pc (S.delete LedBecauseSustain reasons) m

@@ -48,9 +48,9 @@ allLedOsc :: String -> Led -> ByteString
 allLedOsc prefix led = allLeds prefix $ boolToInt led
 
 
--- | The reason an LED is lit.
+-- | The reason a (pitch class of) LED(s) in the keyboard window is lit.
 data LedBecause =
     LedBecauseSwitch  (X,Y)
-  | LedBecauseSustain (X,Y)
+  | LedBecauseSustain
   | LedBecauseAnchor -- ^ Some "visual anchor" pitches are always on.
   deriving (Show, Eq, Ord)
