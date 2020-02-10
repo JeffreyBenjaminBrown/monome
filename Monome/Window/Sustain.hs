@@ -41,26 +41,22 @@ handler    mst        toSustain   ws          (xy0, True) = do
   st <- takeMVar mst
   let st' = updateSt st
   putMVar mst st'
+  case stSustainOn st' of
 
-  case stSustainOn st' of -- IO: lights and sound
     False -> do -- Turn sustain off.
       let voicesToSilence      = get_voicesToSilence st
           pitchClassesToDarken = get_pitchClassesToDarken st st'
-
-      -- Silence some voices.
-      let silence xy = set ((M.!) (stVoices st) xy) (0 :: I "amp")
+      let -- Silence some voices.
+        silence xy = set ((M.!) (stVoices st) xy) (0 :: I "amp")
         in mapM_ silence voicesToSilence
-
-      -- Darken some of the keyboard (which is a different window).
-      let toKeyboard = relayToWindow st Kbd.label ws
-          draw = drawPitchClass toKeyboard $ stXyShift st
+      let -- Darken some of the keyboard (which is a different window).
+        draw = drawPitchClass toKeyboard $ stXyShift st
+          where toKeyboard = relayToWindow st Kbd.label ws
         in mapM_ (draw False) $ S.toList pitchClassesToDarken
+      curry toSustain xy0 False -- Darken the sustain button.
 
-      -- Darken the sustain button.
-      curry toSustain xy0 False
-
-    -- Light the sustain button.
-    True -> curry toSustain xy0 True
+    True -> -- Turn sustain on.
+      curry toSustain xy0 True
 
 get_voicesToSilence :: St -> Set (X,Y)
 get_voicesToSilence oldSt =
