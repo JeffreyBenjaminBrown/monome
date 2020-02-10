@@ -33,6 +33,8 @@ import Monome.Window.Sustain
 -- Windows listed earlier are "above" later ones:
 -- key presses are handled by the first window containing them.
 windows :: [Window]
+  -- PITFALL: It is tempting to incorporate this into the St type,
+  -- but that creates a dependency cycle.
 windows = [sustainWindow, shiftWindow, keyboardWindow]
 
 et31 :: Maybe PitchClass -> IO St
@@ -50,8 +52,9 @@ et31 mbAnchor = do
     , stVoices = voices
     , stXyShift = (0,0)
     , stFingers = mempty
-    , stLit = let f anchor = M.singleton anchor $ S.singleton LedBecauseAnchor
-              in maybe mempty f mbAnchor
+    , stLit = let
+        f anchor = M.singleton anchor $ S.singleton LedBecauseAnchor
+      in maybe mempty f mbAnchor
     , stSustainOn = False
     , stSustained = mempty
     }

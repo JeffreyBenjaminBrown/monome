@@ -1,4 +1,3 @@
-* TODO incorporate [Window] into St
 * TODO create voices on the fly
 first change stFingers
 ** Currently
@@ -28,6 +27,7 @@ even when it no longer represents the same pitch.
 ** why
 It will make updating the screen easier.
 It will make testing easier.
+  For instance, the handlers could be pure.
 ** how
 In sound, rather than sending to SC,
 change the state to have a collection of messages to send.

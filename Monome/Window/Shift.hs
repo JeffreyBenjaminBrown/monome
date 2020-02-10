@@ -58,9 +58,9 @@ handler :: MVar St -> LedRelay -> [Window] -> ((X,Y), Switch) -> IO ()
 handler    _             _           _           (_,  False) = return ()
 handler    mst           _           ws          (xy, True ) = do
   st0 <- takeMVar mst
-  let toKeyboard = relayToWindow st0 Kbd.label ws
-      st' = st0 { stXyShift = addPair (stXyShift st0) (shift xy) }
+  let st' = st0 { stXyShift = addPair (stXyShift st0) (shift xy) }
       draw st = drawPitchClass toKeyboard $ stXyShift st
+        where toKeyboard = relayToWindow st0 Kbd.label ws
   mapM_ (draw st0 False) $ M.keys $ stLit st0
   mapM_ (draw st' True ) $ M.keys $ stLit st'
   putMVar mst st'
