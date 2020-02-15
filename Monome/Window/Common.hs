@@ -12,6 +12,7 @@ import Monome.Types.Button
 import Monome.Util
 
 
+-- TODO : delete once unneeded
 drawPitchClass :: LedRelay
                -> (X,Y)      -- ^ a shift
                -> Led

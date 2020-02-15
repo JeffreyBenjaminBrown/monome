@@ -50,6 +50,7 @@ et31 monomePort = do
   mst <- newMVar $ St {
       stInbox = inbox
     , stToMonome = toMonome
+    , stPending_Monome = []
     , stVoices = voices
     , stXyShift = (0,0)
     , stFingers = mempty

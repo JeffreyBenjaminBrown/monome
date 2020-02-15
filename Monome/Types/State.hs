@@ -14,7 +14,7 @@ import Monome.Util
 data St = St {
     stInbox :: Socket
   , stToMonome :: Socket
-  , stPending_Monome :: [(WindowLabel, (X,Y), Bool)]
+  , stPending_Monome :: [(WindowLabel, ((X,Y), Bool))]
   , stVoices :: Map (X,Y) (Synth BoopParams)
     -- ^ TODO ? This is expensive, precluding the use of big synths.
     -- Maybe I could make them dynamically without much speed penalty.

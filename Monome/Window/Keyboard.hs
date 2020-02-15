@@ -1,5 +1,6 @@
 {-# OPTIONS_GHC -fno-warn-type-defaults #-}
 {-# LANGUAGE DataKinds
+, TupleSections
 , ScopedTypeVariables
 #-}
 
@@ -36,14 +37,14 @@ keyboardWindow =  Window {
       st <- readMVar mst
       mapM_ (drawPitchClass toKeyboard (stXyShift st) True)
         $ M.keys $ stLit st
-  , windowRoutine = NoMVarRoutine handler }
+  , windowRoutine = PurerRoutine handler }
 
-handler :: St
+handlerOld :: St
         -> LedRelay
         -> [Window]
         -> ((X,Y), Switch)
         -> IO (St)
-handler st toKeyboard _ press @ (xy,sw) = do
+handlerOld st toKeyboard _ press @ (xy,sw) = do
   soundKey st press
 
   let pcNow :: PitchClass =
@@ -65,6 +66,41 @@ handler st toKeyboard _ press @ (xy,sw) = do
   mapM_ (drawPitchClass toKeyboard (stXyShift st) False) toDark
   mapM_ (drawPitchClass toKeyboard (stXyShift st) True)  toLight
   return st { stFingers = fingers'
+            , stLit = lit' }
+
+handler :: St
+        -> LedRelay
+        -> [Window]
+        -> ((X,Y), Switch)
+        -> IO (St)
+handler st _ _ press @ (xy,sw) = do
+  soundKey st press
+
+  let pcNow :: PitchClass =
+        mod (xyToEt31 $ addPair xy $ negPair $ stXyShift st) 31
+        -- what the key represents currently
+      pcThen :: Maybe PitchClass =
+        ledBecause_toPitchClass (stLit st) $ LedBecauseSwitch xy
+        -- what the key represented when it was pressed,
+        -- if it is now being released
+      fingers' = case sw of
+        True  -> M.insert xy pcNow $ stFingers st
+        False -> M.delete xy $ stFingers st
+      lit' :: LitPitches = updateStLit (xy,sw) pcNow pcThen $ stLit st
+      oldKeys :: Set PitchClass = S.fromList $ M.keys $ stLit st
+      newKeys :: Set PitchClass = S.fromList $ M.keys $ lit'
+      toDark  :: Set PitchClass = S.difference oldKeys newKeys
+      toLight :: Set PitchClass = S.difference newKeys oldKeys
+      toXy :: PitchClass -> [(X,Y)]
+      toXy pc = enharmonicToXYs $
+                addPair (et31ToLowXY pc) $
+                stXyShift st
+      msgs :: [(WindowLabel, ((X,Y), Led))] =
+        map (label,) $
+        (map (,False) $ concatMap toXy $ S.toList toDark) ++
+        (map (,True)  $ concatMap toXy $ S.toList toLight)
+  return st { stFingers = fingers'
+            , stPending_Monome = msgs ++ stPending_Monome st
             , stLit = lit' }
 
 soundKey :: St -> ((X,Y), Switch) -> IO ()
