@@ -35,10 +35,12 @@ sustainWindow = Window {
   , windowRoutine = NoMVarRoutine handler
 }
 
-handler :: St -> LedRelay -> [Window] -> ((X,Y), Switch) -> IO (St)
-handler    st    _           _           (_ , False) = return st
-handler    st    toSustain   ws          (xy0, True) = do
+handler :: St -> [Window] -> ((X,Y), Switch) -> IO (St)
+handler    st    _           (_ , False) = return st
+handler    st    ws          (xy0, True) = do
   let st' = updateSt st
+      toSustain = relayToWindow st label ws
+
   case stSustainOn st' of
 
     False -> do -- Turn sustain off.

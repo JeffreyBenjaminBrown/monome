@@ -48,20 +48,6 @@ data Window = Window {
 data WindowRoutine =
   NoMVarRoutine (
        St
-    -> LedRelay -- ^ Control Leds via this, not raw `send` commands.
-    -> [Window] -- ^ To construct an LedRelay to another Window, if needed.
-      -- PIFALL: Should be a list of all Windows -- not just, say, later ones.
-      -- TODO ? Include the list of windows as part of an St,
-      -- and omit this argument
-    -> ((X,Y), Switch) -- ^ the incoming button press|release
-    -> IO St )
-  | PurerRoutine (
-      -- ^ The type signatures of NoMVarRoutine and PurerRoutine
-      -- are identical, but they are handled differently upstream.
-      -- Once all elements of IO have been eliminated,
-      -- this type signature will change.
-       St
-    -> LedRelay -- ^ Control Leds via this, not raw `send` commands.
     -> [Window] -- ^ To construct an LedRelay to another Window, if needed.
       -- PIFALL: Should be a list of all Windows -- not just, say, later ones.
       -- TODO ? Include the list of windows as part of an St,
@@ -90,12 +76,12 @@ handleSwitch a b c =
     st <- readMVar mst
     case windowContains w btn of
       True -> let
-        ledRelay = relayIfHere (stToMonome st) allWindows w
-        in case windowRoutine w of
-             NoMVarRoutine r -> do
-               st0 <- takeMVar mst
-               r st0 ledRelay allWindows sw
-                 >>= putMVar mst
+        ledRelay = relayIfHere (stToMonome st) allWindows w in
+        case windowRoutine w of
+          NoMVarRoutine r -> do
+            st0 <- takeMVar mst
+            r st0 allWindows sw
+              >>= putMVar mst
       False -> go allWindows ws mst sw
 
 findWindow :: [Window] -> WindowLabel -> Maybe Window

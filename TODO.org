@@ -1,4 +1,5 @@
 These are pretty well ordered by dependency.
+* TODO remove LedRelay from PurerRoutine
 * TODO isolate IO
 ** why
 It will make using multiple monomes easier.
@@ -7,9 +8,6 @@ It will make using multiple monomes easier.
 It will make adding flashing LEDs easier.
 It will make testing easier.
   For instance, the handlers could be pure.
-** how, in serial
-*** eliminate MVar from WindowRoutine
-*** eliminate IO from WindowRoutine
 ** how: Sound X Video
 *** In sound, rather than sending to SC,
 change the state to have a collection of messages to send.
