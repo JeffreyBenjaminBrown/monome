@@ -90,7 +90,10 @@ handleSwitch a b c =
         ledRelay = relayIfHere (stToMonome st) allWindows w
         in case windowRoutine w of
              IORoutine r -> r mst ledRelay allWindows sw
-             NoMVarRoutine _ -> error "Types.Window.handleSwitch: TODO"
+             NoMVarRoutine r -> do
+               st0 <- takeMVar mst
+               st1 <- r st0 ledRelay allWindows sw
+               putMVar mst st1
       False -> go allWindows ws mst sw
 
 findWindow :: [Window] -> WindowLabel -> Maybe Window
