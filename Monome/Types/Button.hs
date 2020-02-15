@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Monome.Types.Button (
-  X, Y, Switch, Led, LedBecause(..)
+  X, Y, Switch, Led, LedBecause(..), LedRelay, LedFilter
   , readSwitchOSC, boolToInt, boolFromInt
   , ledOsc, allLedOsc
   ) where
@@ -26,6 +26,10 @@ data LedBecause =
   | LedBecauseSustain
   | LedBecauseAnchor -- ^ Some "visual anchor" pitches are always on.
   deriving (Show, Eq, Ord)
+
+-- | Forward a message to the monome if appropriate.
+type LedRelay  = ((X,Y), Led) -> IO ()
+type LedFilter = (X,Y) -> Bool
 
 boolToInt :: Num a => Bool -> a
 boolToInt True = 1

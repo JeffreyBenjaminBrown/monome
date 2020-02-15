@@ -9,9 +9,6 @@ import Monome.Types.State
 import Monome.Network.Util
 
 
-type LedRelay  = ((X,Y), Led) -> IO ()
-type LedFilter = ((X,Y), Led) -> Bool
-
 -- | `belongsHere allWindows w _` returns a `Filter` that returns `True`
 -- if `(X,Y)` belongs in `w` and none of the `Window`s preceding `w`.
 -- PITFALL: `allWindows` should include literally all of them, even `w`.
@@ -21,8 +18,8 @@ belongsHere allWindows w = f where
     -- `obscurers` == the windows above `w`
   obscured :: (X,Y) -> Bool
   obscured xy = or $ map ($ xy) $ map windowContains obscurers
-  f :: ((X,Y), Led) -> Bool
-  f (btn,_) = not (obscured btn) && windowContains w btn
+  f :: (X,Y) -> Bool
+  f btn = (obscured btn) && windowContains w btn
 
 -- | `relayIfHere dest ws w` returns a `LedRelay` which,
 -- if the coordinate falls in `w` and in no other `Window` before `w` in `ws`,
@@ -31,7 +28,7 @@ relayIfHere :: Socket
             -> [Window] -> Window -> LedRelay
 relayIfHere dest ws w = f where
   f :: ((X,Y),Led) -> IO ()
-  f msg = if belongsHere ws w msg
+  f msg = if belongsHere ws w $ fst msg
     then (send dest $ ledOsc "/monome" msg) >> return ()
     else return ()
 
@@ -58,8 +55,12 @@ data WindowRoutine =
       -- TODO ? Include the list of windows as part of an St,
       -- and omit this argument
     -> ((X,Y), Switch) -- ^ the incoming button press|release
-    -> IO (St) )
-  | PureRoutine (
+    -> IO St )
+  | PurerRoutine (
+      -- ^ The type signatures of NoMVarRoutine and PurerRoutine
+      -- are identical, but they are handled differently upstream.
+      -- Once all elements of IO have been eliminated,
+      -- this type signature will change.
        St
     -> LedRelay -- ^ Control Leds via this, not raw `send` commands.
     -> [Window] -- ^ To construct an LedRelay to another Window, if needed.
@@ -67,7 +68,7 @@ data WindowRoutine =
       -- TODO ? Include the list of windows as part of an St,
       -- and omit this argument
     -> ((X,Y), Switch) -- ^ the incoming button press|release
-    -> St )
+    -> IO St )
 
 instance Eq Window where
   (==) a b = windowLabel a == windowLabel b
