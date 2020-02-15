@@ -47,9 +47,9 @@ handler    st    toSustain   ws          (xy0, True) = do
         silence xy = set ((M.!) (stVoices st) xy) (0 :: I "amp")
         in mapM_ silence voicesToSilence
       let -- Darken some of the keyboard (which is a different window).
-        draw = drawPitchClass toKeyboard $ stXyShift st
-          where toKeyboard = relayToWindow st Kbd.label ws
-        in mapM_ (draw False) $ S.toList pitchClassesToDarken
+        toKeyboard = relayToWindow st Kbd.label ws
+        in mapM_ (drawPitchClass toKeyboard (stXyShift st) False)
+           $ S.toList pitchClassesToDarken
       curry toSustain xy0 False -- Darken the sustain button.
 
     True -> -- Turn sustain on.

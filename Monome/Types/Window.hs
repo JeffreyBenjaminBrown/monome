@@ -59,6 +59,15 @@ data WindowRoutine =
       -- and omit this argument
     -> ((X,Y), Switch) -- ^ the incoming button press|release
     -> IO (St) )
+  | PureRoutine (
+       St
+    -> LedRelay -- ^ Control Leds via this, not raw `send` commands.
+    -> [Window] -- ^ To construct an LedRelay to another Window, if needed.
+      -- PIFALL: Should be a list of all Windows -- not just, say, later ones.
+      -- TODO ? Include the list of windows as part of an St,
+      -- and omit this argument
+    -> ((X,Y), Switch) -- ^ the incoming button press|release
+    -> St )
 
 instance Eq Window where
   (==) a b = windowLabel a == windowLabel b
