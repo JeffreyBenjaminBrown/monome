@@ -7,7 +7,6 @@ module Monome.Window.Shift (
   ) where
 
 import Prelude hiding (pred)
-import Control.Concurrent.MVar
 import qualified Data.Map as M
 
 import           Monome.Types.Window

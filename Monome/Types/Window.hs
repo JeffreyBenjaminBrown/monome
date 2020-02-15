@@ -92,8 +92,8 @@ handleSwitch a b c =
              IORoutine r -> r mst ledRelay allWindows sw
              NoMVarRoutine r -> do
                st0 <- takeMVar mst
-               st1 <- r st0 ledRelay allWindows sw
-               putMVar mst st1
+               r st0 ledRelay allWindows sw
+                 >>= putMVar mst
       False -> go allWindows ws mst sw
 
 findWindow :: [Window] -> WindowLabel -> Maybe Window
