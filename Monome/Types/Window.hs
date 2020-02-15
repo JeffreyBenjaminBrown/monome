@@ -45,16 +45,29 @@ data Window = Window {
     -- Every Window therefore needs a nontrivial windowContains field,
     -- even the background Window.
   , windowInit :: MVar St -> LedRelay -> IO ()
-  , windowRoutine -- ^ Acts on messages from the monome.
-    :: MVar St
+  , windowRoutine :: WindowRoutine
+  }
+
+-- | Acts on messages from the monome.
+data WindowRoutine =
+  IORoutine (
+       MVar St
     -> LedRelay -- ^ Control Leds via this, not raw `send` commands.
     -> [Window] -- ^ To construct an LedRelay to another Window, if needed.
       -- PIFALL: Should be a list of all Windows -- not just, say, later ones.
       -- TODO ? Include the list of windows as part of an St,
       -- and omit this argument
     -> ((X,Y), Switch) -- ^ the incoming button press|release
-    -> IO ()
-  }
+    -> IO () )
+  | StRoutine (
+       St
+    -> LedRelay -- ^ Control Leds via this, not raw `send` commands.
+    -> [Window] -- ^ To construct an LedRelay to another Window, if needed.
+      -- PIFALL: Should be a list of all Windows -- not just, say, later ones.
+      -- TODO ? Include the list of windows as part of an St,
+      -- and omit this argument
+    -> ((X,Y), Switch) -- ^ the incoming button press|release
+    -> St )
 
 instance Eq Window where
   (==) a b = windowLabel a == windowLabel b
@@ -76,8 +89,11 @@ handleSwitch a b c =
   go    allWindows  (w:ws)      mst           sw @ (btn,_) = do
     st <- readMVar mst
     case windowContains w btn of
-      True -> let ledRelay = relayIfHere (stToMonome st) allWindows w
-              in windowRoutine w mst ledRelay allWindows sw
+      True -> let
+        ledRelay = relayIfHere (stToMonome st) allWindows w
+        in case windowRoutine w of
+             IORoutine r -> r mst ledRelay allWindows sw
+             StRoutine _ -> error "Types.Window.handleSwitch: TODO"
       False -> go allWindows ws mst sw
 
 findWindow :: [Window] -> WindowLabel -> Maybe Window

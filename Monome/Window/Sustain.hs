@@ -32,7 +32,7 @@ sustainWindow = Window {
     windowLabel = label
   , windowContains = (==) theButton
   , windowInit = \_ _ -> return ()
-  , windowRoutine = handler
+  , windowRoutine = IORoutine handler
 }
 
 handler :: MVar St -> LedRelay -> [Window] -> ((X,Y), Switch) -> IO ()

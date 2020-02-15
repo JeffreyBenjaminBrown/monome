@@ -25,9 +25,9 @@ testDependentPitchClass = TestCase $ do
 
 testBelongsHere :: Test
 testBelongsHere = TestCase $ do
-  let w1 = Window "w1" (\(x,y) -> x > y) mempty mempty
-      w2 = Window "w2" (\(x,_) -> x > 4) mempty mempty
-      w3 = Window "w3" (\(_,_) -> True)  mempty mempty
+  let w1 = Window "w1" (\(x,y) -> x > y) mempty $ IORoutine mempty
+      w2 = Window "w2" (\(x,_) -> x > 4) mempty $ IORoutine mempty
+      w3 = Window "w3" (\(_,_) -> True)  mempty $ IORoutine mempty
       ws = [w1,w2,w3]
   assertBool "caught by w1 before reaching w3" $
     not $ belongsHere ws w3 ((1,0),True)
