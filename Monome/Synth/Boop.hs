@@ -19,10 +19,22 @@ boop = sd ( 100 :: I "freq"
           ) $ do
   -- p <- pulse (freq_ (V::V "freq"))
   -- s <- saw (freq_ (V::V "freq"))
-  slow <- sinOsc (freq_ $ (V::V "freq") ~/ 100)
-  sn <- sinOsc (freq_ (V::V "freq"))
-  sn2 <- sinOsc ( freq_ $ (V::V "freq") ~* (2 ~+ slow ~/ 60)
-                , phase_ 1.5 ) -- roughly pi / 2, i.e. 90 degrees
-  s1 <- lag (in_ (V::V "amp"), lagSecs_ 0.03) ~* (sn ~+ sn2)
+  -- slow <- sinOsc (freq_ $ (V::V "freq") ~/ 100)
+  -- sn2 <- sinOsc ( freq_ $ (V::V "freq") ~* (2 ~+ slow ~/ 60) )
+         -- `slow` gives a slight vibrato effect
+  sn  <- sinOsc (freq_ (V::V "freq"))
+  sn2 <- sinOsc (freq_ $ 2 ~* (V::V "freq"))
+  sn3 <- sinOsc (freq_ $ 3 ~* (V::V "freq"))
+  -- sn4 <- sinOsc (freq_ $ 4 ~* (V::V "freq"))
+  -- sn5 <- sinOsc (freq_ $ 5 ~* (V::V "freq"))
+  s1 <- lag (in_ (V::V "amp"), lagSecs_ 0.03)
+        ~* 0.05 -- to prevent distortion
+        ~* foldr1 (~+) ( map (\(f,a) -> f ~* a)
+                         [ (sn,1)
+                         , (sn2,1/2)
+                         , (sn3,1/4)
+                         -- , (sn4,1/8)
+                         -- , (sn5,1/16)
+                         ] )
     -- The lag smooths out discontinuities in the change in "amp".
   out 0 [s1, s1]

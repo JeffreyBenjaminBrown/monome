@@ -32,16 +32,17 @@ import Monome.Window.Sustain
 -- | PITFALL: Order matters.
 -- Windows listed earlier are "above" later ones:
 -- key presses are handled by the first window containing them.
-windows :: [Window]
+windowLayers :: [Window]
   -- PITFALL: It is tempting to incorporate this into the St type,
   -- but that creates a dependency cycle.
-windows = [sustainWindow, shiftWindow, keyboardWindow]
+windowLayers = [sustainWindow, shiftWindow, keyboardWindow]
 
-et31 :: Maybe PitchClass -> IO St
-et31 mbAnchor = do
-  inbox <- receivesAt "127.0.0.1" 8000
+et31 :: Int -- ^ The monome address, as serialoscd reports on startup.
+     -> IO St
+et31 monomePort = do
+  inbox :: Socket <- receivesAt "127.0.0.1" 8000
     -- I don't know why it's port 8000, or why it used to be 11111.
-  toMonome <- sendsTo (unpack localhost) 15226
+  toMonome :: Socket <- sendsTo (unpack localhost) monomePort
     -- to find the port number above, use the first part of HandTest.hs
   voices :: M.Map (X, Y) (Synth BoopParams) <-
     let places = [(a,b) | a <- [0..15], b <- [0..15]]
@@ -52,23 +53,22 @@ et31 mbAnchor = do
     , stVoices = voices
     , stXyShift = (0,0)
     , stFingers = mempty
-    , stLit = let
-        f anchor = M.singleton anchor $ S.singleton LedBecauseAnchor
-      in maybe mempty f mbAnchor
+    , stLit = M.singleton (2 :: PitchClass)
+              $ S.singleton LedBecauseAnchor
     , stSustainOn = False
     , stSustained = mempty
     }
 
-  initAllWindows mst windows
+  initAllWindows mst windowLayers
 
   responder <- forkIO $ forever $ do
     decodeOSC <$> recv inbox 4096 >>= \case
       Left text -> putStrLn . show $ text
       Right osc -> let switch = readSwitchOSC osc
-                   in  handleSwitch windows mst switch
+                   in  handleSwitch windowLayers mst switch
 
   let (loop :: IO St) = getChar >>= \case
-        'q' -> do
+        'q' -> do -- quit
           close inbox
           mapM_ free (M.elems voices)
           killThread responder
@@ -76,4 +76,5 @@ et31 mbAnchor = do
           _ <- send toMonome $ allLedOsc "/monome" False
           return $ st { stVoices = mempty } -- PITFALL: ?
         _   -> loop
-  loop
+    in putStrLn "press 'q' to quit"
+       >> loop

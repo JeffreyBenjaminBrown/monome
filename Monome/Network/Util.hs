@@ -1,7 +1,19 @@
 {-# OPTIONS_GHC -fno-warn-type-defaults #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Monome.Network.Util where
+module Monome.Network.Util (
+    close          -- ^ NS.Socket -> IO ()
+  , recv           -- ^ NS.Socket -> Int -> IO ByteString
+  , send           -- ^ NS.Socket -> ByteString -> IO Int
+  , HostName       -- ^ NS.HostName
+  , Socket         -- ^ NS.Socket
+  , localhost      -- ^ ByteString
+  , toPort         -- ^ Show a => a -> IO NS.Socket
+  , toSerialosc    -- ^ IO NS.Socket
+  , getLocalSocket -- ^ Show a => HostName -> a -> IO (Socket, NS.AddrInfo)
+  , sendsTo        -- ^ Show a => NS.HostName -> a -> IO NS.Socket
+  , receivesAt     -- ^ Show a => NS.HostName -> a -> IO NS.Socket
+  ) where
 
 import Data.ByteString (ByteString)
 import Data.ByteString.Char8 (unpack)
@@ -33,8 +45,7 @@ toSerialosc :: IO NS.Socket
 toSerialosc = toPort 12002
   -- ^ https://monome.org/docs/serialosc/osc/
 
-getLocalSocket :: Show a
-               => NS.HostName -> a -> IO (NS.Socket, NS.AddrInfo)
+getLocalSocket :: Show a => HostName -> a -> IO (Socket, NS.AddrInfo)
 getLocalSocket host port = do
   (a:_) <- NS.getAddrInfo Nothing (Just host) (Just $ show port)
   s <- NS.socket (NS.addrFamily a) NS.Datagram NS.defaultProtocol
