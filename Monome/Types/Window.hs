@@ -4,9 +4,10 @@ import Prelude hiding (pred)
 import Control.Concurrent.MVar
 import qualified Data.List as L
 
+import Monome.Network.Util
 import Monome.Types.Button
 import Monome.Types.State
-import Monome.Network.Util
+import Monome.Util
 
 
 -- | `belongsHere allWindows w _` returns a `Filter` that returns `True`
@@ -31,8 +32,6 @@ relayIfHere dest ws w = f where
   f msg = if belongsHere ws w $ fst msg
     then (send dest $ ledOsc "/monome" msg) >> return ()
     else return ()
-
-type WindowLabel = String
 
 data Window = Window {
     windowLabel :: WindowLabel -- ^ PITFALL: Must be unique across windows,

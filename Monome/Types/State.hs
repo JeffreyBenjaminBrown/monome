@@ -5,14 +5,16 @@ import Data.Set
 import Vivid
 
 import Monome.Math31
+import Monome.Network.Util
 import Monome.Synth.Boop
 import Monome.Types.Button
-import Monome.Network.Util
+import Monome.Util
 
 
 data St = St {
     stInbox :: Socket
   , stToMonome :: Socket
+  , stPending_Monome :: [(WindowLabel, (X,Y), Bool)]
   , stVoices :: Map (X,Y) (Synth BoopParams)
     -- ^ TODO ? This is expensive, precluding the use of big synths.
     -- Maybe I could make them dynamically without much speed penalty.

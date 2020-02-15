@@ -1,5 +1,6 @@
 module Monome.Util (
   ByteString
+  , WindowLabel
   , pack
   , unpack
   , fi
@@ -12,6 +13,9 @@ where
 
 import Data.ByteString (ByteString)
 import Data.ByteString.Char8 (pack, unpack)
+
+
+type WindowLabel = String
 
 -- | Because OSC needs a lot of Int32 values while I prefer Int.
 fi :: (Integral a, Num b) => a -> b
