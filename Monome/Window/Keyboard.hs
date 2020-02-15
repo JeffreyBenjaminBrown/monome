@@ -63,8 +63,8 @@ handler st _ press @ (xy,sw) = do
       toLight ::    [PitchClass] = S.toList $ S.difference newKeys oldKeys
       msgs :: [(WindowLabel, ((X,Y), Led))] =
         map (label,) $
-        (map (,False) $ concatMap $ pcToXys $ stXyShift st $ toDark) ++
-        (map (,True)  $ concatMap $ pcToXys $ stXyShift st $ toLight)
+        (map (,False) $ concatMap (pcToXys $ stXyShift st) toDark) ++
+        (map (,True)  $ concatMap (pcToXys $ stXyShift st) toLight)
   return st { stFingers = fingers'
             , stPending_Monome = msgs ++ stPending_Monome st
             , stLit = lit' }

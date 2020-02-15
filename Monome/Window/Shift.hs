@@ -9,11 +9,11 @@ module Monome.Window.Shift (
 import Prelude hiding (pred)
 import qualified Data.Map as M
 
-import           Monome.Types.Window
+import           Monome.Math31
 import           Monome.Types.Button
 import           Monome.Types.State
+import           Monome.Types.Window
 import           Monome.Util
-import           Monome.Window.Common (drawPitchClass)
 import qualified Monome.Window.Keyboard as Kbd
 
 
@@ -55,10 +55,11 @@ colorArrows toShiftWindow = let f = toShiftWindow . (,True)
 
 handler :: St -> [Window] -> ((X,Y), Switch) -> IO (St)
 handler    st0   _           (_,  False)     = return st0
-handler    st0   ws          (xy, True )     = do
-  let st' = st0 { stXyShift = addPair (stXyShift st0) (shift xy) }
-      draw xyShift = drawPitchClass toKeyboard xyShift
-        where toKeyboard = relayToWindow st0 Kbd.label ws
-  mapM_ (draw (stXyShift st0) False) $ M.keys $ stLit st0
-  mapM_ (draw (stXyShift st') True ) $ M.keys $ stLit st'
-  return st'
+handler    st0   _           (xy, True )     = let
+  st' = st0 { stXyShift = addPair (stXyShift st0) (shift xy) }
+  lit  = M.keys $ stLit st0
+  msgs :: [(WindowLabel, ((X,Y), Led))] =
+    map (Kbd.label,) $
+    (map (,False) $ concatMap (pcToXys $ stXyShift st0) lit) ++
+    (map (,True)  $ concatMap (pcToXys $ stXyShift st') lit)
+  in return st' { stPending_Monome = msgs }
