@@ -13,13 +13,14 @@ import Control.Concurrent.MVar
 import qualified Data.Map as M
 import qualified Data.Set as S
 import           Data.Set (Set)
-import Vivid hiding (pitch)
+import Vivid (set, toI, I, Synth)
 
-import Monome.Types.Window
+import Monome.Math31
+import Monome.Synth.Boop (BoopParams)
 import Monome.Types.Button
 import Monome.Types.State
+import Monome.Types.Window
 import Monome.Util
-import Monome.Math31
 import Monome.Window.Common
 
 
@@ -73,11 +74,10 @@ soundKey st (xy, sw) = do
   case S.member xy $ S.map fst $ stSustained st of
     True -> return () -- it's already sounding due to sustain
     False ->
-      let freq = 100 * et31ToFreq pitch
-          voice = (M.!) (stVoices st) xy
+      let freq :: Float = 100 * et31ToFreq pitch
+          voice :: Synth BoopParams = (M.!) (stVoices st) xy
       in set voice ( toI freq                  :: I "freq"
                    , toI $ 0.15 * boolToInt sw :: I "amp" )
-
 
 updateStLit :: ((X,Y), Switch)
        -> PitchClass       -- ^ what xy represents now

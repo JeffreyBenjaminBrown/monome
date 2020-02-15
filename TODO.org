@@ -1,13 +1,16 @@
 These are pretty well ordered by dependency.
 * TODO isolate IO
 ** why
+It will make using multiple monomes easier.
+  Launch two separate et31 instances, one for each monome.
+  Launch a single routine that receives from those and sends to Vivid.
 It will make adding flashing LEDs easier.
 It will make testing easier.
   For instance, the handlers could be pure.
 ** how
-In sound, rather than sending to SC,
+*** In sound, rather than sending to SC,
 change the state to have a collection of messages to send.
-In video, rather than sending to monome,
+*** In LEDs, rather than sending to monome,
 make each window keep a "last sent" and a "to show" set of LED assignments,
 and compute the difference when needed.
 * TODO add tests
