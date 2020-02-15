@@ -7,7 +7,6 @@ module Monome.Window.Sustain (
   , label
   ) where
 
-import Control.Concurrent.MVar
 import qualified Data.Map as M
 import           Data.Set (Set)
 import qualified Data.Set as S
@@ -32,15 +31,13 @@ sustainWindow = Window {
     windowLabel = label
   , windowContains = (==) theButton
   , windowInit = \_ _ -> return ()
-  , windowRoutine = IORoutine handler
+  , windowRoutine = NoMVarRoutine handler
 }
 
-handler :: MVar St -> LedRelay -> [Window] -> ((X,Y), Switch) -> IO ()
-handler    _          _           _           (_ , False) = return ()
-handler    mst        toSustain   ws          (xy0, True) = do
-  st <- takeMVar mst
+handler :: St -> LedRelay -> [Window] -> ((X,Y), Switch) -> IO (St)
+handler    st    _           _           (_ , False) = return st
+handler    st    toSustain   ws          (xy0, True) = do
   let st' = updateSt st
-  putMVar mst st'
   case stSustainOn st' of
 
     False -> do -- Turn sustain off.
@@ -57,6 +54,8 @@ handler    mst        toSustain   ws          (xy0, True) = do
 
     True -> -- Turn sustain on.
       curry toSustain xy0 True
+
+  return st'
 
 get_voicesToSilence :: St -> Set (X,Y)
 get_voicesToSilence oldSt =

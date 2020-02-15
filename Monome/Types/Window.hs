@@ -50,20 +50,14 @@ data Window = Window {
 
 -- | Acts on messages from the monome.
 data WindowRoutine =
-  IORoutine (
-       MVar St
+  NoMVarRoutine (
+       St
     -> LedRelay -- ^ Control Leds via this, not raw `send` commands.
     -> [Window] -- ^ To construct an LedRelay to another Window, if needed.
       -- PIFALL: Should be a list of all Windows -- not just, say, later ones.
       -- TODO ? Include the list of windows as part of an St,
       -- and omit this argument
     -> ((X,Y), Switch) -- ^ the incoming button press|release
-    -> IO () )
-  | NoMVarRoutine (
-       St
-    -> LedRelay
-    -> [Window]
-    -> ((X,Y), Switch)
     -> IO (St) )
 
 instance Eq Window where
@@ -89,7 +83,6 @@ handleSwitch a b c =
       True -> let
         ledRelay = relayIfHere (stToMonome st) allWindows w
         in case windowRoutine w of
-             IORoutine r -> r mst ledRelay allWindows sw
              NoMVarRoutine r -> do
                st0 <- takeMVar mst
                r st0 ledRelay allWindows sw

@@ -36,15 +36,14 @@ keyboardWindow =  Window {
       st <- readMVar mst
       mapM_ (drawPitchClass toKeyboard (stXyShift st) True)
         $ M.keys $ stLit st
-  , windowRoutine = IORoutine handler }
+  , windowRoutine = NoMVarRoutine handler }
 
-handler :: MVar St
+handler :: St
         -> LedRelay
         -> [Window]
         -> ((X,Y), Switch)
-        -> IO ()
-handler mst toKeyboard _ press @ (xy,sw) = do
-  st <- takeMVar mst
+        -> IO (St)
+handler st toKeyboard _ press @ (xy,sw) = do
   soundKey st press
 
   let pcNow :: PitchClass =
@@ -65,8 +64,8 @@ handler mst toKeyboard _ press @ (xy,sw) = do
 
   mapM_ (drawPitchClass toKeyboard (stXyShift st) False) toDark
   mapM_ (drawPitchClass toKeyboard (stXyShift st) True)  toLight
-  putMVar mst $ st { stFingers = fingers'
-                   , stLit = lit' }
+  return st { stFingers = fingers'
+            , stLit = lit' }
 
 soundKey :: St -> ((X,Y), Switch) -> IO ()
 soundKey st (xy, sw) = do
