@@ -19,7 +19,7 @@ belongsHere allWindows w = f where
   obscured :: (X,Y) -> Bool
   obscured xy = or $ map ($ xy) $ map windowContains obscurers
   f :: (X,Y) -> Bool
-  f btn = (obscured btn) && windowContains w btn
+  f btn = not (obscured btn) && windowContains w btn
 
 -- | `relayIfHere dest ws w` returns a `LedRelay` which,
 -- if the coordinate falls in `w` and in no other `Window` before `w` in `ws`,
