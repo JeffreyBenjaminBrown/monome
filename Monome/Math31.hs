@@ -5,10 +5,11 @@
 
 module Monome.Math31 (
   Pitch, PitchClass, LitPitches
-  , et31ToFreq
-  , xyToEt31
-  , et31ToLowXY
-  , enharmonicToXYs
+  , et31ToFreq      -- ^ Pitch -> Float
+  , xyToEt31        -- ^ (X,Y) -> Pitch
+  , et31ToLowXY     -- ^ PitchClass -> (X,Y)
+  , enharmonicToXYs -- ^ (X,Y) -> [(X,Y)]
+  , pcToXys         -- ^ PitchClass -> (X,Y) -> [(X,Y)]
   ) where
 
 import Data.Map (Map)
@@ -53,3 +54,8 @@ enharmonicToXYs btn = map (addPair low) wideGrid
   where low = et31ToLowXY $ xyToEt31 btn
         wideGrid = [ (5*i - j, i + 6*j )
                    | i <- [0..3] , j <- [-1..2] ]
+
+pcToXys :: (X,Y) -> PitchClass -> [(X,Y)]
+pcToXys shift pc =
+  enharmonicToXYs $
+  addPair (et31ToLowXY pc) shift

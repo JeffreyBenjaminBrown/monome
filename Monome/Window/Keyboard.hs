@@ -57,18 +57,14 @@ handler st _ press @ (xy,sw) = do
         True  -> M.insert xy pcNow $ stFingers st
         False -> M.delete xy $ stFingers st
       lit' :: LitPitches = updateStLit (xy,sw) pcNow pcThen $ stLit st
-      oldKeys :: Set PitchClass = S.fromList $ M.keys $ stLit st
-      newKeys :: Set PitchClass = S.fromList $ M.keys $ lit'
-      toDark  :: Set PitchClass = S.difference oldKeys newKeys
-      toLight :: Set PitchClass = S.difference newKeys oldKeys
-      toXy :: PitchClass -> [(X,Y)]
-      toXy pc = enharmonicToXYs $
-                addPair (et31ToLowXY pc) $
-                stXyShift st
+      oldKeys :: Set PitchClass  = S.fromList $ M.keys $ stLit st
+      newKeys :: Set PitchClass  = S.fromList $ M.keys $ lit'
+      toDark  ::    [PitchClass] = S.toList $ S.difference oldKeys newKeys
+      toLight ::    [PitchClass] = S.toList $ S.difference newKeys oldKeys
       msgs :: [(WindowLabel, ((X,Y), Led))] =
         map (label,) $
-        (map (,False) $ concatMap toXy $ S.toList toDark) ++
-        (map (,True)  $ concatMap toXy $ S.toList toLight)
+        (map (,False) $ concatMap $ pcToXys $ stXyShift st $ toDark) ++
+        (map (,True)  $ concatMap $ pcToXys $ stXyShift st $ toLight)
   return st { stFingers = fingers'
             , stPending_Monome = msgs ++ stPending_Monome st
             , stLit = lit' }

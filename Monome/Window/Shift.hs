@@ -54,8 +54,8 @@ colorArrows toShiftWindow = let f = toShiftWindow . (,True)
   in mapM_ f [ upArrow, downArrow, leftArrow, rightArrow ]
 
 handler :: St -> [Window] -> ((X,Y), Switch) -> IO (St)
-handler    st0   _           (_,  False) = return st0
-handler    st0   ws          (xy, True ) = do
+handler    st0   _           (_,  False)     = return st0
+handler    st0   ws          (xy, True )     = do
   let st' = st0 { stXyShift = addPair (stXyShift st0) (shift xy) }
       draw xyShift = drawPitchClass toKeyboard xyShift
         where toKeyboard = relayToWindow st0 Kbd.label ws
