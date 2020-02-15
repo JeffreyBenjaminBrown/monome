@@ -66,23 +66,24 @@ initAllWindows mst allWindows = do
 
 -- | called every time a monome button is pressed or released
 handleSwitch     :: [Window] -> MVar St -> ((X,Y), Switch) -> IO ()
-handleSwitch a b c =
-  go       a a b c where
-  -- `go` keeps the complete list of windows in its first arg,
-  -- while iteratively discarding the head of its second.
-  go :: [Window] -> [Window] -> MVar St -> ((X, Y), Switch) -> IO ()
-  go    _           []          _             _            = return ()
-  go    allWindows  (w:ws)      mst           sw @ (btn,_) = do
-    st <- readMVar mst
+handleSwitch ws0 b c =
+  go ws0 b c where
+  go :: [Window] -> MVar St -> ((X, Y), Switch) -> IO ()
+  go    []          _           _            = return ()
+  go    (w:ws)      mst         sw @ (btn,_) =
     case windowContains w btn of
-      True -> let
-        ledRelay = relayIfHere (stToMonome st) allWindows w in
-        case windowRoutine w of
-          NoMVarRoutine r -> do
-            st0 <- takeMVar mst
-            r st0 allWindows sw
-              >>= putMVar mst
-      False -> go allWindows ws mst sw
+      True -> case windowRoutine w of
+        NoMVarRoutine r -> do
+          st0 <- takeMVar mst
+          st1 <- r st0 ws0 sw
+          mapM_ (ledToWindow st1 ws0) $ stPending_Monome st1
+          putMVar mst st1 {stPending_Monome = []}
+      False -> go ws mst sw
+
+ledToWindow :: St -> [Window] -> (WindowLabel, ((X,Y), Led)) -> IO ()
+ledToWindow st ws (l, (xy,b)) =
+  let toWindow = relayToWindow st l ws
+  in toWindow (xy,b)
 
 findWindow :: [Window] -> WindowLabel -> Maybe Window
 findWindow ws l = L.find pred ws where
@@ -92,5 +93,5 @@ findWindow ws l = L.find pred ws where
 relayToWindow :: St -> WindowLabel -> [Window] -> LedRelay
 relayToWindow st wl ws = let
   w = maybe err id $ findWindow ws wl
-    where err = error "Window.Shift.handler: keyboard window not found."
+    where err = error $ "relayToWindow: " ++ wl ++ " not found."
   in relayIfHere (stToMonome st) ws w

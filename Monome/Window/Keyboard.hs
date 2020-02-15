@@ -43,37 +43,7 @@ handler :: St
         -> [Window]
         -> ((X,Y), Switch)
         -> IO (St)
-handler st ws press @ (xy,sw) = do
-  soundKey st press
-
-  let pcNow :: PitchClass =
-        mod (xyToEt31 $ addPair xy $ negPair $ stXyShift st) 31
-        -- what the key represents currently
-      pcThen :: Maybe PitchClass =
-        ledBecause_toPitchClass (stLit st) $ LedBecauseSwitch xy
-        -- what the key represented when it was pressed,
-        -- if it is now being released
-      fingers' = case sw of
-        True  -> M.insert xy pcNow $ stFingers st
-        False -> M.delete xy $ stFingers st
-      lit' :: LitPitches = updateStLit (xy,sw) pcNow pcThen $ stLit st
-      oldKeys :: Set PitchClass = S.fromList $ M.keys $ stLit st
-      newKeys :: Set PitchClass = S.fromList $ M.keys $ lit'
-      toDark  :: Set PitchClass = S.difference oldKeys newKeys
-      toLight :: Set PitchClass = S.difference newKeys oldKeys
-      toKeyboard = relayToWindow st label ws
-
-  mapM_ (drawPitchClass toKeyboard (stXyShift st) False) toDark
-  mapM_ (drawPitchClass toKeyboard (stXyShift st) True)  toLight
-  return st { stFingers = fingers'
-            , stLit = lit' }
-
-handlerNew :: St
-        -> LedRelay
-        -> [Window]
-        -> ((X,Y), Switch)
-        -> IO (St)
-handlerNew st _ _ press @ (xy,sw) = do
+handler st _ press @ (xy,sw) = do
   soundKey st press
 
   let pcNow :: PitchClass =

@@ -1,5 +1,4 @@
 These are pretty well ordered by dependency.
-* TODO remove LedRelay from PurerRoutine
 * TODO isolate IO
 ** why
 It will make using multiple monomes easier.
