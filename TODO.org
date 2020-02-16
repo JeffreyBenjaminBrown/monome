@@ -1,5 +1,4 @@
 These are pretty well ordered by dependency.
-* TODO delete LedRelay if possible
 * TODO isolate IO
 ** why
 It will make using multiple monomes easier.

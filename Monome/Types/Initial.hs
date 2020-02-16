@@ -4,8 +4,6 @@ module Monome.Types.Initial (
   , Pitch, PitchClass, LitPitches
   , X, Y, Switch, Led
   , LedBecause(..)
-  , LedRelay
-  , LedFilter
   , DeviceID(..)
   , Device(..)
   , St(..)
@@ -55,10 +53,6 @@ data LedBecause =
   | LedBecauseSustain
   | LedBecauseAnchor -- ^ Some "visual anchor" pitches are always on.
   deriving (Show, Eq, Ord)
-
--- | Forward a message to the monome if appropriate.
-type LedRelay  = ((X,Y), Led) -> IO ()
-type LedFilter = (X,Y) -> Bool
 
 -- | SerialOsc responds to /serialosc/list messages with this information.
 data DeviceID = DeviceID { deviceIDName :: ByteString

@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Monome.Types.Button (
-  X, Y, Switch, Led, LedBecause(..), LedRelay, LedFilter
+    X, Y, Switch, Led, LedBecause(..)
   , readSwitchOSC, fromBool, boolFromInt
   , ledOsc, allLedOsc
   ) where
