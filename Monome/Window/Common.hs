@@ -5,8 +5,8 @@
 
 module Monome.Window.Common (
     ledBecause_toPitchClass -- ^ LitPitches -> LedBecause -> Maybe PitchClass
-  , silenceMsg -- ^ (X,Y) -> (VoiceId, Float, String)
-  , soundKeySt -- ^ St -> ((X,Y), Switch) -> [(VoiceId, Float, String)]
+  , silenceMsg              -- ^ (X,Y) -> SoundMsg
+  , soundKeySt              -- ^ St -> ((X,Y), Switch) -> [SoundMsg]
   ) where
 
 import Prelude hiding (pred)
@@ -28,10 +28,10 @@ ledBecause_toPitchClass m ldr =
             $ filter (S.member ldr . snd)
             $ M.toList m
 
-silenceMsg :: (X,Y) -> (VoiceId, Float, String)
+silenceMsg :: (X,Y) -> SoundMsg
 silenceMsg xy = (xy, 0, "amp")
 
-soundKeySt :: St -> ((X,Y), Switch) -> [(VoiceId, Float, String)]
+soundKeySt :: St -> ((X,Y), Switch) -> [SoundMsg]
 soundKeySt st (xy, sw) = do
   let pitch = xyToEt31 xy - xyToEt31 (stXyShift st)
   if S.member xy $ S.map fst $ stSustained st

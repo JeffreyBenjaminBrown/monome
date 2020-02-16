@@ -10,7 +10,7 @@ module Monome.Types.Window (
 
 -- | * So far, no need to export these.
 --  LedRelay, LedFilter
---  , doSoundMessage -- ^ St -> (VoiceId, Float, String) -> IO ()
+--  , doSoundMessage -- ^ St -> SoundMsg -> IO ()
 --  , doLedMessage   -- ^ St -> [Window] -> (WindowId, ((X,Y), Led)) -> IO ()
 --  , relayToWindow  -- ^ St -> WindowId -> [Window] -> LedRelay
 --  , relayIfHere    -- ^ Socket > [Window] -> Window -> LedRelay
@@ -60,7 +60,7 @@ handleSwitch    mst        sw @ (btn,_)     = do
           False -> go ws
   go $ stWindowLayers st0
 
-doSoundMessage :: St -> (VoiceId, Float, String) -> IO (St)
+doSoundMessage :: St -> SoundMsg -> IO (St)
 doSoundMessage st0 (xy,f,p) = do
   let v = fst $ stVoices st0 M.! xy
   st1 <- case p of

@@ -2,6 +2,7 @@ module Monome.Types.Initial (
     HostName, Socket
   , WindowId, VoiceId
   , Pitch, PitchClass, LitPitches
+  , SoundMsg
   , X, Y, Switch, Led
   , LedBecause(..)
   , St(..)
@@ -39,6 +40,8 @@ type LitPitches = Map PitchClass (Set LedBecause)
   -- and if it's an anchor, we should never darken it.
   -- The Set is a Set because an LED could be on for multiple reasons.
 
+type SoundMsg = (VoiceId, Float, String)
+
 -- | X and Y are coordinates on the monome.
 -- PITFALL: X rises from left to right, but Y rises from top to bottom.
 -- Thus (0,1) is just under the top-left corner.
@@ -67,7 +70,7 @@ data St = St {
     -- Maybe I could make them dynamically without much speed penalty.
     -- Tom of Vivid thinks so.
   , stPending_Monome :: [(WindowId, ((X,Y), Switch))]
-  , stPending_Vivid :: [(VoiceId, Float, String)]
+  , stPending_Vivid :: [SoundMsg]
 
   , stXyShift :: (X,Y) -- ^ this is relative -- a vector, not a point
   , stFingers :: Map (X,Y) PitchClass
@@ -103,4 +106,3 @@ instance Eq Window where
 
 instance Show Window where
   show = windowLabel
-

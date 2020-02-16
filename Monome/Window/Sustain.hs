@@ -43,7 +43,7 @@ handler    st    (xy0, True)      = let
          concatMap (pcToXys $ stXyShift st) $
          get_pitchClassesToDarken st st'
     else []
-  vividMsgs :: [(VoiceId, Float, String)] =
+  vividMsgs :: [SoundMsg] =
     if not $ stSustainOn st'
     then map silenceMsg $ S.toList $ get_voicesToSilence st
     else []
