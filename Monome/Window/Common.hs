@@ -36,9 +36,12 @@ ledBecause_toPitchClass m ldr =
 silence :: St -> (X,Y) -> IO ()
 silence st xy = set ((M.!) (stVoices st) xy) (0 :: I "amp")
 
-silenceSt :: St -> (X,Y) -> St
-silenceSt st xy = st {
-  stPending_Vivid = (xy, 0, "amp") : stPending_Vivid st }
+silenceSt :: St -> [(X,Y)] -> St
+silenceSt st xys = st {
+  stPending_Vivid = stPending_Vivid st ++ map silenceMsg xys }
+
+silenceMsg :: (X,Y) -> (VoiceId, Float, String)
+silenceMsg xy = (xy, 0, "amp")
 
 -- | Vivid's type safety makes this boilerplate necessary.
 sendVivid :: St -> (VoiceId, Float, String) -> IO ()
