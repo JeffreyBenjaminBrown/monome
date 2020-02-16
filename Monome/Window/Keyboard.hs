@@ -55,7 +55,7 @@ handler st press @ (xy,sw) = do
       newKeys :: Set PitchClass  = S.fromList $ M.keys $ lit'
       toDark  ::    [PitchClass] = S.toList $ S.difference oldKeys newKeys
       toLight ::    [PitchClass] = S.toList $ S.difference newKeys oldKeys
-      kbdMsgs :: [(WindowId, ((X,Y), Led))] =
+      kbdMsgs :: [LedMsg] =
         map (label,) $
         (map (,False) $ concatMap (pcToXys $ stXyShift st) toDark) ++
         (map (,True)  $ concatMap (pcToXys $ stXyShift st) toLight)

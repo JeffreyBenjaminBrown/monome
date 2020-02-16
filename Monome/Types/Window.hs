@@ -11,7 +11,7 @@ module Monome.Types.Window (
 -- | * So far, no need to export these.
 --  LedRelay, LedFilter
 --  , doSoundMessage -- ^ St -> SoundMsg -> IO ()
---  , doLedMessage   -- ^ St -> [Window] -> (WindowId, ((X,Y), Led)) -> IO ()
+--  , doLedMessage   -- ^ St -> [Window] -> LedMsg -> IO ()
 --  , relayToWindow  -- ^ St -> WindowId -> [Window] -> LedRelay
 --  , relayIfHere    -- ^ Socket > [Window] -> Window -> LedRelay
 --  , findWindow     -- ^ [Window] -> WindowId -> Maybe Window
@@ -71,7 +71,7 @@ doSoundMessage st0 (xy,f,p) = do
     _  -> error $ "doSoundMessage: unrecognized parameter " ++ p
   return st1
 
-doLedMessage :: St -> (WindowId, ((X,Y), Led)) -> IO ()
+doLedMessage :: St -> LedMsg -> IO ()
 doLedMessage st (l, (xy,b)) =
   let toWindow = relayToWindow st l
   in toWindow (xy,b)

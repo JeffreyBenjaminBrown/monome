@@ -55,7 +55,7 @@ handler    st0   (_,  False)      = st0
 handler    st0   (xy, True )      = let
   st' = st0 { stXyShift = addPair (stXyShift st0) (shift xy) }
   lit  = M.keys $ stLit st0
-  msgs :: [(WindowId, ((X,Y), Led))] =
+  msgs :: [LedMsg] =
     map (Kbd.label,) $
     (map (,False) $ concatMap (pcToXys $ stXyShift st0) lit) ++
     (map (,True)  $ concatMap (pcToXys $ stXyShift st') lit)

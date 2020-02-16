@@ -37,7 +37,7 @@ handler :: St -> ((X,Y), Switch) -> St
 handler    st    (_ , False)      = st
 handler    st    (xy0, True)      = let
   st' = updateSt st
-  kbdMsgs :: [(WindowId, ((X,Y), Led))] =
+  kbdMsgs :: [LedMsg] =
     if not $ stSustainOn st'
     then map ( (Kbd.label,) . (,False) ) $
          concatMap (pcToXys $ stXyShift st) $

@@ -2,7 +2,7 @@ module Monome.Types.Initial (
     HostName, Socket
   , WindowId, VoiceId
   , Pitch, PitchClass, LitPitches
-  , SoundMsg
+  , LedMsg, SoundMsg
   , X, Y, Switch, Led
   , LedBecause(..)
   , St(..)
@@ -40,6 +40,7 @@ type LitPitches = Map PitchClass (Set LedBecause)
   -- and if it's an anchor, we should never darken it.
   -- The Set is a Set because an LED could be on for multiple reasons.
 
+type LedMsg   = (WindowId, ((X,Y), Led))
 type SoundMsg = (VoiceId, Float, String)
 
 -- | X and Y are coordinates on the monome.
@@ -69,7 +70,7 @@ data St = St {
     -- ^ TODO ? This is expensive, precluding the use of big synths.
     -- Maybe I could make them dynamically without much speed penalty.
     -- Tom of Vivid thinks so.
-  , stPending_Monome :: [(WindowId, ((X,Y), Switch))]
+  , stPending_Monome :: [LedMsg]
   , stPending_Vivid :: [SoundMsg]
 
   , stXyShift :: (X,Y) -- ^ this is relative -- a vector, not a point
