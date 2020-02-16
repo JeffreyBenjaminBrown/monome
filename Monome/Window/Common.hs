@@ -7,7 +7,7 @@
 module Monome.Window.Common (
     ledBecause_toPitchClass -- ^ LitPitches -> LedBecause -> Maybe PitchClass
   , silence   -- ^ St -> (X,Y) -> IO ()
-  , silenceSt -- ^ St -> (X,Y) -> St
+  , silenceMsg -- ^ (X,Y) -> (VoiceId, Float, String)
   , sendVivid -- ^ St -> (VoiceId, Float, String) -> IO ()
   , soundKey  -- ^ St -> ((X,Y), Switch) -> IO ()
   ) where
@@ -35,10 +35,6 @@ ledBecause_toPitchClass m ldr =
 
 silence :: St -> (X,Y) -> IO ()
 silence st xy = set ((M.!) (stVoices st) xy) (0 :: I "amp")
-
-silenceSt :: St -> [(X,Y)] -> St
-silenceSt st xys = st {
-  stPending_Vivid = stPending_Vivid st ++ map silenceMsg xys }
 
 silenceMsg :: (X,Y) -> (VoiceId, Float, String)
 silenceMsg xy = (xy, 0, "amp")

@@ -20,6 +20,7 @@ import qualified Data.List as L
 import Monome.Network.Util
 import Monome.Types.Button
 import Monome.Types.Initial
+import Monome.Window.Common
 
 
 -- | Forward a message to the monome if appropriate.
@@ -47,9 +48,10 @@ handleSwitch    ws0         b          c =
     case windowContains w btn of
       True -> do st0 <- takeMVar mst
                  st1 <- windowRoutine w st0 sw
-                 -- TODO This should send to Vivid too.
+                 mapM_ (sendVivid st1)       $ stPending_Vivid st1
                  mapM_ (ledToWindow st1 ws0) $ stPending_Monome st1
-                 putMVar mst st1 {stPending_Monome = []}
+                 putMVar mst st1 { stPending_Monome = []
+                                 , stPending_Vivid = [] }
       False -> go ws mst sw
 
 ledToWindow :: St -> [Window] -> (WindowId, ((X,Y), Led)) -> IO ()
