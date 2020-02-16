@@ -17,7 +17,6 @@ import qualified Data.Set as S
 import Vivid
 import Vivid.OSC
 
-import Monome.Math31
 import Monome.Network.Util
 import Monome.Synth.Boop
 import Monome.Types.Button
@@ -48,11 +47,11 @@ et31 monomePort = do
     let places = [(a,b) | a <- [0..15], b <- [0..15]]
     in M.fromList . zip places <$> mapM (synth boop) (replicate 256 ())
   mst <- newMVar $ St {
-      stInbox = inbox
-    , stToMonome = toMonome
-    , stPending_Monome = []
+      stToMonome = toMonome
     , stVoices = voices
     , stPending_Vivid = []
+    , stPending_Monome = []
+
     , stXyShift = (0,0)
     , stFingers = mempty
     , stLit = M.singleton (2 :: PitchClass)

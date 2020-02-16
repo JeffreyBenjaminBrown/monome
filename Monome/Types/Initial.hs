@@ -74,24 +74,25 @@ data Device = Device {
   } deriving (Show, Eq, Ord)
 
 data St = St {
-    stInbox :: Socket
-  , stToMonome :: Socket
-  , stPending_Monome :: [(WindowId, ((X,Y), Switch))]
-  , stVoices :: Map (X,Y) (Synth BoopParams)
+    stToMonome :: Socket
+  , stVoices :: Map VoiceId (Synth BoopParams)
     -- ^ TODO ? This is expensive, precluding the use of big synths.
     -- Maybe I could make them dynamically without much speed penalty.
     -- Tom of Vivid thinks so.
+  , stPending_Monome :: [(WindowId, ((X,Y), Switch))]
   , stPending_Vivid :: [(VoiceId, Float, String)]
+
   , stXyShift :: (X,Y) -- ^ this is relative -- a vector, not a point
   , stFingers :: Map (X,Y) PitchClass
     -- ^ Where each finger is, and what it's lighting up.
     -- Note that this doesn't track what pitch it started.
     -- Since voices are indexed by (X,Y), that's okay.
   , stLit :: LitPitches
+
   , stSustainOn :: Bool
     -- ^ TODO ? This could be eliminated by making the next field a Maybe.
   , stSustained :: Set ((X,Y), PitchClass)
-    -- ^ PITFALL: In spirit, the thing sustained is a PitchClass,
+    -- ^ PITFALL: In spirit, the thing sustained is a Pitch,
     -- but it's represented as a voice,
     -- identified by the key that originally launched it.
   } deriving (Show, Eq)

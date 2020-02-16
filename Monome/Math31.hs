@@ -4,8 +4,7 @@
 , TupleSections #-}
 
 module Monome.Math31 (
-  Pitch, PitchClass, LitPitches
-  , et31ToFreq      -- ^ Pitch -> Float
+    et31ToFreq      -- ^ Pitch -> Float
   , xyToEt31        -- ^ (X,Y) -> Pitch
   , et31ToLowXY     -- ^ PitchClass -> (X,Y)
   , enharmonicToXYs -- ^ (X,Y) -> [(X,Y)]
