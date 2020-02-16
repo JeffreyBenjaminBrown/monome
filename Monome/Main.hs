@@ -43,9 +43,11 @@ et31 monomePort = do
     -- I don't know why it's port 8000, or why it used to be 11111.
   toMonome :: Socket <- sendsTo (unpack localhost) monomePort
     -- to find the port number above, use the first part of HandTest.hs
-  voices :: M.Map VoiceId (Synth BoopParams) <-
+  voices :: M.Map VoiceId (Synth BoopParams, Pitch) <-
     let places = [(a,b) | a <- [0..15], b <- [0..15]]
-    in M.fromList . zip places <$> mapM (synth boop) (replicate 256 ())
+        initialPitch = 400
+    in M.fromList . zip places . map (,initialPitch)
+       <$> mapM (synth boop) (replicate 256 ())
   mst <- newMVar $ St {
       stToMonome = toMonome
     , stVoices = voices
@@ -68,14 +70,15 @@ et31 monomePort = do
       Right osc -> let switch = readSwitchOSC osc
                    in  handleSwitch windowLayers mst switch
 
-  let (loop :: IO St) = getChar >>= \case
+  let loop :: IO St =
+        getChar >>= \case
         'q' -> do -- quit
           close inbox
-          mapM_ free (M.elems voices)
+          mapM_ (free . fst) (M.elems voices)
           killThread responder
           st <- readMVar mst
           _ <- send toMonome $ allLedOsc "/monome" False
-          return $ st { stVoices = mempty } -- PITFALL: ?
+          return $ st { stVoices = mempty }
         _   -> loop
     in putStrLn "press 'q' to quit"
        >> loop

@@ -81,7 +81,7 @@ data Device = Device {
 
 data St = St {
     stToMonome :: Socket
-  , stVoices :: Map VoiceId (Synth BoopParams)
+  , stVoices :: Map VoiceId (Synth BoopParams, Pitch)
     -- ^ TODO ? This is expensive, precluding the use of big synths.
     -- Maybe I could make them dynamically without much speed penalty.
     -- Tom of Vivid thinks so.

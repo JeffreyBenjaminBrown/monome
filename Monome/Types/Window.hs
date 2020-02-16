@@ -10,8 +10,8 @@ module Monome.Types.Window (
 
 -- | * So far, no need to export these.
 --  LedRelay, LedFilter
---  , sendVivid      -- ^ St -> (VoiceId, Float, String) -> IO ()
---  , ledToWindow    -- ^ St -> [Window] -> (WindowId, ((X,Y), Led)) -> IO ()
+--  , doSoundMessage -- ^ St -> (VoiceId, Float, String) -> IO ()
+--  , doLedMessage   -- ^ St -> [Window] -> (WindowId, ((X,Y), Led)) -> IO ()
 --  , relayToWindow  -- ^ St -> WindowId -> [Window] -> LedRelay
 --  , relayIfHere    -- ^ Socket > [Window] -> Window -> LedRelay
 --  , findWindow     -- ^ [Window] -> WindowId -> Maybe Window
@@ -38,7 +38,7 @@ initAllWindows mst allWindows = do
   let runWindowInit :: St -> [Window] -> Window -> IO ()
       runWindowInit st ws w = let
         st' = windowInit w st
-        in mapM_ (ledToWindow st' ws)
+        in mapM_ (doLedMessage st' ws)
            $ stPending_Monome st'
   st <- readMVar mst
   mapM_ (runWindowInit st allWindows) allWindows
@@ -53,20 +53,27 @@ handleSwitch    ws0         b          c =
     case windowContains w btn of
       True -> do st0 <- takeMVar mst
                  let st1 = windowRoutine w st0 sw
-                 mapM_ (sendVivid st1)       $ stPending_Vivid st1
-                 mapM_ (ledToWindow st1 ws0) $ stPending_Monome st1
-                 putMVar mst st1 { stPending_Monome = []
+                 st2 <- foldM doSoundMessage st1     $ stPending_Vivid st1
+                 _   <- mapM_ (doLedMessage st1 ws0) $ stPending_Monome st1
+                 putMVar mst st2 { stPending_Monome = []
                                  , stPending_Vivid = [] }
       False -> go ws mst sw
 
 -- | Vivid's type safety makes this boilerplate necessary.
-sendVivid :: St -> (VoiceId, Float, String) -> IO ()
-sendVivid st (xy,f,"amp")  = set ((M.!) (stVoices st) xy) (toI f :: I "amp")
-sendVivid st (xy,f,"freq") = set ((M.!) (stVoices st) xy) (toI f :: I "freq")
-sendVivid _  (_,_,p)       = error $ "sendVivid: unrecognized parameter " ++ p
+doSoundMessage :: St -> (VoiceId, Float, String) -> IO (St)
+doSoundMessage st (xy,f,p) = do
+  let v = fst $ stVoices st M.! xy
+  st2 <- case p of
+    "amp"  -> set v (toI f :: I "amp")
+      >> return st
+    "freq" -> set v (toI f :: I "freq")
+      -- TODO : change pitch values in stVoices
+      >> return st
+    _  -> error $ "doSoundMessage: unrecognized parameter " ++ p
+  return st2
 
-ledToWindow :: St -> [Window] -> (WindowId, ((X,Y), Led)) -> IO ()
-ledToWindow st ws (l, (xy,b)) =
+doLedMessage :: St -> [Window] -> (WindowId, ((X,Y), Led)) -> IO ()
+doLedMessage st ws (l, (xy,b)) =
   let toWindow = relayToWindow st l ws
   in toWindow (xy,b)
 
