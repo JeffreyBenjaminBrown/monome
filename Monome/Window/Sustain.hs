@@ -19,7 +19,7 @@ import           Monome.Window.Common
 import qualified Monome.Window.Keyboard as Kbd
 
 
-label :: WindowLabel
+label :: WindowId
 label = "sustain window"
 
 theButton :: (X,Y)
@@ -37,7 +37,7 @@ handler :: St -> ((X,Y), Switch) -> IO St
 handler    st    (_ , False)      = return st
 handler    st    (xy0, True)      = do
   let st' = updateSt st
-  kbdMsgs :: [(WindowLabel, ((X,Y), Led))] <-
+  kbdMsgs :: [(WindowId, ((X,Y), Led))] <-
     if not $ stSustainOn st'
     then do
       mapM_ (silence st) $ get_voicesToSilence st

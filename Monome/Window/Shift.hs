@@ -15,7 +15,7 @@ import           Monome.Util
 import qualified Monome.Window.Keyboard as Kbd
 
 
-label :: WindowLabel
+label :: WindowId
 label = "shift window"
 
 -- | = the arrows
@@ -55,7 +55,7 @@ handler    st0   (_,  False)      = return st0
 handler    st0   (xy, True )      = let
   st' = st0 { stXyShift = addPair (stXyShift st0) (shift xy) }
   lit  = M.keys $ stLit st0
-  msgs :: [(WindowLabel, ((X,Y), Led))] =
+  msgs :: [(WindowId, ((X,Y), Led))] =
     map (Kbd.label,) $
     (map (,False) $ concatMap (pcToXys $ stXyShift st0) lit) ++
     (map (,True)  $ concatMap (pcToXys $ stXyShift st') lit)

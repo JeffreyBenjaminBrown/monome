@@ -21,7 +21,7 @@ import Monome.Util
 import Monome.Window.Common
 
 
-label :: WindowLabel
+label :: WindowId
 label = "keyboard window"
 
 keyboardWindow :: Window
@@ -57,7 +57,7 @@ handler st press @ (xy,sw) = do
       newKeys :: Set PitchClass  = S.fromList $ M.keys $ lit'
       toDark  ::    [PitchClass] = S.toList $ S.difference oldKeys newKeys
       toLight ::    [PitchClass] = S.toList $ S.difference newKeys oldKeys
-      msgs :: [(WindowLabel, ((X,Y), Led))] =
+      msgs :: [(WindowId, ((X,Y), Led))] =
         map (label,) $
         (map (,False) $ concatMap (pcToXys $ stXyShift st) toDark) ++
         (map (,True)  $ concatMap (pcToXys $ stXyShift st) toLight)

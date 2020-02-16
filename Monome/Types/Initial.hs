@@ -1,6 +1,6 @@
 module Monome.Types.Initial (
     HostName, Socket
-  , WindowLabel, VoiceLabel
+  , WindowId, VoiceId
   , Pitch, PitchClass, LitPitches
   , X, Y, Switch, Led
   , LedBecause(..)
@@ -22,9 +22,9 @@ import Monome.Synth.Boop
 type HostName = NS.HostName
 type Socket = NS.Socket
 
-type WindowLabel = String
-type VoiceLabel = (Int,Int) -- ^ I would call this (X,Y),
-                            -- but it would require a cyclic dependency.
+type WindowId = String
+type VoiceId = (Int,Int) -- ^ I would call this (X,Y),
+                         -- but it would require a cyclic dependency.
 
 -- | Pitch is isomorphic to the integers.
 -- PitchClass is isomorphic to the integers modulo 31.
@@ -77,12 +77,12 @@ data Device = Device {
 data St = St {
     stInbox :: Socket
   , stToMonome :: Socket
-  , stPending_Monome :: [(WindowLabel, ((X,Y), Bool))]
+  , stPending_Monome :: [(WindowId, ((X,Y), Bool))]
   , stVoices :: Map (X,Y) (Synth BoopParams)
     -- ^ TODO ? This is expensive, precluding the use of big synths.
     -- Maybe I could make them dynamically without much speed penalty.
     -- Tom of Vivid thinks so.
-  , stPending_Vivid :: [(VoiceLabel,Float,String)]
+  , stPending_Vivid :: [(VoiceId,Float,String)]
   , stXyShift :: (X,Y) -- ^ this is relative -- a vector, not a point
   , stFingers :: Map (X,Y) PitchClass
     -- ^ Where each finger is, and what it's lighting up.
@@ -98,7 +98,7 @@ data St = St {
   } deriving (Show, Eq)
 
 data Window = Window {
-    windowLabel :: WindowLabel -- ^ PITFALL: Must be unique across windows,
+    windowLabel :: WindowId -- ^ PITFALL: Must be unique across windows,
     -- or the Eq instance fails.
   , windowContains :: (X,Y) -> Bool
     -- ^ PITFALL: A monome will respond to out-of-bounds (x,y) values.

@@ -7,10 +7,10 @@ module Monome.Types.Window (
 
 -- | * So far, no need to export these.
 --  LedRelay, LedFilter
---  , ledToWindow    -- ^ St -> [Window] -> (WindowLabel, ((X,Y), Led)) -> IO ()
---  , relayToWindow  -- ^ St -> WindowLabel -> [Window] -> LedRelay
+--  , ledToWindow    -- ^ St -> [Window] -> (WindowId, ((X,Y), Led)) -> IO ()
+--  , relayToWindow  -- ^ St -> WindowId -> [Window] -> LedRelay
 --  , relayIfHere    -- ^ Socket > [Window] -> Window -> LedRelay
---  , findWindow     -- ^ [Window] -> WindowLabel -> Maybe Window
+--  , findWindow     -- ^ [Window] -> WindowId -> Maybe Window
   ) where
 
 import Prelude hiding (pred)
@@ -52,12 +52,12 @@ handleSwitch    ws0         b          c =
                  putMVar mst st1 {stPending_Monome = []}
       False -> go ws mst sw
 
-ledToWindow :: St -> [Window] -> (WindowLabel, ((X,Y), Led)) -> IO ()
+ledToWindow :: St -> [Window] -> (WindowId, ((X,Y), Led)) -> IO ()
 ledToWindow st ws (l, (xy,b)) =
   let toWindow = relayToWindow st l ws
   in toWindow (xy,b)
 
-relayToWindow :: St -> WindowLabel -> [Window] -> LedRelay
+relayToWindow :: St -> WindowId -> [Window] -> LedRelay
 relayToWindow st wl ws = let
   w = maybe err id $ findWindow ws wl
     where err = error $ "relayToWindow: " ++ wl ++ " not found."
@@ -85,7 +85,7 @@ belongsHere allWindows w = f where
   f :: (X,Y) -> Bool
   f btn = not (obscured btn) && windowContains w btn
 
-findWindow :: [Window] -> WindowLabel -> Maybe Window
+findWindow :: [Window] -> WindowId -> Maybe Window
 findWindow ws l = L.find pred ws where
   -- Pitfall: Assumes the window will be found.
   pred = (==) l . windowLabel
