@@ -45,8 +45,7 @@ handler    st    (xy0, True)      = do
         voicesToSilence      = get_voicesToSilence st
         silence xy = set ((M.!) (stVoices st) xy) (0 :: I "amp")
         in mapM_ silence voicesToSilence
-      return $ map (Kbd.label,) $
-        map (,False) $
+      return $ map ( (Kbd.label,) . (,False) ) $
         concatMap (pcToXys $ stXyShift st) $
         get_pitchClassesToDarken st st'
     else return []

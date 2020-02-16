@@ -33,8 +33,7 @@ keyboardWindow =  Window {
                                in pred x && pred y
   , windowInit = \st ->
       st { stPending_Monome =
-            map (label,) $
-            map (,True)  $
+            map ( (label,) . (,True) ) $
             concatMap (pcToXys $ stXyShift st) $
             M.keys $ stLit st }
   , windowRoutine = handler }

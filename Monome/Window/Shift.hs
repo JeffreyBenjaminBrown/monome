@@ -43,9 +43,10 @@ shiftWindow :: Window
 shiftWindow = Window {
     windowLabel = label
   , windowContains = \(x,y) -> numBetween 13 15 x && numBetween 14 15 y
-  , windowInit = \st -> st { stPending_Monome =
-                               (label,) . (,True) <$>
-                               [ upArrow, downArrow, leftArrow, rightArrow ] }
+  , windowInit = \st ->
+      st { stPending_Monome =
+             (label,) . (,True) <$>
+             [ upArrow, downArrow, leftArrow, rightArrow ] }
   , windowRoutine = handler
 }
 

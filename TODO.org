@@ -1,5 +1,4 @@
 These are pretty well ordered by dependency.
-* TODO WindowRoutine should be a type synonym (again)
 * TODO isolate IO
 ** why
 It will make using multiple monomes easier.
