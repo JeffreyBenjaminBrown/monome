@@ -6,10 +6,11 @@
 
 module Monome.Window.Common (
     ledBecause_toPitchClass -- ^ LitPitches -> LedBecause -> Maybe PitchClass
-  , silence   -- ^ St -> (X,Y) -> IO ()
+  , silence    -- ^ St -> (X,Y) -> IO ()
   , silenceMsg -- ^ (X,Y) -> (VoiceId, Float, String)
-  , sendVivid -- ^ St -> (VoiceId, Float, String) -> IO ()
-  , soundKey  -- ^ St -> ((X,Y), Switch) -> IO ()
+  , sendVivid  -- ^ St -> (VoiceId, Float, String) -> IO ()
+  , soundKey   -- ^ St -> ((X,Y), Switch) -> IO ()
+  , soundKeySt -- ^ St -> ((X,Y), Switch) -> [(VoiceId, Float, String)]
   ) where
 
 import Prelude hiding (pred)
@@ -57,3 +58,13 @@ soundKey st (xy, sw) = do
         voice :: Synth BoopParams = (M.!) (stVoices st) xy
         in set voice ( toI freq   :: I "freq"
                      , toI $ 0.15 :: I "amp" )
+
+soundKeySt :: St -> ((X,Y), Switch) -> [(VoiceId, Float, String)]
+soundKeySt st (xy, sw) = do
+  let pitch = xyToEt31 xy - xyToEt31 (stXyShift st)
+  if S.member xy $ S.map fst $ stSustained st
+    then [] -- it's already sounding due to sustain
+    else if sw
+         then [ (xy, 100 * et31ToFreq pitch, "freq")
+              , (xy, 0.15                  , "amp") ]
+         else [silenceMsg xy]

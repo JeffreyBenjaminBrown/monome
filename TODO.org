@@ -1,4 +1,5 @@
 These are pretty well ordered by dependency.
+* TODO delete some unused functions from Common once possible
 * TODO isolate IO
 ** why
 It will make using multiple monomes easier.
