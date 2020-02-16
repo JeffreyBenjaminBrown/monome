@@ -60,18 +60,16 @@ handleSwitch    mst        sw @ (btn,_)     = do
           False -> go ws
   go $ stWindowLayers st0
 
--- | Vivid's type safety makes this boilerplate necessary.
 doSoundMessage :: St -> (VoiceId, Float, String) -> IO (St)
-doSoundMessage st (xy,f,p) = do
-  let v = fst $ stVoices st M.! xy
-  st2 <- case p of
+doSoundMessage st0 (xy,f,p) = do
+  let v = fst $ stVoices st0 M.! xy
+  st1 <- case p of
     "amp"  -> set v (toI f :: I "amp")
-      >> return st
+      >> return st0
     "freq" -> set v (toI f :: I "freq")
-      -- TODO : change pitch values in stVoices
-      >> return st
+      >> return st0
     _  -> error $ "doSoundMessage: unrecognized parameter " ++ p
-  return st2
+  return st1
 
 doLedMessage :: St -> (WindowId, ((X,Y), Led)) -> IO ()
 doLedMessage st (l, (xy,b)) =
