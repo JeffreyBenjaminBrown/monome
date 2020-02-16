@@ -2,7 +2,7 @@
 
 module Monome.Types.Button (
   X, Y, Switch, Led, LedBecause(..), LedRelay, LedFilter
-  , readSwitchOSC, boolToInt, boolFromInt
+  , readSwitchOSC, fromBool, boolFromInt
   , ledOsc, allLedOsc
   ) where
 
@@ -13,9 +13,9 @@ import Monome.Types.Initial
 import Monome.Util
 
 
-boolToInt :: Num a => Bool -> a
-boolToInt True = 1
-boolToInt False = 0
+fromBool :: Num a => Bool -> a
+fromBool True = 1
+fromBool False = 0
 
 boolFromInt :: Int -> Bool
 boolFromInt 0 = False
@@ -30,8 +30,8 @@ readSwitchOSC x = error $ "readSwitchOSC: bad message: " ++ show x
 
 -- | Tells the monome to turn on an LED. See Test/HandTest.hs.
 ledOsc :: String -> ((X,Y), Led) -> ByteString
-ledOsc prefix ((x, y), led) = onoff prefix x y $ boolToInt led
+ledOsc prefix ((x, y), led) = onoff prefix x y $ fromBool led
 
 -- | Tells the monome to turn on every LED. See Test/HandTest.hs.
 allLedOsc :: String -> Led -> ByteString
-allLedOsc prefix led = allLeds prefix $ boolToInt led
+allLedOsc prefix led = allLeds prefix $ fromBool led

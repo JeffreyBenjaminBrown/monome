@@ -40,7 +40,7 @@ soundKey st (xy, sw) = do
       let freq :: Float = 100 * et31ToFreq pitch
           voice :: Synth BoopParams = (M.!) (stVoices st) xy
       in set voice ( toI freq                  :: I "freq"
-                   , toI $ 0.15 * boolToInt sw :: I "amp" )
+                   , toI $ 0.15 * fromBool sw :: I "amp" )
 
 silence :: St -> (X,Y) -> IO ()
 silence st xy = set ((M.!) (stVoices st) xy) (0 :: I "amp")
