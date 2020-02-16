@@ -28,14 +28,6 @@ import Monome.Window.Shift
 import Monome.Window.Sustain
 
 
--- | PITFALL: Order matters.
--- Windows listed earlier are "above" later ones:
--- key presses are handled by the first window containing them.
-windowLayers :: [Window]
-  -- PITFALL: It is tempting to incorporate this into the St type,
-  -- but that creates a dependency cycle.
-windowLayers = [sustainWindow, shiftWindow, keyboardWindow]
-
 et31 :: Int -- ^ The monome address, as serialoscd reports on startup.
      -> IO St
 et31 monomePort = do
@@ -49,7 +41,8 @@ et31 monomePort = do
     in M.fromList . zip places . map (,initialPitch)
        <$> mapM (synth boop) (replicate 256 ())
   mst <- newMVar $ St {
-      stToMonome = toMonome
+      stWindowLayers = [sustainWindow, shiftWindow, keyboardWindow]
+    , stToMonome = toMonome
     , stVoices = voices
     , stPending_Vivid = []
     , stPending_Monome = []
@@ -62,13 +55,13 @@ et31 monomePort = do
     , stSustained = mempty
     }
 
-  initAllWindows mst windowLayers
+  initAllWindows mst
 
   responder <- forkIO $ forever $ do
     decodeOSC <$> recv inbox 4096 >>= \case
       Left text -> putStrLn . show $ text
       Right osc -> let switch = readSwitchOSC osc
-                   in  handleSwitch windowLayers mst switch
+                   in  handleSwitch mst switch
 
   let loop :: IO St =
         getChar >>= \case

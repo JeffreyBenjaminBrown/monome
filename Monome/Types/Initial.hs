@@ -80,7 +80,10 @@ data Device = Device {
   } deriving (Show, Eq, Ord)
 
 data St = St {
-    stToMonome :: Socket
+    stWindowLayers :: [Window] -- ^ PITFALL: Order matters.
+      -- Key presses are handled by the first window containing them.
+      -- Windows listed earlier are thus "above" later ones.
+  , stToMonome :: Socket
   , stVoices :: Map VoiceId (Synth BoopParams, Pitch)
     -- ^ TODO ? This is expensive, precluding the use of big synths.
     -- Maybe I could make them dynamically without much speed penalty.
@@ -119,3 +122,7 @@ data Window = Window {
 
 instance Eq Window where
   (==) a b = windowLabel a == windowLabel b
+
+instance Show Window where
+  show = windowLabel
+

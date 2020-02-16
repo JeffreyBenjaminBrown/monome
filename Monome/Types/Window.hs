@@ -33,31 +33,32 @@ import Monome.Types.Initial
 type LedRelay  = ((X,Y), Led) -> IO ()
 type LedFilter = (X,Y) -> Bool
 
-initAllWindows :: MVar St -> [Window] -> IO ()
-initAllWindows mst allWindows = do
-  let runWindowInit :: St -> [Window] -> Window -> IO ()
-      runWindowInit st ws w = let
-        st' = windowInit w st
-        in mapM_ (doLedMessage st' ws)
-           $ stPending_Monome st'
+initAllWindows :: MVar St -> IO ()
+initAllWindows mst = do
   st <- readMVar mst
-  mapM_ (runWindowInit st allWindows) allWindows
+  let runWindowInit :: Window -> IO ()
+      runWindowInit w = let
+        st' :: St = windowInit w st
+        in mapM_ (doLedMessage st') $ stPending_Monome st'
+  mapM_ runWindowInit $ stWindowLayers st
 
 -- | called every time a monome button is pressed or released
-handleSwitch :: [Window] -> MVar St -> ((X,Y), Switch) -> IO ()
-handleSwitch    ws0         b          c =
-  go ws0 b c where
-  go :: [Window] -> MVar St -> ((X, Y), Switch) -> IO ()
-  go    []          _           _            = return ()
-  go    (w:ws)      mst         sw @ (btn,_) =
-    case windowContains w btn of
-      True -> do st0 <- takeMVar mst
-                 let st1 = windowRoutine w st0 sw
-                 st2 <- foldM doSoundMessage st1     $ stPending_Vivid st1
-                 _   <- mapM_ (doLedMessage st1 ws0) $ stPending_Monome st1
-                 putMVar mst st2 { stPending_Monome = []
-                                 , stPending_Vivid = [] }
-      False -> go ws mst sw
+handleSwitch :: MVar St -> ((X,Y), Switch) -> IO ()
+handleSwitch    mst        sw @ (btn,_)     = do
+  st0 <- takeMVar mst
+  let go :: [Window] -> IO ()
+      go    []       = error $
+        "handleSwitch: Switch " ++ show sw ++ " claimed by no Window."
+      go    (w:ws)   =
+        case windowContains w btn of
+          True -> do
+            let st1 = windowRoutine w st0 sw
+            st2 <- foldM doSoundMessage st1 $ stPending_Vivid  st1
+            mapM_ (doLedMessage st1)        $ stPending_Monome st1
+            putMVar mst st2 { stPending_Monome = []
+                            , stPending_Vivid = [] }
+          False -> go ws
+  go $ stWindowLayers st0
 
 -- | Vivid's type safety makes this boilerplate necessary.
 doSoundMessage :: St -> (VoiceId, Float, String) -> IO (St)
@@ -72,13 +73,14 @@ doSoundMessage st (xy,f,p) = do
     _  -> error $ "doSoundMessage: unrecognized parameter " ++ p
   return st2
 
-doLedMessage :: St -> [Window] -> (WindowId, ((X,Y), Led)) -> IO ()
-doLedMessage st ws (l, (xy,b)) =
-  let toWindow = relayToWindow st l ws
+doLedMessage :: St -> (WindowId, ((X,Y), Led)) -> IO ()
+doLedMessage st (l, (xy,b)) =
+  let toWindow = relayToWindow st l
   in toWindow (xy,b)
 
-relayToWindow :: St -> WindowId -> [Window] -> LedRelay
-relayToWindow st wl ws = let
+relayToWindow :: St -> WindowId -> LedRelay
+relayToWindow st wl = let
+  ws = stWindowLayers st
   w = maybe err id $ findWindow ws wl
     where err = error $ "relayToWindow: " ++ wl ++ " not found."
   in relayIfHere (stToMonome st) ws w
