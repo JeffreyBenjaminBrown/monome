@@ -1,3 +1,6 @@
+{-# LANGUAGE DataKinds
+, ScopedTypeVariables #-}
+
 module Monome.Types.Window (
     initAllWindows -- ^ MVar St -> [Window] -> IO ()
   , handleSwitch   -- ^ [Window] -> MVar St -> ((X,Y), Switch) -> IO ()
@@ -7,20 +10,22 @@ module Monome.Types.Window (
 
 -- | * So far, no need to export these.
 --  LedRelay, LedFilter
+--  , sendVivid      -- ^ St -> (VoiceId, Float, String) -> IO ()
 --  , ledToWindow    -- ^ St -> [Window] -> (WindowId, ((X,Y), Led)) -> IO ()
 --  , relayToWindow  -- ^ St -> WindowId -> [Window] -> LedRelay
 --  , relayIfHere    -- ^ Socket > [Window] -> Window -> LedRelay
 --  , findWindow     -- ^ [Window] -> WindowId -> Maybe Window
   ) where
 
-import Prelude hiding (pred)
-import Control.Concurrent.MVar
+import           Prelude hiding (pred)
+import           Control.Concurrent.MVar
 import qualified Data.List as L
+import qualified Data.Map as M
+import           Vivid hiding (pitch)
 
 import Monome.Network.Util
 import Monome.Types.Button
 import Monome.Types.Initial
-import Monome.Window.Common
 
 
 -- | Forward a message to the monome if appropriate.
@@ -53,6 +58,12 @@ handleSwitch    ws0         b          c =
                  putMVar mst st1 { stPending_Monome = []
                                  , stPending_Vivid = [] }
       False -> go ws mst sw
+
+-- | Vivid's type safety makes this boilerplate necessary.
+sendVivid :: St -> (VoiceId, Float, String) -> IO ()
+sendVivid st (xy,f,"amp")  = set ((M.!) (stVoices st) xy) (toI f :: I "amp")
+sendVivid st (xy,f,"freq") = set ((M.!) (stVoices st) xy) (toI f :: I "freq")
+sendVivid _  (_,_,p)       = error $ "sendVivid: unrecognized parameter " ++ p
 
 ledToWindow :: St -> [Window] -> (WindowId, ((X,Y), Led)) -> IO ()
 ledToWindow st ws (l, (xy,b)) =
