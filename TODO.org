@@ -7,11 +7,10 @@ It will make using multiple monomes easier.
 It will make adding flashing LEDs easier.
 It will make testing easier.
   For instance, the handlers could be pure.
-** how: Sound X Video
-*** In sound, rather than sending to SC,
+** TODO In sound, rather than sending to SC,
 change the state to have a collection of messages to send.
 * TODO add tests
-* TODO improve the St type
+* TODO voices: improve representation
 ** why
 It will make decoupoling voices from keys possible.
   Which will allow me to solve the bug where keys become inactive
