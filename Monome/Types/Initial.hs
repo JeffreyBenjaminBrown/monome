@@ -77,7 +77,7 @@ data Device = Device {
 data St = St {
     stInbox :: Socket
   , stToMonome :: Socket
-  , stPending_Monome :: [(WindowId, ((X,Y), Bool))]
+  , stPending_Monome :: [(WindowId, ((X,Y), Switch))]
   , stVoices :: Map (X,Y) (Synth BoopParams)
     -- ^ TODO ? This is expensive, precluding the use of big synths.
     -- Maybe I could make them dynamically without much speed penalty.
