@@ -50,7 +50,7 @@ handler    st    (xy0, True)      = let
   in st' { stPending_Monome = ( label, (xy0, stSustainOn st') ) : kbdMsgs
          , stPending_Vivid = stPending_Vivid st ++ vividMsgs }
 
-get_voicesToSilence :: St -> Set (X,Y)
+get_voicesToSilence :: St -> Set VoiceId
 get_voicesToSilence oldSt =
     -- If a voice was sustained before sustain was released,
     -- and it is not fingered, it should be darkened.
@@ -74,7 +74,7 @@ get_pitchClassesToDarken oldSt newSt =
         else True
     voicesToSilence_pcs :: Set PitchClass =
       S.map snd $ S.filter f $ stSustained oldSt
-      where f :: ((X,Y), PitchClass) -> Bool
+      where f :: (VoiceId, PitchClass) -> Bool
             f (b,_) = S.member b $ get_voicesToSilence oldSt
 
 -- | When the sustain button is toggled --
@@ -85,7 +85,7 @@ updateSt :: St -> St
 updateSt st = let
   sustainOn' :: Bool = -- new sustain state
     not $ stSustainOn st
-  sustained' :: Set ((X,Y), PitchClass) = -- new sustained pitches
+  sustained' :: Set (VoiceId, PitchClass) = -- new sustained pitches
     if not sustainOn' then S.empty
     else S.fromList $ M.toList $ stFingers st
 

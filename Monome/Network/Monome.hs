@@ -8,12 +8,7 @@ import Monome.Util
 import Monome.Network.Util (localhost)
 
 
--- | PITFALL: The monome will respond to out-of-bounds (x,y) values.
--- Therefore every Window should have a nontrivial windowContains field,
--- even if it is the background Window.
-
-
--- | to the SerialOSC server
+-- | * to the SerialOSC server
 
 requestDeviceList :: Int -> ByteString
 requestDeviceList mailboxPort = do
@@ -21,7 +16,7 @@ requestDeviceList mailboxPort = do
                                     , OSC_I $ fi mailboxPort ]
 
 
--- | to a device, esp. a monome
+-- | * to a device, esp. a monome
 
 requestDeviceInfo :: Int -> ByteString
 requestDeviceInfo mailboxPort = do

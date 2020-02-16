@@ -29,6 +29,9 @@ type VoiceId = (Int,Int) -- ^ I would call this (X,Y),
 -- PitchClass is isomorphic to the integers modulo 31.
 -- That is, PitchClass 0 is identical to PitchClass 31,
 -- whereas Pitch 31 is an octave above Pitch 0.
+-- Pitch classes are (so far) only relevant in the visual context:
+-- if a key is lit up on the keyboard, so are all enharmonic notes,
+-- in all octaves.
 type Pitch      = Int
 type PitchClass = Int
 type LitPitches = Map PitchClass (Set LedBecause)
@@ -38,8 +41,11 @@ type LitPitches = Map PitchClass (Set LedBecause)
   -- and if it's an anchor, we should never darken it.
   -- The Set is a Set because an LED could be on for multiple reasons.
 
--- | PITFALL: X rises from left to right, but Y rises from top to bottom.
+-- | X and Y are coordinates on the monome.
+-- PITFALL: X rises from left to right, but Y rises from top to bottom.
 -- Thus (0,1) is just under the top-left corner.
+-- PITFALL: The monome will respond to out-of-bounds (x,y) values.
+-- I don't use that feature.
 type X = Int
 type Y = Int
 
@@ -91,7 +97,7 @@ data St = St {
 
   , stSustainOn :: Bool
     -- ^ TODO ? This could be eliminated by making the next field a Maybe.
-  , stSustained :: Set ((X,Y), PitchClass)
+  , stSustained :: Set (VoiceId, PitchClass)
     -- ^ PITFALL: In spirit, the thing sustained is a Pitch,
     -- but it's represented as a voice,
     -- identified by the key that originally launched it.

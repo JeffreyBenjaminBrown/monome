@@ -43,7 +43,7 @@ et31 monomePort = do
     -- I don't know why it's port 8000, or why it used to be 11111.
   toMonome :: Socket <- sendsTo (unpack localhost) monomePort
     -- to find the port number above, use the first part of HandTest.hs
-  voices :: M.Map (X, Y) (Synth BoopParams) <-
+  voices :: M.Map VoiceId (Synth BoopParams) <-
     let places = [(a,b) | a <- [0..15], b <- [0..15]]
     in M.fromList . zip places <$> mapM (synth boop) (replicate 256 ())
   mst <- newMVar $ St {
