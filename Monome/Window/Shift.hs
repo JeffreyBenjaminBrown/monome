@@ -2,7 +2,6 @@
 
 module Monome.Window.Shift (
     shiftWindow
-  , colorArrows
   , label
   ) where
 
@@ -47,7 +46,7 @@ shiftWindow = Window {
   , windowInit = \st -> st { stPending_Monome =
                                (label,) . (,True) <$>
                                [ upArrow, downArrow, leftArrow, rightArrow ] }
-  , windowRoutine = NoMVarRoutine handler
+  , windowRoutine = handler
 }
 
 handler :: St -> ((X,Y), Switch) -> IO St

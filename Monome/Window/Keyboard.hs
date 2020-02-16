@@ -37,7 +37,7 @@ keyboardWindow =  Window {
             map (,True)  $
             concatMap (pcToXys $ stXyShift st) $
             M.keys $ stLit st }
-  , windowRoutine = NoMVarRoutine handler }
+  , windowRoutine = handler }
 
 handler :: St
         -> ((X,Y), Switch)

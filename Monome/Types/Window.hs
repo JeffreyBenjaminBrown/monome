@@ -51,13 +51,11 @@ handleSwitch    ws0         b          c =
   go    []          _           _            = return ()
   go    (w:ws)      mst         sw @ (btn,_) =
     case windowContains w btn of
-      True -> case windowRoutine w of
-        NoMVarRoutine r -> do
-          st0 <- takeMVar mst
-          st1 <- r st0 sw
-          -- TODO This should send to Vivid too.
-          mapM_ (ledToWindow st1 ws0) $ stPending_Monome st1
-          putMVar mst st1 {stPending_Monome = []}
+      True -> do st0 <- takeMVar mst
+                 st1 <- windowRoutine w st0 sw
+                 -- TODO This should send to Vivid too.
+                 mapM_ (ledToWindow st1 ws0) $ stPending_Monome st1
+                 putMVar mst st1 {stPending_Monome = []}
       False -> go ws mst sw
 
 ledToWindow :: St -> [Window] -> (WindowLabel, ((X,Y), Led)) -> IO ()

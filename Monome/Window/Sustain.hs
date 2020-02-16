@@ -30,7 +30,7 @@ sustainWindow = Window {
     windowLabel = label
   , windowContains = (==) theButton
   , windowInit = id
-  , windowRoutine = NoMVarRoutine handler
+  , windowRoutine = handler
 }
 
 handler :: St -> ((X,Y), Switch) -> IO St

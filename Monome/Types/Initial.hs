@@ -10,7 +10,7 @@ module Monome.Types.Initial (
   , Device(..)
   , St(..)
   , Window(..)
-  , WindowRoutine(..)
+  , WindowRoutine
   ) where
 
 import           Data.Map
@@ -118,8 +118,7 @@ instance Eq Window where
   (==) a b = windowLabel a == windowLabel b
 
 -- | Acts on messages from the monome.
-data WindowRoutine =
-  NoMVarRoutine (
-       St
-    -> ((X,Y), Switch) -- ^ the incoming button press|release
-    -> IO St )
+type WindowRoutine =
+     St
+  -> ((X,Y), Switch) -- ^ the incoming button press|release
+  -> IO St
