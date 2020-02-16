@@ -33,23 +33,22 @@ sustainWindow = Window {
   , windowRoutine = handler
 }
 
-handler :: St -> ((X,Y), Switch) -> IO St
-handler    st    (_ , False)      = return st
-handler    st    (xy0, True)      = do
-  let st' = updateSt st
-      kbdMsgs :: [(WindowId, ((X,Y), Led))] =
-        if not $ stSustainOn st'
-        then map ( (Kbd.label,) . (,False) ) $
-             concatMap (pcToXys $ stXyShift st) $
-             get_pitchClassesToDarken st st'
-        else []
-      vividMsgs :: [(VoiceId, Float, String)] =
-        if not $ stSustainOn st'
-        then map silenceMsg $ S.toList $ get_voicesToSilence st
-        else []
-  return st' {
-      stPending_Monome = ( label, (xy0, stSustainOn st') ) : kbdMsgs
-    , stPending_Vivid = stPending_Vivid st ++ vividMsgs }
+handler :: St -> ((X,Y), Switch) -> St
+handler    st    (_ , False)      = st
+handler    st    (xy0, True)      = let
+  st' = updateSt st
+  kbdMsgs :: [(WindowId, ((X,Y), Led))] =
+    if not $ stSustainOn st'
+    then map ( (Kbd.label,) . (,False) ) $
+         concatMap (pcToXys $ stXyShift st) $
+         get_pitchClassesToDarken st st'
+    else []
+  vividMsgs :: [(VoiceId, Float, String)] =
+    if not $ stSustainOn st'
+    then map silenceMsg $ S.toList $ get_voicesToSilence st
+    else []
+  in st' { stPending_Monome = ( label, (xy0, stSustainOn st') ) : kbdMsgs
+         , stPending_Vivid = stPending_Vivid st ++ vividMsgs }
 
 get_voicesToSilence :: St -> Set (X,Y)
 get_voicesToSilence oldSt =

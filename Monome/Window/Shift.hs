@@ -50,8 +50,8 @@ shiftWindow = Window {
   , windowRoutine = handler
 }
 
-handler :: St -> ((X,Y), Switch) -> IO St
-handler    st0   (_,  False)      = return st0
+handler :: St -> ((X,Y), Switch) -> St
+handler    st0   (_,  False)      = st0
 handler    st0   (xy, True )      = let
   st' = st0 { stXyShift = addPair (stXyShift st0) (shift xy) }
   lit  = M.keys $ stLit st0
@@ -59,4 +59,4 @@ handler    st0   (xy, True )      = let
     map (Kbd.label,) $
     (map (,False) $ concatMap (pcToXys $ stXyShift st0) lit) ++
     (map (,True)  $ concatMap (pcToXys $ stXyShift st') lit)
-  in return st' { stPending_Monome = msgs }
+  in st' { stPending_Monome = msgs }

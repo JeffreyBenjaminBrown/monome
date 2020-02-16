@@ -8,7 +8,6 @@ module Monome.Types.Initial (
   , Device(..)
   , St(..)
   , Window(..)
-  , WindowRoutine
   ) where
 
 import           Data.Map
@@ -105,14 +104,11 @@ data Window = Window {
     -- Every Window therefore needs a nontrivial windowContains field,
     -- even the background Window.
   , windowInit :: St -> St
-  , windowRoutine :: WindowRoutine
+  , windowRoutine :: -- ^ Acts on messages from the monome.
+      St
+      -> ((X,Y), Switch) -- ^ the incoming button press|release
+      -> St
   }
 
 instance Eq Window where
   (==) a b = windowLabel a == windowLabel b
-
--- | Acts on messages from the monome.
-type WindowRoutine =
-     St
-  -> ((X,Y), Switch) -- ^ the incoming button press|release
-  -> IO St

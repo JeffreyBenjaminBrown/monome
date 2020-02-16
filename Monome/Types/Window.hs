@@ -47,7 +47,7 @@ handleSwitch    ws0         b          c =
   go    (w:ws)      mst         sw @ (btn,_) =
     case windowContains w btn of
       True -> do st0 <- takeMVar mst
-                 st1 <- windowRoutine w st0 sw
+                 let st1 = windowRoutine w st0 sw
                  mapM_ (sendVivid st1)       $ stPending_Vivid st1
                  mapM_ (ledToWindow st1 ws0) $ stPending_Monome st1
                  putMVar mst st1 { stPending_Monome = []

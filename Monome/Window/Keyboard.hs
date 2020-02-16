@@ -38,7 +38,7 @@ keyboardWindow =  Window {
 
 handler :: St
         -> ((X,Y), Switch)
-        -> IO St
+        -> St
 handler st press @ (xy,sw) = do
   let pcNow :: PitchClass =
         mod (xyToEt31 $ addPair xy $ negPair $ stXyShift st) 31
@@ -59,10 +59,10 @@ handler st press @ (xy,sw) = do
         map (label,) $
         (map (,False) $ concatMap (pcToXys $ stXyShift st) toDark) ++
         (map (,True)  $ concatMap (pcToXys $ stXyShift st) toLight)
-  return st { stFingers = fingers'
-            , stPending_Monome = kbdMsgs ++ stPending_Monome st
-            , stPending_Vivid = soundKeySt st press ++ stPending_Vivid st
-            , stLit = lit' }
+  st { stFingers = fingers'
+     , stPending_Monome = kbdMsgs ++ stPending_Monome st
+     , stPending_Vivid = soundKeySt st press ++ stPending_Vivid st
+     , stLit = lit' }
 
 updateStLit :: ((X,Y), Switch)
        -> PitchClass       -- ^ what xy represents now
