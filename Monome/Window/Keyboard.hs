@@ -40,8 +40,6 @@ handler :: St
         -> ((X,Y), Switch)
         -> IO St
 handler st press @ (xy,sw) = do
-  soundKey st press
-
   let pcNow :: PitchClass =
         mod (xyToEt31 $ addPair xy $ negPair $ stXyShift st) 31
         -- what the key represents currently
@@ -57,12 +55,13 @@ handler st press @ (xy,sw) = do
       newKeys :: Set PitchClass  = S.fromList $ M.keys $ lit'
       toDark  ::    [PitchClass] = S.toList $ S.difference oldKeys newKeys
       toLight ::    [PitchClass] = S.toList $ S.difference newKeys oldKeys
-      msgs :: [(WindowId, ((X,Y), Led))] =
+      kbdMsgs :: [(WindowId, ((X,Y), Led))] =
         map (label,) $
         (map (,False) $ concatMap (pcToXys $ stXyShift st) toDark) ++
         (map (,True)  $ concatMap (pcToXys $ stXyShift st) toLight)
   return st { stFingers = fingers'
-            , stPending_Monome = msgs ++ stPending_Monome st
+            , stPending_Monome = kbdMsgs ++ stPending_Monome st
+            , stPending_Vivid = soundKeySt st press ++ stPending_Vivid st
             , stLit = lit' }
 
 updateStLit :: ((X,Y), Switch)
