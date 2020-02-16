@@ -10,7 +10,6 @@ module Monome.Window.Keyboard (
   ) where
 
 import Prelude hiding (pred)
-import Control.Concurrent.MVar
 import qualified Data.Map as M
 import qualified Data.Set as S
 import           Data.Set (Set)
@@ -32,10 +31,12 @@ keyboardWindow =  Window {
     windowLabel = label
   , windowContains = \(x,y) -> let pred = numBetween 0 15
                                in pred x && pred y
-  , windowInit = \mst toKeyboard -> do
-      st <- readMVar mst
-      mapM_ (drawPitchClass toKeyboard (stXyShift st) True)
-        $ M.keys $ stLit st
+  , windowInit = \st ->
+      st { stPending_Monome =
+            map (label,) $
+            map (,True)  $
+            concatMap (pcToXys $ stXyShift st) $
+            M.keys $ stLit st }
   , windowRoutine = NoMVarRoutine handler }
 
 handler :: St

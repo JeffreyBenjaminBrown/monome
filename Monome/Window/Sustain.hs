@@ -29,7 +29,7 @@ sustainWindow :: Window
 sustainWindow = Window {
     windowLabel = label
   , windowContains = (==) theButton
-  , windowInit = \_ _ -> return ()
+  , windowInit = id
   , windowRoutine = NoMVarRoutine handler
 }
 

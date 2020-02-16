@@ -44,13 +44,11 @@ shiftWindow :: Window
 shiftWindow = Window {
     windowLabel = label
   , windowContains = \(x,y) -> numBetween 13 15 x && numBetween 14 15 y
-  , windowInit = \_ toShiftWindow -> colorArrows toShiftWindow
+  , windowInit = \st -> st { stPending_Monome =
+                               (label,) . (,True) <$>
+                               [ upArrow, downArrow, leftArrow, rightArrow ] }
   , windowRoutine = NoMVarRoutine handler
 }
-
-colorArrows :: LedRelay -> IO ()
-colorArrows toShiftWindow = let f = toShiftWindow . (,True)
-  in mapM_ f [ upArrow, downArrow, leftArrow, rightArrow ]
 
 handler :: St -> ((X,Y), Switch) -> IO St
 handler    st0   (_,  False)      = return st0

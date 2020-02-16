@@ -36,11 +36,16 @@ initAllWindows :: MVar St -> [Window] -> IO ()
 initAllWindows mst allWindows = do
   st <- readMVar mst
   let toWindow w = relayIfHere (stToMonome st) allWindows w
-  mapM_ (\w -> windowInit w mst $ toWindow w) allWindows
+  mapM_ (runWindowInit st allWindows) allWindows
+
+runWindowInit :: St -> [Window] -> Window -> IO ()
+runWindowInit st ws w = let
+  st' = windowInit w st
+  in mapM_ (ledToWindow st' ws) $ stPending_Monome st'
 
 -- | called every time a monome button is pressed or released
-handleSwitch     :: [Window] -> MVar St -> ((X,Y), Switch) -> IO ()
-handleSwitch ws0 b c =
+handleSwitch :: [Window] -> MVar St -> ((X,Y), Switch) -> IO ()
+handleSwitch    ws0         b          c =
   go ws0 b c where
   go :: [Window] -> MVar St -> ((X, Y), Switch) -> IO ()
   go    []          _           _            = return ()
@@ -50,6 +55,7 @@ handleSwitch ws0 b c =
         NoMVarRoutine r -> do
           st0 <- takeMVar mst
           st1 <- r st0 sw
+          -- TODO This should send to Vivid too.
           mapM_ (ledToWindow st1 ws0) $ stPending_Monome st1
           putMVar mst st1 {stPending_Monome = []}
       False -> go ws mst sw

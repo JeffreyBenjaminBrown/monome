@@ -13,7 +13,6 @@ module Monome.Types.Initial (
   , WindowRoutine(..)
   ) where
 
-import           Control.Concurrent.MVar
 import           Data.Map
 import           Data.Set
 import qualified Network.Socket as NS
@@ -111,7 +110,7 @@ data Window = Window {
     -- ^ PITFALL: A monome will respond to out-of-bounds (x,y) values.
     -- Every Window therefore needs a nontrivial windowContains field,
     -- even the background Window.
-  , windowInit :: MVar St -> LedRelay -> IO ()
+  , windowInit :: St -> St
   , windowRoutine :: WindowRoutine
   }
 
