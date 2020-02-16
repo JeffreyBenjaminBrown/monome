@@ -31,16 +31,18 @@ ledBecause_toPitchClass m ldr =
             $ filter (S.member ldr . snd)
             $ M.toList m
 
+silence :: St -> (X,Y) -> IO ()
+silence st xy = set ((M.!) (stVoices st) xy) (0 :: I "amp")
+
 soundKey :: St -> ((X,Y), Switch) -> IO ()
 soundKey st (xy, sw) = do
   let pitch = xyToEt31 xy - xyToEt31 (stXyShift st)
   case S.member xy $ S.map fst $ stSustained st of
     True -> return () -- it's already sounding due to sustain
-    False ->
-      let freq :: Float = 100 * et31ToFreq pitch
-          voice :: Synth BoopParams = (M.!) (stVoices st) xy
-      in set voice ( toI freq                  :: I "freq"
-                   , toI $ 0.15 * fromBool sw :: I "amp" )
-
-silence :: St -> (X,Y) -> IO ()
-silence st xy = set ((M.!) (stVoices st) xy) (0 :: I "amp")
+    False -> case sw of
+      False -> silence st xy
+      True -> let
+        freq :: Float = 100 * et31ToFreq pitch
+        voice :: Synth BoopParams = (M.!) (stVoices st) xy
+        in set voice ( toI freq   :: I "freq"
+                     , toI $ 0.15 :: I "amp" )
