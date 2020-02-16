@@ -8,28 +8,10 @@ module Monome.Types.Button (
 
 import Vivid.OSC
 
-import Monome.Util
 import Monome.Network.Monome
+import Monome.Types.Initial
+import Monome.Util
 
-
--- | PITFALL: X rises from left to right, but Y rises from top to bottom.
--- Thus (0,1) is just under the top-left corner.
-type X = Int
-type Y = Int
-
-type Switch = Bool -- | Whether a monome button is pressed.
-type Led    = Bool -- | Whether a monome LED is lit.
-
--- | The reason a (pitch class of) LED(s) in the keyboard window is lit.
-data LedBecause =
-    LedBecauseSwitch (X,Y)
-  | LedBecauseSustain
-  | LedBecauseAnchor -- ^ Some "visual anchor" pitches are always on.
-  deriving (Show, Eq, Ord)
-
--- | Forward a message to the monome if appropriate.
-type LedRelay  = ((X,Y), Led) -> IO ()
-type LedFilter = (X,Y) -> Bool
 
 boolToInt :: Num a => Bool -> a
 boolToInt True = 1

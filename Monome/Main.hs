@@ -18,12 +18,12 @@ import Vivid
 import Vivid.OSC
 
 import Monome.Math31
-import Monome.Util
 import Monome.Network.Util
 import Monome.Synth.Boop
-import Monome.Types.Window
 import Monome.Types.Button
-import Monome.Types.State
+import Monome.Types.Initial
+import Monome.Types.Window
+import Monome.Util
 import Monome.Window.Keyboard
 import Monome.Window.Shift
 import Monome.Window.Sustain
@@ -52,6 +52,7 @@ et31 monomePort = do
     , stToMonome = toMonome
     , stPending_Monome = []
     , stVoices = voices
+    , stPending_Vivid = []
     , stXyShift = (0,0)
     , stFingers = mempty
     , stLit = M.singleton (2 :: PitchClass)

@@ -14,10 +14,8 @@ import qualified Data.Set as S
 import Vivid
 
 import           Monome.Math31
-import           Monome.Types.Window
 import           Monome.Types.Button
-import           Monome.Types.State
-import           Monome.Util
+import           Monome.Types.Initial
 import qualified Monome.Window.Keyboard as Kbd
 
 

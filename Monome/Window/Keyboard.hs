@@ -19,8 +19,7 @@ import Vivid (set, toI, I, Synth)
 import Monome.Math31
 import Monome.Synth.Boop (BoopParams)
 import Monome.Types.Button
-import Monome.Types.State
-import Monome.Types.Window
+import Monome.Types.Initial
 import Monome.Util
 import Monome.Window.Common
 

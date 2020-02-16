@@ -6,8 +6,7 @@ import qualified Data.List as L
 
 import Monome.Network.Util
 import Monome.Types.Button
-import Monome.Types.State
-import Monome.Util
+import Monome.Types.Initial
 
 
 -- | `belongsHere allWindows w _` returns a `Filter` that returns `True`
@@ -32,27 +31,6 @@ relayIfHere dest ws w = f where
   f msg = if belongsHere ws w $ fst msg
     then (send dest $ ledOsc "/monome" msg) >> return ()
     else return ()
-
-data Window = Window {
-    windowLabel :: WindowLabel -- ^ PITFALL: Must be unique across windows,
-    -- or the Eq instance fails.
-  , windowContains :: (X,Y) -> Bool
-    -- ^ PITFALL: A monome will respond to out-of-bounds (x,y) values.
-    -- Every Window therefore needs a nontrivial windowContains field,
-    -- even the background Window.
-  , windowInit :: MVar St -> LedRelay -> IO ()
-  , windowRoutine :: WindowRoutine
-  }
-
--- | Acts on messages from the monome.
-data WindowRoutine =
-  NoMVarRoutine (
-       St
-    -> ((X,Y), Switch) -- ^ the incoming button press|release
-    -> IO St )
-
-instance Eq Window where
-  (==) a b = windowLabel a == windowLabel b
 
 initAllWindows :: MVar St -> [Window] -> IO ()
 initAllWindows mst allWindows = do

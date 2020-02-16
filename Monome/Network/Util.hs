@@ -2,17 +2,17 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Monome.Network.Util (
-    close          -- ^ NS.Socket -> IO ()
-  , recv           -- ^ NS.Socket -> Int -> IO ByteString
-  , send           -- ^ NS.Socket -> ByteString -> IO Int
-  , HostName       -- ^ NS.HostName
-  , Socket         -- ^ NS.Socket
+    close          -- ^ Socket -> IO ()
+  , recv           -- ^ Socket -> Int -> IO ByteString
+  , send           -- ^ Socket -> ByteString -> IO Int
+  , HostName       -- ^ HostName
+  , Socket         -- ^ Socket
   , localhost      -- ^ ByteString
-  , toPort         -- ^ Show a => a -> IO NS.Socket
-  , toSerialosc    -- ^ IO NS.Socket
+  , toPort         -- ^ Show a => a -> IO Socket
+  , toSerialosc    -- ^ IO Socket
   , getLocalSocket -- ^ Show a => HostName -> a -> IO (Socket, NS.AddrInfo)
-  , sendsTo        -- ^ Show a => NS.HostName -> a -> IO NS.Socket
-  , receivesAt     -- ^ Show a => NS.HostName -> a -> IO NS.Socket
+  , sendsTo        -- ^ Show a => HostName -> a -> IO Socket
+  , receivesAt     -- ^ Show a => HostName -> a -> IO Socket
   ) where
 
 import Data.ByteString (ByteString)
@@ -20,28 +20,27 @@ import Data.ByteString.Char8 (unpack)
 import qualified Network.Socket as NS
 import qualified Network.Socket.ByteString as NSB
 
+import Monome.Types.Initial (HostName, Socket)
+
 
 -- | = PITFALL: Ports 0-1024 are reserved.
 -- All 5-digit numbers seem to work, though.
 
-close :: NS.Socket -> IO ()
+close :: Socket -> IO ()
 close = NS.close
 
-recv :: NS.Socket -> Int -> IO ByteString
+recv :: Socket -> Int -> IO ByteString
 recv = NSB.recv
 
-send :: NS.Socket -> ByteString -> IO Int
+send :: Socket -> ByteString -> IO Int
 send = NSB.send
-
-type HostName = NS.HostName
-type Socket = NS.Socket
 
 localhost :: ByteString
 localhost = "127.0.0.1"
 
-toPort :: Show a => a -> IO NS.Socket
+toPort :: Show a => a -> IO Socket
 toPort port = sendsTo (unpack localhost) port
-toSerialosc :: IO NS.Socket
+toSerialosc :: IO Socket
 toSerialosc = toPort 12002
   -- ^ https://monome.org/docs/serialosc/osc/
 
@@ -51,13 +50,13 @@ getLocalSocket host port = do
   s <- NS.socket (NS.addrFamily a) NS.Datagram NS.defaultProtocol
   return (s,a)
 
-sendsTo :: Show a => NS.HostName -> a -> IO NS.Socket
+sendsTo :: Show a => HostName -> a -> IO Socket
 sendsTo host port = do
   (s,a) <- getLocalSocket host port
   NS.connect s $ NS.addrAddress a
   return s
 
-receivesAt :: Show a => NS.HostName -> a -> IO NS.Socket
+receivesAt :: Show a => HostName -> a -> IO Socket
 receivesAt host port = do
   (s,a) <- getLocalSocket host port
   NS.bind s $ NS.addrAddress a

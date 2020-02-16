@@ -11,8 +11,7 @@ import qualified Data.Map as M
 
 import           Monome.Math31
 import           Monome.Types.Button
-import           Monome.Types.State
-import           Monome.Types.Window
+import           Monome.Types.Initial
 import           Monome.Util
 import qualified Monome.Window.Keyboard as Kbd
 
