@@ -1,5 +1,6 @@
 {-# LANGUAGE DataKinds
 , ScopedTypeVariables
+, TupleSections
 #-}
 
 module Monome.Window.Sustain (
@@ -17,7 +18,6 @@ import           Monome.Types.Window
 import           Monome.Types.Button
 import           Monome.Types.State
 import           Monome.Util
-import           Monome.Window.Common (drawPitchClass)
 import qualified Monome.Window.Keyboard as Kbd
 
 
@@ -37,25 +37,24 @@ sustainWindow = Window {
 
 handler :: St -> [Window] -> ((X,Y), Switch) -> IO (St)
 handler    st    _           (_ , False) = return st
-handler    st    ws          (xy0, True) = do
+handler    st    _           (xy0, True) = do
   let st' = updateSt st
-      toSustain = relayToWindow st label ws
-      toKeyboard = relayToWindow st Kbd.label ws
-  if not $ stSustainOn st'
+  kbdMsgs :: [(WindowLabel, ((X,Y), Led))] <-
+    if not $ stSustainOn st'
     then do
 
-      let voicesToSilence      = get_voicesToSilence st
-          pitchClassesToDarken = get_pitchClassesToDarken st st'
       let -- Silence some voices.
+        voicesToSilence      = get_voicesToSilence st
         silence xy = set ((M.!) (stVoices st) xy) (0 :: I "amp")
         in mapM_ silence voicesToSilence
-      let -- Darken some of the keyboard (which is a different window).
-        in mapM_ (drawPitchClass toKeyboard (stXyShift st) False)
-           $ S.toList pitchClassesToDarken
-      curry toSustain xy0 False -- Darken the sustain button.
-    else return ()
+      return $ map (Kbd.label,) $
+        map (,False) $
+        concatMap (pcToXys $ stXyShift st) $
+        get_pitchClassesToDarken st st'
+    else return []
   return st' { stPending_Monome =
-               [( label, (xy0, stSustainOn st') )] }
+               ( label, (xy0, stSustainOn st') )
+               : kbdMsgs }
 
 get_voicesToSilence :: St -> Set (X,Y)
 get_voicesToSilence oldSt =

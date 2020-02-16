@@ -1,4 +1,5 @@
 These are pretty well ordered by dependency.
+* TODO delete [Window] from NoMVarRoutine if possible
 * TODO isolate IO
 ** why
 It will make using multiple monomes easier.
@@ -10,9 +11,6 @@ It will make testing easier.
 ** how: Sound X Video
 *** In sound, rather than sending to SC,
 change the state to have a collection of messages to send.
-*** In LEDs, rather than sending to monome,
-make each window keep a "last sent" and a "to show" set of LED assignments,
-and compute the difference when needed.
 * TODO add tests
 * TODO improve the St type
 ** why
