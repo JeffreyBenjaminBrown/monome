@@ -35,7 +35,6 @@ relayIfHere dest ws w = f where
 initAllWindows :: MVar St -> [Window] -> IO ()
 initAllWindows mst allWindows = do
   st <- readMVar mst
-  let toWindow w = relayIfHere (stToMonome st) allWindows w
   mapM_ (runWindowInit st allWindows) allWindows
 
 runWindowInit :: St -> [Window] -> Window -> IO ()

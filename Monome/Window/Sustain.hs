@@ -11,11 +11,11 @@ module Monome.Window.Sustain (
 import qualified Data.Map as M
 import           Data.Set (Set)
 import qualified Data.Set as S
-import Vivid
 
 import           Monome.Math31
 import           Monome.Types.Button
 import           Monome.Types.Initial
+import           Monome.Window.Common
 import qualified Monome.Window.Keyboard as Kbd
 
 
@@ -40,11 +40,7 @@ handler    st    (xy0, True)      = do
   kbdMsgs :: [(WindowLabel, ((X,Y), Led))] <-
     if not $ stSustainOn st'
     then do
-
-      let -- Silence some voices.
-        voicesToSilence      = get_voicesToSilence st
-        silence xy = set ((M.!) (stVoices st) xy) (0 :: I "amp")
-        in mapM_ silence voicesToSilence
+      mapM_ (silence st) $ get_voicesToSilence st
       return $ map ( (Kbd.label,) . (,False) ) $
         concatMap (pcToXys $ stXyShift st) $
         get_pitchClassesToDarken st st'

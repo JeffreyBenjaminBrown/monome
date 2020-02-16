@@ -13,10 +13,8 @@ import Prelude hiding (pred)
 import qualified Data.Map as M
 import qualified Data.Set as S
 import           Data.Set (Set)
-import Vivid (set, toI, I, Synth)
 
 import Monome.Math31
-import Monome.Synth.Boop (BoopParams)
 import Monome.Types.Button
 import Monome.Types.Initial
 import Monome.Util
@@ -66,17 +64,6 @@ handler st press @ (xy,sw) = do
   return st { stFingers = fingers'
             , stPending_Monome = msgs ++ stPending_Monome st
             , stLit = lit' }
-
-soundKey :: St -> ((X,Y), Switch) -> IO ()
-soundKey st (xy, sw) = do
-  let pitch = xyToEt31 xy - xyToEt31 (stXyShift st)
-  case S.member xy $ S.map fst $ stSustained st of
-    True -> return () -- it's already sounding due to sustain
-    False ->
-      let freq :: Float = 100 * et31ToFreq pitch
-          voice :: Synth BoopParams = (M.!) (stVoices st) xy
-      in set voice ( toI freq                  :: I "freq"
-                   , toI $ 0.15 * boolToInt sw :: I "amp" )
 
 updateStLit :: ((X,Y), Switch)
        -> PitchClass       -- ^ what xy represents now
