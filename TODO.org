@@ -1,15 +1,4 @@
 These are pretty well ordered by dependency.
-* TODO delete some unused functions from Common once possible
-* TODO isolate IO
-** why
-It will make using multiple monomes easier.
-  Launch two separate et31 instances, one for each monome.
-  Launch a single routine that receives from those and sends to Vivid.
-It will make adding flashing LEDs easier.
-It will make testing easier.
-  For instance, the handlers could be pure.
-** TODO In sound, rather than sending to SC,
-change the state to have a collection of messages to send.
 * TODO add tests
 * TODO voices: improve representation
 ** why
