@@ -25,7 +25,7 @@ testDependentPitchClass = TestCase $ do
 
 testBelongsHere :: Test
 testBelongsHere = TestCase $ do
-  let nmr = NoMVarRoutine $ \st _ _ -> return st
+  let nmr = NoMVarRoutine $ \st _ -> return st
       w1 = Window "w1" (\(x,y) -> x > y) mempty nmr
       w2 = Window "w2" (\(x,_) -> x > 4) mempty nmr
       w3 = Window "w3" (\(_,_) -> True)  mempty nmr

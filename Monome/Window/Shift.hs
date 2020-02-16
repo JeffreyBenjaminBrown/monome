@@ -53,9 +53,9 @@ colorArrows :: LedRelay -> IO ()
 colorArrows toShiftWindow = let f = toShiftWindow . (,True)
   in mapM_ f [ upArrow, downArrow, leftArrow, rightArrow ]
 
-handler :: St -> [Window] -> ((X,Y), Switch) -> IO (St)
-handler    st0   _           (_,  False)     = return st0
-handler    st0   _           (xy, True )     = let
+handler :: St -> ((X,Y), Switch) -> IO St
+handler    st0   (_,  False)      = return st0
+handler    st0   (xy, True )      = let
   st' = st0 { stXyShift = addPair (stXyShift st0) (shift xy) }
   lit  = M.keys $ stLit st0
   msgs :: [(WindowLabel, ((X,Y), Led))] =

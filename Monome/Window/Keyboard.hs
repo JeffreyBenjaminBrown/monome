@@ -40,10 +40,9 @@ keyboardWindow =  Window {
   , windowRoutine = NoMVarRoutine handler }
 
 handler :: St
-        -> [Window]
         -> ((X,Y), Switch)
-        -> IO (St)
-handler st _ press @ (xy,sw) = do
+        -> IO St
+handler st press @ (xy,sw) = do
   soundKey st press
 
   let pcNow :: PitchClass =

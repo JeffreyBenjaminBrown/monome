@@ -48,10 +48,6 @@ data Window = Window {
 data WindowRoutine =
   NoMVarRoutine (
        St
-    -> [Window] -- ^ To construct an LedRelay to another Window, if needed.
-      -- PIFALL: Should be a list of all Windows -- not just, say, later ones.
-      -- TODO ? Include the list of windows as part of an St,
-      -- and omit this argument
     -> ((X,Y), Switch) -- ^ the incoming button press|release
     -> IO St )
 
@@ -75,7 +71,7 @@ handleSwitch ws0 b c =
       True -> case windowRoutine w of
         NoMVarRoutine r -> do
           st0 <- takeMVar mst
-          st1 <- r st0 ws0 sw
+          st1 <- r st0 sw
           mapM_ (ledToWindow st1 ws0) $ stPending_Monome st1
           putMVar mst st1 {stPending_Monome = []}
       False -> go ws mst sw

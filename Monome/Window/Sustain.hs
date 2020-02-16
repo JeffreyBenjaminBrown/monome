@@ -35,9 +35,9 @@ sustainWindow = Window {
   , windowRoutine = NoMVarRoutine handler
 }
 
-handler :: St -> [Window] -> ((X,Y), Switch) -> IO (St)
-handler    st    _           (_ , False) = return st
-handler    st    _           (xy0, True) = do
+handler :: St -> ((X,Y), Switch) -> IO St
+handler    st    (_ , False)      = return st
+handler    st    (xy0, True)      = do
   let st' = updateSt st
   kbdMsgs :: [(WindowLabel, ((X,Y), Led))] <-
     if not $ stSustainOn st'
