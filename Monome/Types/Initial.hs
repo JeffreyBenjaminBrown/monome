@@ -82,7 +82,7 @@ data St = St {
     -- ^ TODO ? This is expensive, precluding the use of big synths.
     -- Maybe I could make them dynamically without much speed penalty.
     -- Tom of Vivid thinks so.
-  , stPending_Vivid :: [(VoiceId,Float,String)]
+  , stPending_Vivid :: [(VoiceId, Float, String)]
   , stXyShift :: (X,Y) -- ^ this is relative -- a vector, not a point
   , stFingers :: Map (X,Y) PitchClass
     -- ^ Where each finger is, and what it's lighting up.

@@ -6,8 +6,10 @@
 
 module Monome.Window.Common (
     ledBecause_toPitchClass -- ^ LitPitches -> LedBecause -> Maybe PitchClass
-  , soundKey -- ^ St -> ((X,Y), Switch) -> IO ()
-  , silence -- ^ St -> (X,Y) -> IO ()
+  , silence   -- ^ St -> (X,Y) -> IO ()
+  , silenceSt -- ^ St -> (X,Y) -> St
+  , sendVivid -- ^ St -> (VoiceId, Float, String) -> IO ()
+  , soundKey  -- ^ St -> ((X,Y), Switch) -> IO ()
   ) where
 
 import Prelude hiding (pred)
@@ -33,6 +35,16 @@ ledBecause_toPitchClass m ldr =
 
 silence :: St -> (X,Y) -> IO ()
 silence st xy = set ((M.!) (stVoices st) xy) (0 :: I "amp")
+
+silenceSt :: St -> (X,Y) -> St
+silenceSt st xy = st {
+  stPending_Vivid = (xy, 0, "amp") : stPending_Vivid st }
+
+-- | Vivid's type safety makes this boilerplate necessary.
+sendVivid :: St -> (VoiceId, Float, String) -> IO ()
+sendVivid st (xy,f,"amp")  = set ((M.!) (stVoices st) xy) (toI f :: I "amp")
+sendVivid st (xy,f,"freq") = set ((M.!) (stVoices st) xy) (toI f :: I "freq")
+sendVivid _  (_,_,p)       = error $ "sendVivid: unrecognized parameter " ++ p
 
 soundKey :: St -> ((X,Y), Switch) -> IO ()
 soundKey st (xy, sw) = do
