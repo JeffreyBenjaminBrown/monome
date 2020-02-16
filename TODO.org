@@ -3,8 +3,6 @@ These are pretty well ordered by dependency.
 ** should receive a Pitch (Int)
 not a "Freq" (Float)
 ** should store voice parameter info
-* TODO search for todo items in code
-* TODO incorporate [Window] into St
 * TODO add tests
 * TODO voices: improve representation
 ** TODO ? first

@@ -86,7 +86,7 @@ updateStLit (xy,False) _ mpcThen m =
   case mpcThen of
     Nothing -> m
     Just pc ->
-      -- TODO (#safety) Check that that's really what's being deleted.
+      -- todo ? (#safety) Check that that's really what's being deleted.
       let Just reasons = M.lookup pc m
       in case S.size reasons < 2 of -- size < 1 should not happen
         True -> M.delete pc m

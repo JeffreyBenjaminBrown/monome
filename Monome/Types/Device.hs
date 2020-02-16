@@ -9,9 +9,28 @@ import Vivid.OSC
 
 import Monome.Network.Util
 import Monome.Types.Button
-import Monome.Types.Initial
 import Monome.Util
 
+
+-- | SerialOsc responds to /serialosc/list messages with this information.
+data DeviceID = DeviceID { deviceIDName :: ByteString
+                         , deviceIDType :: ByteString
+                         , deviceIDPort :: Int }
+  deriving (Show, Eq, Ord)
+
+-- | A monome (distinct form serialosc!) responds to /sys/info messages
+-- with this information.
+--
+-- A device's DeviceInfo.deviceName = its DeviceID.deviceIDName.
+-- That is the only pooint where `Device` and `DeviceID` overlap.
+data Device = Device {
+    deviceName :: String
+  , deviceSize :: (X,Y)
+  , deviceHost :: HostName   -- ^ Where it sends to.
+  , devicePort :: Int        -- ^ Where it sends to.
+  , devicePrefix :: String   -- ^ PITFALL: Includes a leading slash.
+  , deviceRotation :: Int    -- ^ 0, 90, 180 or 270
+  } deriving (Show, Eq, Ord)
 
 readDeviceID :: OSC -> DeviceID
 readDeviceID ( OSC "/serialosc/device" [ OSC_S name

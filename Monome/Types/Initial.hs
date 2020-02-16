@@ -4,8 +4,6 @@ module Monome.Types.Initial (
   , Pitch, PitchClass, LitPitches
   , X, Y, Switch, Led
   , LedBecause(..)
-  , DeviceID(..)
-  , Device(..)
   , St(..)
   , Window(..)
   ) where
@@ -58,26 +56,6 @@ data LedBecause =
   | LedBecauseSustain
   | LedBecauseAnchor -- ^ Some "visual anchor" pitches are always on.
   deriving (Show, Eq, Ord)
-
--- | SerialOsc responds to /serialosc/list messages with this information.
-data DeviceID = DeviceID { deviceIDName :: ByteString
-                         , deviceIDType :: ByteString
-                         , deviceIDPort :: Int }
-  deriving (Show, Eq, Ord)
-
--- | A monome (distinct form serialosc!) responds to /sys/info messages
--- with this information.
---
--- A device's DeviceInfo.deviceName = its DeviceID.deviceIDName.
--- That is the only pooint where `Device` and `DeviceID` overlap.
-data Device = Device {
-    deviceName :: String
-  , deviceSize :: (X,Y)
-  , deviceHost :: HostName   -- ^ Where it sends to.
-  , devicePort :: Int        -- ^ Where it sends to.
-  , devicePrefix :: String   -- ^ PITFALL: Includes a leading slash.
-  , deviceRotation :: Int    -- ^ 0, 90, 180 or 270
-  } deriving (Show, Eq, Ord)
 
 data St = St {
     stWindowLayers :: [Window] -- ^ PITFALL: Order matters.
