@@ -1,27 +1,13 @@
 These are pretty well ordered by dependency.
 * TODO replace tuples with types
-* TODO add tests
 * TODO voices: improve representation
-** why
-It will make decoupoling voices from keys possible.
-  Which will allow me to solve the bug where keys become inactive
-  due to sustain after spatial drift.
-It will make creating voices on the fly easier.
-  Which will allow using fewer voices, better synths.
-** what there is now
-*** code: see temp.hs
-*** types
-St = ...
-  stVoices :: M.Map (X,Y) (Synth BoopParams)
-  stFingers :: M.Map (X,Y) PitchClass -- should be pitch, not pitch class
-  stLit :: LitPitches = Map PitchClass (Set LedBecause)
-  stSustained :: S.Set ((X,Y), PitchClass) -- should just be a voice ID
-** what there should be
-type VoiceId = Int
-data St = ...
-  stVoices  :: Map VoiceId (Synth BoopParams).
-  stFingers :: Map (X,Y) VoiceId
-  stSustained :: S.Set VoiceID
+LedBecause: maybe don't distinguish between keys and sustain,
+  just use VoiceId
+stVoices  :: Map VoiceId (Synth BoopParams).
+stFingers :: Map (X,Y) VoiceId
+stSustained :: S.Set VoiceID
+* TODO add tests
+* TODO create voices on the fly
 ** Vivid: voice creation, use and deletion
 use "synth" to make a synth, "free" to free it:
   s <- synth boop
