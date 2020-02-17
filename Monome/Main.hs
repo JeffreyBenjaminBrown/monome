@@ -28,6 +28,9 @@ import Monome.Window.Shift
 import Monome.Window.Sustain
 
 
+initialPitch :: Pitch
+initialPitch = 50
+
 et31 :: Int -- ^ The monome address, as serialoscd reports on startup.
      -> IO St
 et31 monomePort = do
@@ -37,7 +40,6 @@ et31 monomePort = do
     -- to find the port number above, use the first part of HandTest.hs
   voices :: M.Map VoiceId (Synth BoopParams, Pitch) <-
     let places = [(a,b) | a <- [0..15], b <- [0..15]]
-        initialPitch = 400
     in M.fromList . zip places . map (,initialPitch)
        <$> mapM (synth boop) (replicate 256 ())
   mst <- newMVar $ St {
