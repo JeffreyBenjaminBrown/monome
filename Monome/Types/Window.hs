@@ -19,9 +19,10 @@ module Monome.Types.Window (
 
 import           Prelude hiding (pred)
 import           Control.Concurrent.MVar
+import           Control.Lens hiding (set)
 import qualified Data.List as L
 import qualified Data.Map as M
-import           Vivid hiding (pitch)
+import           Vivid hiding (pitch, synth)
 
 import Monome.Network.Util
 import Monome.Types.Button
@@ -61,14 +62,14 @@ handleSwitch    mst        sw @ (btn,_)     = do
   go $ _stWindowLayers st0
 
 doSoundMessage :: St -> SoundMsg -> IO (St)
-doSoundMessage st0 (xy,f,p) = do
-  let v = fst $ _stVoices st0 M.! xy
-  st1 <- case p of
+doSoundMessage st0 (vid,p,f,param) = do
+  let v = (_stVoices st0 M.! vid) ^. _1
+  st1 <- case param of
     "amp"  -> set v (toI f :: I "amp")
       >> return st0
     "freq" -> set v (toI f :: I "freq")
       >> return st0
-    _  -> error $ "doSoundMessage: unrecognized parameter " ++ p
+    _  -> error $ "doSoundMessage: unrecognized parameter " ++ param
   return st1
 
 doLedMessage :: St -> LedMsg -> IO ()

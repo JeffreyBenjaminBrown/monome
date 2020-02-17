@@ -29,7 +29,7 @@ ledBecause_toPitchClass m ldr =
             $ M.toList m
 
 silenceMsg :: (X,Y) -> SoundMsg
-silenceMsg xy = (xy, 0, "amp")
+silenceMsg xy = (xy, Nothing, 0, "amp")
 
 soundKeySt :: St -> ((X,Y), Switch) -> [SoundMsg]
 soundKeySt st (xy, sw) = do
@@ -37,6 +37,6 @@ soundKeySt st (xy, sw) = do
   if S.member xy $ S.map fst $ _stSustained st
     then [] -- it's already sounding due to sustain
     else if sw
-         then [ (xy, 100 * et31ToFreq pitch, "freq")
-              , (xy, 0.15                  , "amp") ]
+         then [ (xy, Just pitch, 100 * et31ToFreq pitch, "freq")
+              , (xy, Just pitch, 0.15                  , "amp" ) ]
          else [silenceMsg xy]

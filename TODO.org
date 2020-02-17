@@ -1,8 +1,8 @@
 These are pretty well ordered by dependency.
 * TODO doSoundMessage
+** should store voice parameter info
 ** should receive a Pitch (Int)
 not a "Freq" (Float)
-** should store voice parameter info
 * TODO add tests
 * TODO voices: improve representation
 ** TODO ? first

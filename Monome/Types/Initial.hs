@@ -16,7 +16,7 @@ import           Control.Lens
 import           Data.Map
 import           Data.Set
 import qualified Network.Socket as NS
-import           Vivid
+import           Vivid hiding (Param)
 
 import Monome.Synth.Boop
 
@@ -24,6 +24,7 @@ import Monome.Synth.Boop
 type HostName = NS.HostName
 type Socket = NS.Socket
 
+type Param = String
 type WindowId = String
 type VoiceId = (Int,Int) -- ^ I would call this (X,Y),
                          -- but it would require a cyclic dependency.
@@ -45,7 +46,10 @@ type LitPitches = Map PitchClass (Set LedBecause)
   -- The Set is a Set because an LED could be on for multiple reasons.
 
 type LedMsg   = (WindowId, ((X,Y), Led))
-type SoundMsg = (VoiceId, Float, String)
+type SoundMsg = ( VoiceId
+                , Maybe Pitch -- ^ messages like "turn off" don't need one
+                , Float
+                , Param )
 
 -- | X and Y are coordinates on the monome.
 -- PITFALL: X rises from left to right, but Y rises from top to bottom.
@@ -94,6 +98,10 @@ data St = St {
     -- ^ TODO ? This is expensive, precluding the use of big synths.
     -- Maybe I could make them dynamically without much speed penalty.
     -- Tom of Vivid thinks so.
+
+  -- | The purpose of `_stPending_Monome` and `_stPending_Vivid`
+  -- is to isolate side-effects to a small portion of the code. Elsewhere,
+  -- scattered functions can simply change an `St` instead of doing IO.
   , _stPending_Monome :: [LedMsg]
   , _stPending_Vivid :: [SoundMsg]
 

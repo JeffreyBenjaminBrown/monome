@@ -2,7 +2,7 @@
 
 import Control.Concurrent
 import Control.Concurrent.MVar
-import Control.Lens
+import Control.Lens hiding (set)
 
 import qualified Data.List as L
 import           Data.Map (Map)
