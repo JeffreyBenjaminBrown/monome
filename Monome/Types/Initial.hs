@@ -94,7 +94,7 @@ data St = St {
       -- Key presses are handled by the first window containing them.
       -- Windows listed earlier are thus "above" later ones.
   , _stToMonome :: Socket
-  , _stVoices :: Map VoiceId (Synth BoopParams, Pitch)
+  , _stVoices :: Map VoiceId (Synth BoopParams, Pitch, Map String Float)
     -- ^ TODO ? This is expensive, precluding the use of big synths.
     -- Maybe I could make them dynamically without much speed penalty.
     -- Tom of Vivid thinks so.

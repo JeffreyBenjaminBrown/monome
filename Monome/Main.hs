@@ -12,6 +12,7 @@ module Monome.Main (
 
 import Control.Concurrent (forkIO, killThread)
 import Control.Concurrent.MVar
+import Control.Lens
 import qualified Data.Map as M
 import qualified Data.Set as S
 import Vivid
@@ -38,9 +39,14 @@ et31 monomePort = do
     -- I don't know why it's port 8000, or why it used to be 11111.
   toMonome :: Socket <- sendsTo (unpack localhost) monomePort
     -- to find the port number above, use the first part of HandTest.hs
-  voices :: M.Map VoiceId (Synth BoopParams, Pitch) <-
+  voices :: M.Map VoiceId (Synth BoopParams, Pitch, M.Map String Float) <-
     let places = [(a,b) | a <- [0..15], b <- [0..15]]
-    in M.fromList . zip places . map (,initialPitch)
+        defaultVoiceState :: synth -> (synth, Pitch, M.Map String Float)
+        defaultVoiceState s = (s, initialPitch, mempty)
+          -- `mempty` is inaccurate -- initially each voice has amp 0
+          -- and freq 100, because those ares the Boop defaults.
+          -- Since none are sounding, I don't think it matters.
+    in M.fromList . zip places . map defaultVoiceState
        <$> mapM (synth boop) (replicate 256 ())
   mst <- newMVar $ St {
       _stWindowLayers = [sustainWindow, shiftWindow, keyboardWindow]
@@ -69,7 +75,9 @@ et31 monomePort = do
         getChar >>= \case
         'q' -> do -- quit
           close inbox
-          mapM_ (free . fst) (M.elems voices)
+          mapM_ (free . (^. _1)) (M.elems voices)
+            -- TODO Once `voices` are dynamic,
+            -- this should read that value from `mst`.
           killThread responder
           st <- readMVar mst
           _ <- send toMonome $ allLedOsc "/monome" False
