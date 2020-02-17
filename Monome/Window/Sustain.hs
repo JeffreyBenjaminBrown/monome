@@ -89,11 +89,11 @@ updateSt st = let
     not $ _stSustainOn st
   sustained' :: Set (VoiceId, PitchClass) = -- new sustained pitches
     if not sustainOn' then S.empty
-    else S.fromList $ M.toList $ _stFingers st
+    else S.fromList $ M.elems $ _stFingers st
 
   lit' | sustainOn' =
          foldr insertOneSustainedNote (_stLit st)
-         $ M.elems $ _stFingers st
+         $ map snd $ M.elems $ _stFingers st
        | otherwise =
          foldr deleteOneSustainedNote (_stLit st)
          $ S.toList $ S.map snd $ _stSustained st

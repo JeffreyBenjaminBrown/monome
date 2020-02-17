@@ -106,10 +106,9 @@ data St = St {
   , _stPending_Vivid :: [SoundMsg]
 
   , _stXyShift :: (X,Y) -- ^ this is relative -- a vector, not a point
-  , _stFingers :: Map (X,Y) PitchClass
-    -- ^ Where each finger is, and what it's lighting up.
-    -- Note that this doesn't track what pitch it started.
-    -- Since voices are indexed by (X,Y), that's okay.
+  , _stFingers :: Map (X,Y) (VoiceId, PitchClass)
+    -- ^ Where fingers are, what each is sounding,
+    -- and what each is lighting up.
   , _stLit :: LitPitches
 
   , _stSustainOn :: Bool

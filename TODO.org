@@ -1,11 +1,7 @@
 These are pretty well ordered by dependency.
-* TODO doSoundMessage
-** should store voice parameter info
+* TODO replace tuples with types
 * TODO add tests
 * TODO voices: improve representation
-** TODO ? first
-stFingers :: Map (X,Y) (VoiceId, PitchClass)
-stVoices :: Map VoiceId (Synth BoopParams, Pitch)
 ** why
 It will make decoupoling voices from keys possible.
   Which will allow me to solve the bug where keys become inactive
