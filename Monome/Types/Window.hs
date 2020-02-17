@@ -62,14 +62,17 @@ handleSwitch    mst        sw @ (btn,_)     = do
   go $ _stWindowLayers st0
 
 doSoundMessage :: St -> SoundMsg -> IO (St)
-doSoundMessage st0 (vid,mp,f,param) = do
-  let v = (_stVoices st0 M.! vid) ^. voiceSynth
+doSoundMessage    st0   sdMsg     = do
+  let vid   = _soundMsgVoiceId sdMsg
+      param = _soundMsgParam   sdMsg
+      f     = _soundMsgVal     sdMsg
+      v = (_stVoices st0 M.! vid) ^. voiceSynth
   case param of
     "amp"  -> set v (toI f :: I "amp")
     "freq" -> set v (toI f :: I "freq")
     _      -> error $
       "doSoundMessage: unrecognized parameter " ++ param
-  return $ st0 & case mp of
+  return $ st0 & case _soundMsgPitch sdMsg of
     Nothing -> id
     Just p -> stVoices . at vid . _Just
               %~ (voicePitch                     .~ p)

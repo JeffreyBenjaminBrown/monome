@@ -9,7 +9,8 @@ module Monome.Window.Common (
   , soundKeySt              -- ^ St -> ((X,Y), Switch) -> [SoundMsg]
   ) where
 
-import Prelude hiding (pred)
+import           Prelude hiding (pred)
+import           Control.Lens
 import qualified Data.Map as M
 import           Data.Maybe
 import qualified Data.Set as S
@@ -29,7 +30,11 @@ ledBecause_toPitchClass m ldr =
             $ M.toList m
 
 silenceMsg :: (X,Y) -> SoundMsg
-silenceMsg xy = (xy, Nothing, 0, "amp")
+silenceMsg xy = SoundMsg {
+    _soundMsgVoiceId = xy
+  , _soundMsgPitch = Nothing
+  , _soundMsgVal = 0
+  , _soundMsgParam = "amp" }
 
 soundKeySt :: St -> ((X,Y), Switch) -> [SoundMsg]
 soundKeySt st (xy, sw) = do
@@ -37,6 +42,11 @@ soundKeySt st (xy, sw) = do
   if S.member xy $ S.map fst $ _stSustained st
     then [] -- it's already sounding due to sustain
     else if sw
-         then [ (xy, Just pitch, 100 * et31ToFreq pitch, "freq")
-              , (xy, Just pitch, 0.15                  , "amp" ) ]
+         then let freqMsg = SoundMsg { _soundMsgVoiceId = xy
+                                     , _soundMsgPitch = Just pitch
+                                     , _soundMsgVal = 100 * et31ToFreq pitch
+                                     , _soundMsgParam = "freq" }
+              in [ freqMsg
+                 , freqMsg & soundMsgVal .~ 0.15
+                           & soundMsgParam .~ "amp" ]
          else [silenceMsg xy]

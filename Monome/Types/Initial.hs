@@ -4,10 +4,11 @@ module Monome.Types.Initial (
     HostName, Socket
   , WindowId, VoiceId
   , Pitch, PitchClass, LitPitches
-  , LedMsg, SoundMsg
+  , LedMsg
   , X, Y, Switch, Led
   , LedBecause(..)
   , Window(..)
+  , SoundMsg(..), soundMsgVoiceId, soundMsgPitch, soundMsgVal, soundMsgParam
   , St(..), stWindowLayers, stToMonome, stVoices, stPending_Monome
     , stPending_Vivid, stXyShift, stFingers, stLit, stSustainOn, stSustained
   , Voice(..), voiceSynth, voicePitch, voiceParams
@@ -47,10 +48,12 @@ type LitPitches = Map PitchClass (Set LedBecause)
   -- The Set is a Set because an LED could be on for multiple reasons.
 
 type LedMsg   = (WindowId, ((X,Y), Led))
-type SoundMsg = ( VoiceId
-                , Maybe Pitch -- ^ messages like "turn off" don't need one
-                , Float
-                , Param )
+data SoundMsg = SoundMsg {
+    _soundMsgVoiceId :: VoiceId
+  , _soundMsgPitch   :: Maybe Pitch -- ^ messages like "off" don't need one
+  , _soundMsgVal     :: Float
+  , _soundMsgParam   :: Param }
+  deriving (Show, Eq, Ord)
 
 -- | X and Y are coordinates on the monome.
 -- PITFALL: X rises from left to right, but Y rises from top to bottom.
@@ -126,5 +129,6 @@ data St = St {
     -- identified by the key that originally launched it.
   } deriving (Show, Eq)
 
+makeLenses ''SoundMsg
 makeLenses ''Voice
 makeLenses ''St
