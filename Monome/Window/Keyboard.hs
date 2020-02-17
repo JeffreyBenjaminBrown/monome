@@ -9,7 +9,8 @@ module Monome.Window.Keyboard (
   , label
   ) where
 
-import Prelude hiding (pred)
+import           Prelude hiding (pred)
+import           Control.Lens
 import qualified Data.Map as M
 import qualified Data.Set as S
 import           Data.Set (Set)
@@ -59,10 +60,10 @@ handler st press @ (xy,sw) = do
         map (label,) $
         (map (,False) $ concatMap (pcToXys $ _stXyShift st) toDark) ++
         (map (,True)  $ concatMap (pcToXys $ _stXyShift st) toLight)
-  st { _stFingers = fingers'
-     , _stPending_Monome = kbdMsgs ++ _stPending_Monome st
-     , _stPending_Vivid = soundKeySt st press ++ _stPending_Vivid st
-     , _stLit = lit' }
+  st & stFingers        .~ fingers'
+     & stLit            .~ lit'
+     & stPending_Monome %~ (kbdMsgs ++)
+     & stPending_Vivid  %~ (soundKeySt st press ++)
 
 updateStLit :: ((X,Y), Switch)
        -> PitchClass       -- ^ what xy represents now

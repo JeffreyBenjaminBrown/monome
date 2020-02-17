@@ -8,6 +8,7 @@ module Monome.Window.Sustain (
   , label
   ) where
 
+import           Control.Lens
 import qualified Data.Map as M
 import           Data.Set (Set)
 import qualified Data.Set as S
@@ -47,8 +48,9 @@ handler    st    (xy0, True)      = let
     if not $ _stSustainOn st'
     then map silenceMsg $ S.toList $ get_voicesToSilence st
     else []
-  in st' { _stPending_Monome = ( label, (xy0, _stSustainOn st') ) : kbdMsgs
-         , _stPending_Vivid = _stPending_Vivid st ++ vividMsgs }
+  in st' & stPending_Monome .~ ( ( label, (xy0, _stSustainOn st') )
+                                : kbdMsgs )
+     & stPending_Vivid %~ (vividMsgs ++)
 
 get_voicesToSilence :: St -> Set VoiceId
 get_voicesToSilence oldSt =

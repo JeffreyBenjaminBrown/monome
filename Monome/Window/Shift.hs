@@ -5,7 +5,8 @@ module Monome.Window.Shift (
   , label
   ) where
 
-import Prelude hiding (pred)
+import           Prelude hiding (pred)
+import           Control.Lens
 import qualified Data.Map as M
 
 import           Monome.Math31
@@ -43,17 +44,16 @@ shiftWindow :: Window
 shiftWindow = Window {
     windowLabel = label
   , windowContains = \(x,y) -> numBetween 13 15 x && numBetween 14 15 y
-  , windowInit = \st ->
-      st { _stPending_Monome =
-             (label,) . (,True) <$>
-             [ upArrow, downArrow, leftArrow, rightArrow ] }
+  , windowInit = stPending_Monome .~
+    ( (label,) . (,True) <$>
+      [ upArrow, downArrow, leftArrow, rightArrow ] )
   , windowRoutine = handler
 }
 
 handler :: St -> ((X,Y), Switch) -> St
 handler    st0   (_,  False)      = st0
 handler    st0   (xy, True )      = let
-  st' = st0 { _stXyShift = addPair (_stXyShift st0) (shift xy) }
+  st' = st0 & stXyShift %~ addPair (shift xy)
   lit  = M.keys $ _stLit st0
   msgs :: [LedMsg] =
     map (Kbd.label,) $
