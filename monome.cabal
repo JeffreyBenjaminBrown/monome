@@ -48,6 +48,7 @@ library
               , bytestring
               , containers
               , HUnit
+              , lens
               , network
               , NumInstances
               , text

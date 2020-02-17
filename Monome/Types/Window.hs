@@ -39,8 +39,8 @@ initAllWindows mst = do
   let runWindowInit :: Window -> IO ()
       runWindowInit w = let
         st' :: St = windowInit w st
-        in mapM_ (doLedMessage st') $ stPending_Monome st'
-  mapM_ runWindowInit $ stWindowLayers st
+        in mapM_ (doLedMessage st') $ _stPending_Monome st'
+  mapM_ runWindowInit $ _stWindowLayers st
 
 -- | called every time a monome button is pressed or released
 handleSwitch :: MVar St -> ((X,Y), Switch) -> IO ()
@@ -53,16 +53,16 @@ handleSwitch    mst        sw @ (btn,_)     = do
         case windowContains w btn of
           True -> do
             let st1 = windowRoutine w st0 sw
-            st2 <- foldM doSoundMessage st1 $ stPending_Vivid  st1
-            mapM_ (doLedMessage st1)        $ stPending_Monome st1
-            putMVar mst st2 { stPending_Monome = []
-                            , stPending_Vivid = [] }
+            st2 <- foldM doSoundMessage st1 $ _stPending_Vivid  st1
+            mapM_ (doLedMessage st1)        $ _stPending_Monome st1
+            putMVar mst st2 { _stPending_Monome = []
+                            , _stPending_Vivid = [] }
           False -> go ws
-  go $ stWindowLayers st0
+  go $ _stWindowLayers st0
 
 doSoundMessage :: St -> SoundMsg -> IO (St)
 doSoundMessage st0 (xy,f,p) = do
-  let v = fst $ stVoices st0 M.! xy
+  let v = fst $ _stVoices st0 M.! xy
   st1 <- case p of
     "amp"  -> set v (toI f :: I "amp")
       >> return st0
@@ -78,10 +78,10 @@ doLedMessage st (l, (xy,b)) =
 
 relayToWindow :: St -> WindowId -> LedRelay
 relayToWindow st wl = let
-  ws = stWindowLayers st
+  ws = _stWindowLayers st
   w = maybe err id $ findWindow ws wl
     where err = error $ "relayToWindow: " ++ wl ++ " not found."
-  in relayIfHere (stToMonome st) ws w
+  in relayIfHere (_stToMonome st) ws w
 
 -- | `relayIfHere dest ws w` returns a `LedRelay` which,
 -- if the coordinate falls in `w` and in no other `Window` before `w` in `ws`,

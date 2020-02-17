@@ -41,18 +41,18 @@ et31 monomePort = do
     in M.fromList . zip places . map (,initialPitch)
        <$> mapM (synth boop) (replicate 256 ())
   mst <- newMVar $ St {
-      stWindowLayers = [sustainWindow, shiftWindow, keyboardWindow]
-    , stToMonome = toMonome
-    , stVoices = voices
-    , stPending_Vivid = []
-    , stPending_Monome = []
+      _stWindowLayers = [sustainWindow, shiftWindow, keyboardWindow]
+    , _stToMonome = toMonome
+    , _stVoices = voices
+    , _stPending_Vivid = []
+    , _stPending_Monome = []
 
-    , stXyShift = (0,0)
-    , stFingers = mempty
-    , stLit = M.singleton (2 :: PitchClass)
+    , _stXyShift = (0,0)
+    , _stFingers = mempty
+    , _stLit = M.singleton (2 :: PitchClass)
               $ S.singleton LedBecauseAnchor
-    , stSustainOn = False
-    , stSustained = mempty
+    , _stSustainOn = False
+    , _stSustained = mempty
     }
 
   initAllWindows mst
@@ -71,7 +71,7 @@ et31 monomePort = do
           killThread responder
           st <- readMVar mst
           _ <- send toMonome $ allLedOsc "/monome" False
-          return $ st { stVoices = mempty }
+          return $ st { _stVoices = mempty }
         _   -> loop
     in putStrLn "press 'q' to quit"
        >> loop

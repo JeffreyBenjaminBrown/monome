@@ -44,7 +44,7 @@ shiftWindow = Window {
     windowLabel = label
   , windowContains = \(x,y) -> numBetween 13 15 x && numBetween 14 15 y
   , windowInit = \st ->
-      st { stPending_Monome =
+      st { _stPending_Monome =
              (label,) . (,True) <$>
              [ upArrow, downArrow, leftArrow, rightArrow ] }
   , windowRoutine = handler
@@ -53,10 +53,10 @@ shiftWindow = Window {
 handler :: St -> ((X,Y), Switch) -> St
 handler    st0   (_,  False)      = st0
 handler    st0   (xy, True )      = let
-  st' = st0 { stXyShift = addPair (stXyShift st0) (shift xy) }
-  lit  = M.keys $ stLit st0
+  st' = st0 { _stXyShift = addPair (_stXyShift st0) (shift xy) }
+  lit  = M.keys $ _stLit st0
   msgs :: [LedMsg] =
     map (Kbd.label,) $
-    (map (,False) $ concatMap (pcToXys $ stXyShift st0) lit) ++
-    (map (,True)  $ concatMap (pcToXys $ stXyShift st') lit)
-  in st' { stPending_Monome = msgs }
+    (map (,False) $ concatMap (pcToXys $ _stXyShift st0) lit) ++
+    (map (,True)  $ concatMap (pcToXys $ _stXyShift st') lit)
+  in st' { _stPending_Monome = msgs }

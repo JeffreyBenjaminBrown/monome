@@ -33,8 +33,8 @@ silenceMsg xy = (xy, 0, "amp")
 
 soundKeySt :: St -> ((X,Y), Switch) -> [SoundMsg]
 soundKeySt st (xy, sw) = do
-  let pitch = xyToEt31 xy - xyToEt31 (stXyShift st)
-  if S.member xy $ S.map fst $ stSustained st
+  let pitch = xyToEt31 xy - xyToEt31 (_stXyShift st)
+  if S.member xy $ S.map fst $ _stSustained st
     then [] -- it's already sounding due to sustain
     else if sw
          then [ (xy, 100 * et31ToFreq pitch, "freq")

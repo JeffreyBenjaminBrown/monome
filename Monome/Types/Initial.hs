@@ -1,3 +1,5 @@
+{-# LANGUAGE TemplateHaskell #-}
+
 module Monome.Types.Initial (
     HostName, Socket
   , WindowId, VoiceId
@@ -5,10 +7,12 @@ module Monome.Types.Initial (
   , LedMsg, SoundMsg
   , X, Y, Switch, Led
   , LedBecause(..)
-  , St(..)
   , Window(..)
+  , St(..), stWindowLayers, stToMonome, stVoices, stPending_Monome
+    , stPending_Vivid, stXyShift, stFingers, stLit, stSustainOn, stSustained
   ) where
 
+import           Control.Lens
 import           Data.Map
 import           Data.Set
 import qualified Network.Socket as NS
@@ -61,33 +65,6 @@ data LedBecause =
   | LedBecauseAnchor -- ^ Some "visual anchor" pitches are always on.
   deriving (Show, Eq, Ord)
 
-data St = St {
-    stWindowLayers :: [Window] -- ^ PITFALL: Order matters.
-      -- Key presses are handled by the first window containing them.
-      -- Windows listed earlier are thus "above" later ones.
-  , stToMonome :: Socket
-  , stVoices :: Map VoiceId (Synth BoopParams, Pitch)
-    -- ^ TODO ? This is expensive, precluding the use of big synths.
-    -- Maybe I could make them dynamically without much speed penalty.
-    -- Tom of Vivid thinks so.
-  , stPending_Monome :: [LedMsg]
-  , stPending_Vivid :: [SoundMsg]
-
-  , stXyShift :: (X,Y) -- ^ this is relative -- a vector, not a point
-  , stFingers :: Map (X,Y) PitchClass
-    -- ^ Where each finger is, and what it's lighting up.
-    -- Note that this doesn't track what pitch it started.
-    -- Since voices are indexed by (X,Y), that's okay.
-  , stLit :: LitPitches
-
-  , stSustainOn :: Bool
-    -- ^ TODO ? This could be eliminated by making the next field a Maybe.
-  , stSustained :: Set (VoiceId, PitchClass)
-    -- ^ PITFALL: In spirit, the thing sustained is a Pitch,
-    -- but it's represented as a voice,
-    -- identified by the key that originally launched it.
-  } deriving (Show, Eq)
-
 data Window = Window {
     windowLabel :: WindowId -- ^ PITFALL: Must be unique across windows,
     -- or the Eq instance fails.
@@ -107,3 +84,31 @@ instance Eq Window where
 
 instance Show Window where
   show = windowLabel
+
+data St = St {
+    _stWindowLayers :: [Window] -- ^ PITFALL: Order matters.
+      -- Key presses are handled by the first window containing them.
+      -- Windows listed earlier are thus "above" later ones.
+  , _stToMonome :: Socket
+  , _stVoices :: Map VoiceId (Synth BoopParams, Pitch)
+    -- ^ TODO ? This is expensive, precluding the use of big synths.
+    -- Maybe I could make them dynamically without much speed penalty.
+    -- Tom of Vivid thinks so.
+  , _stPending_Monome :: [LedMsg]
+  , _stPending_Vivid :: [SoundMsg]
+
+  , _stXyShift :: (X,Y) -- ^ this is relative -- a vector, not a point
+  , _stFingers :: Map (X,Y) PitchClass
+    -- ^ Where each finger is, and what it's lighting up.
+    -- Note that this doesn't track what pitch it started.
+    -- Since voices are indexed by (X,Y), that's okay.
+  , _stLit :: LitPitches
+
+  , _stSustainOn :: Bool
+    -- ^ TODO ? This could be eliminated by making the next field a Maybe.
+  , _stSustained :: Set (VoiceId, PitchClass)
+    -- ^ PITFALL: In spirit, the thing sustained is a Pitch,
+    -- but it's represented as a voice,
+    -- identified by the key that originally launched it.
+  } deriving (Show, Eq)
+makeLenses ''St

@@ -38,24 +38,24 @@ handler    st    (_ , False)      = st
 handler    st    (xy0, True)      = let
   st' = updateSt st
   kbdMsgs :: [LedMsg] =
-    if not $ stSustainOn st'
+    if not $ _stSustainOn st'
     then map ( (Kbd.label,) . (,False) ) $
-         concatMap (pcToXys $ stXyShift st) $
+         concatMap (pcToXys $ _stXyShift st) $
          get_pitchClassesToDarken st st'
     else []
   vividMsgs :: [SoundMsg] =
-    if not $ stSustainOn st'
+    if not $ _stSustainOn st'
     then map silenceMsg $ S.toList $ get_voicesToSilence st
     else []
-  in st' { stPending_Monome = ( label, (xy0, stSustainOn st') ) : kbdMsgs
-         , stPending_Vivid = stPending_Vivid st ++ vividMsgs }
+  in st' { _stPending_Monome = ( label, (xy0, _stSustainOn st') ) : kbdMsgs
+         , _stPending_Vivid = _stPending_Vivid st ++ vividMsgs }
 
 get_voicesToSilence :: St -> Set VoiceId
 get_voicesToSilence oldSt =
     -- If a voice was sustained before sustain was released,
     -- and it is not fingered, it should be darkened.
-    S.difference (S.map fst $ stSustained oldSt)
-                 (S.fromList $ M.keys $ stFingers oldSt)
+    S.difference (S.map fst $ _stSustained oldSt)
+                 (S.fromList $ M.keys $ _stFingers oldSt)
 
 get_pitchClassesToDarken :: St -> St -> Set PitchClass
   -- TODO ? speed: This calls `get_voicesToSilence`.
@@ -67,13 +67,13 @@ get_pitchClassesToDarken oldSt newSt =
   S.filter (not . mustStayLit) $ voicesToSilence_pcs
   where
     mustStayLit :: PitchClass -> Bool
-    mustStayLit pc = case M.lookup pc $ stLit newSt of
+    mustStayLit pc = case M.lookup pc $ _stLit newSt of
       Nothing -> False
       Just s -> if null s
         then error "Sustain handler: null value in LitPitches."
         else True
     voicesToSilence_pcs :: Set PitchClass =
-      S.map snd $ S.filter f $ stSustained oldSt
+      S.map snd $ S.filter f $ _stSustained oldSt
       where f :: (VoiceId, PitchClass) -> Bool
             f (b,_) = S.member b $ get_voicesToSilence oldSt
 
@@ -84,20 +84,20 @@ get_pitchClassesToDarken oldSt newSt =
 updateSt :: St -> St
 updateSt st = let
   sustainOn' :: Bool = -- new sustain state
-    not $ stSustainOn st
+    not $ _stSustainOn st
   sustained' :: Set (VoiceId, PitchClass) = -- new sustained pitches
     if not sustainOn' then S.empty
-    else S.fromList $ M.toList $ stFingers st
+    else S.fromList $ M.toList $ _stFingers st
 
   lit' | sustainOn' =
-         foldr insertOneSustainedNote (stLit st)
-         $ M.elems $ stFingers st
+         foldr insertOneSustainedNote (_stLit st)
+         $ M.elems $ _stFingers st
        | otherwise =
-         foldr deleteOneSustainedNote (stLit st)
-         $ S.toList $ S.map snd $ stSustained st
-  in st { stSustainOn = sustainOn'
-        , stSustained = sustained'
-        , stLit       = lit'      }
+         foldr deleteOneSustainedNote (_stLit st)
+         $ S.toList $ S.map snd $ _stSustained st
+  in st { _stSustainOn = sustainOn'
+        , _stSustained = sustained'
+        , _stLit       = lit'      }
 
 -- | When sustain is toggled, the reasons for having LEDs on change.
 -- If it is turned on, some LEDs are now lit for two reasons:

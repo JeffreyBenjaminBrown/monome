@@ -30,10 +30,10 @@ keyboardWindow =  Window {
   , windowContains = \(x,y) -> let pred = numBetween 0 15
                                in pred x && pred y
   , windowInit = \st ->
-      st { stPending_Monome =
+      st { _stPending_Monome =
             map ( (label,) . (,True) ) $
-            concatMap (pcToXys $ stXyShift st) $
-            M.keys $ stLit st }
+            concatMap (pcToXys $ _stXyShift st) $
+            M.keys $ _stLit st }
   , windowRoutine = handler }
 
 handler :: St
@@ -41,28 +41,28 @@ handler :: St
         -> St
 handler st press @ (xy,sw) = do
   let pcNow :: PitchClass =
-        mod (xyToEt31 $ addPair xy $ negPair $ stXyShift st) 31
+        mod (xyToEt31 $ addPair xy $ negPair $ _stXyShift st) 31
         -- what the key represents currently
       pcThen :: Maybe PitchClass =
-        ledBecause_toPitchClass (stLit st) $ LedBecauseSwitch xy
+        ledBecause_toPitchClass (_stLit st) $ LedBecauseSwitch xy
         -- what the key represented when it was pressed,
         -- if it is now being released
       fingers' = case sw of
-        True  -> M.insert xy pcNow $ stFingers st
-        False -> M.delete xy $ stFingers st
-      lit' :: LitPitches = updateStLit (xy,sw) pcNow pcThen $ stLit st
-      oldKeys :: Set PitchClass  = S.fromList $ M.keys $ stLit st
+        True  -> M.insert xy pcNow $ _stFingers st
+        False -> M.delete xy $ _stFingers st
+      lit' :: LitPitches = updateStLit (xy,sw) pcNow pcThen $ _stLit st
+      oldKeys :: Set PitchClass  = S.fromList $ M.keys $ _stLit st
       newKeys :: Set PitchClass  = S.fromList $ M.keys $ lit'
       toDark  ::    [PitchClass] = S.toList $ S.difference oldKeys newKeys
       toLight ::    [PitchClass] = S.toList $ S.difference newKeys oldKeys
       kbdMsgs :: [LedMsg] =
         map (label,) $
-        (map (,False) $ concatMap (pcToXys $ stXyShift st) toDark) ++
-        (map (,True)  $ concatMap (pcToXys $ stXyShift st) toLight)
-  st { stFingers = fingers'
-     , stPending_Monome = kbdMsgs ++ stPending_Monome st
-     , stPending_Vivid = soundKeySt st press ++ stPending_Vivid st
-     , stLit = lit' }
+        (map (,False) $ concatMap (pcToXys $ _stXyShift st) toDark) ++
+        (map (,True)  $ concatMap (pcToXys $ _stXyShift st) toLight)
+  st { _stFingers = fingers'
+     , _stPending_Monome = kbdMsgs ++ _stPending_Monome st
+     , _stPending_Vivid = soundKeySt st press ++ _stPending_Vivid st
+     , _stLit = lit' }
 
 updateStLit :: ((X,Y), Switch)
        -> PitchClass       -- ^ what xy represents now
