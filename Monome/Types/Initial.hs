@@ -10,6 +10,7 @@ module Monome.Types.Initial (
   , Window(..)
   , St(..), stWindowLayers, stToMonome, stVoices, stPending_Monome
     , stPending_Vivid, stXyShift, stFingers, stLit, stSustainOn, stSustained
+  , Voice(..), voiceSynth, voicePitch, voiceParams
   ) where
 
 import           Control.Lens
@@ -89,12 +90,18 @@ instance Eq Window where
 instance Show Window where
   show = windowLabel
 
+data Voice = Voice {
+    _voiceSynth  :: Synth BoopParams
+  , _voicePitch  :: Pitch
+  , _voiceParams :: Map String Float }
+  deriving (Show, Eq, Ord)
+
 data St = St {
     _stWindowLayers :: [Window] -- ^ PITFALL: Order matters.
       -- Key presses are handled by the first window containing them.
       -- Windows listed earlier are thus "above" later ones.
   , _stToMonome :: Socket
-  , _stVoices :: Map VoiceId (Synth BoopParams, Pitch, Map String Float)
+  , _stVoices :: Map VoiceId Voice
     -- ^ TODO ? This is expensive, precluding the use of big synths.
     -- Maybe I could make them dynamically without much speed penalty.
     -- Tom of Vivid thinks so.
@@ -118,4 +125,6 @@ data St = St {
     -- but it's represented as a voice,
     -- identified by the key that originally launched it.
   } deriving (Show, Eq)
+
+makeLenses ''Voice
 makeLenses ''St

@@ -63,7 +63,7 @@ handleSwitch    mst        sw @ (btn,_)     = do
 
 doSoundMessage :: St -> SoundMsg -> IO (St)
 doSoundMessage st0 (vid,mp,f,param) = do
-  let v = (_stVoices st0 M.! vid) ^. _1
+  let v = (_stVoices st0 M.! vid) ^. voiceSynth
   case param of
     "amp"  -> set v (toI f :: I "amp")
     "freq" -> set v (toI f :: I "freq")
@@ -71,9 +71,9 @@ doSoundMessage st0 (vid,mp,f,param) = do
       "doSoundMessage: unrecognized parameter " ++ param
   return $ st0 & case mp of
     Nothing -> id
-    Just p -> stVoices . at vid . _Just %~
-              (_2 .~ p) .
-              (_3 . at param . _Just .~ f)
+    Just p -> stVoices . at vid . _Just
+              %~ (voicePitch                     .~ p)
+              .  (voiceParams . at param . _Just .~ f)
 
 doLedMessage :: St -> LedMsg -> IO ()
 doLedMessage st (l, (xy,b)) =

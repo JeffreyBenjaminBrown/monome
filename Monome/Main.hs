@@ -39,14 +39,15 @@ et31 monomePort = do
     -- I don't know why it's port 8000, or why it used to be 11111.
   toMonome :: Socket <- sendsTo (unpack localhost) monomePort
     -- to find the port number above, use the first part of HandTest.hs
-  voices :: M.Map VoiceId (Synth BoopParams, Pitch, M.Map String Float) <-
-    let places = [(a,b) | a <- [0..15], b <- [0..15]]
-        defaultVoiceState :: synth -> (synth, Pitch, M.Map String Float)
-        defaultVoiceState s = (s, initialPitch, mempty)
-          -- `mempty` is inaccurate -- initially each voice has amp 0
-          -- and freq 100, because those ares the Boop defaults.
+  voices :: M.Map VoiceId Voice <-
+    let voiceIds = [(a,b) | a <- [0..15], b <- [0..15]]
+        defaultVoiceState s = Voice { _voiceSynth = s
+                                    , _voicePitch = initialPitch
+                                    , _voiceParams = mempty }
+          -- `mempty` above is inaccurate -- initially each voice has
+          -- amp 0 and freq 100, because those ares the `Boop` defaults.
           -- Since none are sounding, I don't think it matters.
-    in M.fromList . zip places . map defaultVoiceState
+    in M.fromList . zip voiceIds . map defaultVoiceState
        <$> mapM (synth boop) (replicate 256 ())
   mst <- newMVar $ St {
       _stWindowLayers = [sustainWindow, shiftWindow, keyboardWindow]
@@ -75,7 +76,7 @@ et31 monomePort = do
         getChar >>= \case
         'q' -> do -- quit
           close inbox
-          mapM_ (free . (^. _1)) (M.elems voices)
+          mapM_ (free . (^. voiceSynth)) (M.elems voices)
             -- TODO Once `voices` are dynamic,
             -- this should read that value from `mst`.
           killThread responder
