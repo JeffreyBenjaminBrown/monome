@@ -22,11 +22,13 @@ import           Control.Concurrent.MVar
 import           Control.Lens hiding (set)
 import qualified Data.List as L
 import qualified Data.Map as M
-import           Vivid hiding (pitch, synth)
+import           Vivid hiding (pitch, synth, Param)
 
 import Monome.Network.Util
+import Monome.Synth.Boop
 import Monome.Types.Button
 import Monome.Types.Initial
+import Monome.Window.Common
 
 
 -- | Forward a message to the monome if appropriate.
@@ -62,21 +64,18 @@ handleSwitch    mst        sw @ (btn,_)     = do
   go $ _stWindowLayers st0
 
 doSoundMessage :: St -> SoundMsg -> IO (St)
-doSoundMessage    st0   sdMsg     = do
-  let vid   = _soundMsgVoiceId sdMsg
-      param = _soundMsgParam   sdMsg
-      f     = _soundMsgVal     sdMsg
-      v = (_stVoices st0 M.! vid) ^. voiceSynth
+doSoundMessage    st   sdMsg     = do
+  let vid   :: VoiceId = _soundMsgVoiceId sdMsg
+      param :: Param   = _soundMsgParam   sdMsg
+      f     :: Float   = _soundMsgVal     sdMsg
+      v     :: Synth BoopParams =
+        (_stVoices st M.! vid) ^. voiceSynth
   case param of
     "amp"  -> set v (toI f :: I "amp")
     "freq" -> set v (toI f :: I "freq")
     _      -> error $
       "doSoundMessage: unrecognized parameter " ++ param
-  return $ st0 & case _soundMsgPitch sdMsg of
-    Nothing -> id
-    Just p -> stVoices . at vid . _Just
-              %~ (voicePitch                     .~ p)
-              .  (voiceParams . at param . _Just .~ f)
+  return $ updateVoice sdMsg st
 
 doLedMessage :: St -> LedMsg -> IO ()
 doLedMessage st (l, (xy,b)) =

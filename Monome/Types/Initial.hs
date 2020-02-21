@@ -2,7 +2,7 @@
 
 module Monome.Types.Initial (
     HostName, Socket
-  , WindowId, VoiceId
+  , Param, WindowId, VoiceId
   , Pitch, PitchClass, LitPitches
   , LedMsg
   , X, Y, Switch, Led
