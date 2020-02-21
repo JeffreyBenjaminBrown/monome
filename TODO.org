@@ -1,43 +1,43 @@
-These are pretty well ordered by dependency.
-* TODO voices: improve representation
+* TODO infrastructure
+** TODO add tests for handlers
+** TODO voices: improve representation
 LedBecause: maybe don't distinguish between keys and sustain,
   just use VoiceId
 stFingers :: Map (X,Y) VoiceId
 stSustained :: S.Set VoiceID
-* TODO redraw the whole screen often
-** why
+** redraw the whole screen often
+*** why
 Dropped messages to LEDs stop being a (hypothetical) problem.
 Shading on both monomes becomes easier.
-* TODO add tests
-* TODO create voices on the fly
-** Vivid: voice creation, use and deletion
+** create voices on the fly
+*** Vivid: voice creation, use and deletion
 use "synth" to make a synth, "free" to free it:
   s <- synth boop
   set s (toI f :: I "amp")
   free s
-* TODO sustained pitches should not disable keys after spatial drift
+* TODO bugfix
+** TODO sustained pitches should not disable keys after spatial drift
 Currently, because each voice is identified with a key,
 if that voice is sustained, that key cannot sound a new note,
 even when it no longer represents the same pitch.
-* TODO flash the anchor
-* TODO sustain: two buttons, "add these" and "release all"
+* TODO features
+** TODO flash the anchor
+** TODO sustain: two buttons, "add these" and "release all"
 "add these" stays in effect until it is released.
 "release all" works as soon as it's touched; holding on it does nothing.
+** TODO store chords
 * Montevideo - Monome Tidal Vivid
 ** Things to represent on the monome
 synth param
 rhythm
 chord
 melody
-* TODO maybe
-** sustain to middle of bottom, and duplicate at both top corners
- so that usually something can touch it
 * features
-** show sustained notes
+** sustain to middle of bottom, and duplicate at both top corners
+so that usually something can touch it
 ** add to ongoing sustained group
 ** transpose ongoing notes
 ** save to chord bank from sustain
-** sustained voices do not block keys
 ** sustain these and future
 This is what most piano sustain pedals do.
 ** loop bank
@@ -51,7 +51,7 @@ This is what most piano sustain pedals do.
 to remove floating point error
 * separate projects
 ** separate Vivid.Jbb from Vivid
- this will make starting the repl faster
+this will make starting the repl faster
 ** separate my own Vivid projects
 *** namely these
 Vivid (clone, for reference)
