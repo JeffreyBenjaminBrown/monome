@@ -16,10 +16,12 @@ use "synth" to make a synth, "free" to free it:
   set s (toI f :: I "amp")
   free s
 * TODO bugfix
-** TODO sustained pitches should not disable keys after spatial drift
+** TODO sustained pitches should not disable keys
+*** after spatial drift
 Currently, because each voice is identified with a key,
 if that voice is sustained, that key cannot sound a new note,
 even when it no longer represents the same pitch.
+*** ? or at all
 * TODO features
 ** TODO flash the anchor
 ** TODO sustain: two buttons, "add these" and "release all"
