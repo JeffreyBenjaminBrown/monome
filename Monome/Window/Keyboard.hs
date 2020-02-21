@@ -40,7 +40,7 @@ keyboardWindow =  Window {
 handler :: St
         -> ((X,Y), Switch)
         -> St
-handler st press @ (xy,sw) = do
+handler st press @ (xy,sw) =
   let pcNow :: PitchClass =
         mod (xyToEt31 $ addPair xy $ negPair $ _stXyShift st) 31
         -- what the key represents currently
@@ -60,10 +60,13 @@ handler st press @ (xy,sw) = do
         map (label,) $
         (map (,False) $ concatMap (pcToXys $ _stXyShift st) toDark) ++
         (map (,True)  $ concatMap (pcToXys $ _stXyShift st) toLight)
-  st & stFingers        .~ fingers'
-     & stLit            .~ lit'
-     & stPending_Monome %~ (kbdMsgs ++)
-     & stPending_Vivid  %~ (soundKeySt st press ++)
+      soundMsgs :: [SoundMsg] = soundKeySt st press
+      st1 :: St = st
+        & stFingers        .~ fingers'
+        & stLit            .~ lit'
+        & stPending_Monome %~ (kbdMsgs ++)
+        & stPending_Vivid  %~ (soundMsgs ++)
+  in foldr updateVoice st1 soundMsgs
 
 updateStLit :: ((X,Y), Switch)
        -> PitchClass       -- ^ what xy represents now

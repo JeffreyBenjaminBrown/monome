@@ -37,20 +37,21 @@ sustainWindow = Window {
 handler :: St -> ((X,Y), Switch) -> St
 handler    st    (_ , False)      = st
 handler    st    (xy0, True)      = let
-  st' = updateSt st
+  st1 = updateSt st
   kbdMsgs :: [LedMsg] =
-    if not $ _stSustainOn st'
+    if not $ _stSustainOn st1
     then map ( (Kbd.label,) . (,False) ) $
          concatMap (pcToXys $ _stXyShift st) $
-         get_pitchClassesToDarken st st'
+         get_pitchClassesToDarken st st1
     else []
-  vividMsgs :: [SoundMsg] =
-    if not $ _stSustainOn st'
+  sdMsgs :: [SoundMsg] =
+    if not $ _stSustainOn st1
     then map silenceMsg $ S.toList $ get_voicesToSilence st
     else []
-  in st' & stPending_Monome .~ ( ( label, (xy0, _stSustainOn st') )
-                                : kbdMsgs )
-     & stPending_Vivid %~ (vividMsgs ++)
+  st2 = st1 & stPending_Monome .~ ( ( label, (xy0, _stSustainOn st1) )
+                                    : kbdMsgs )
+        & stPending_Vivid %~ (sdMsgs ++)
+  in foldr updateVoice st2 sdMsgs
 
 get_voicesToSilence :: St -> Set VoiceId
 get_voicesToSilence oldSt =
