@@ -57,8 +57,8 @@ updateVoice sdMsg st = let
   vid   :: VoiceId = _soundMsgVoiceId sdMsg
   param :: Param   = _soundMsgParam   sdMsg
   f     :: Float   = _soundMsgVal     sdMsg
-  in st & case (_soundMsgPitch sdMsg) of
-    Nothing -> id
-    Just p -> stVoices . at vid . _Just
-              %~ (voicePitch                     .~ p)
-              .  (voiceParams . at param . _Just .~ f)
+  in st & case _soundMsgPitch sdMsg of
+            Nothing -> id
+            Just p -> stVoices . at vid . _Just
+                      %~ (voicePitch                     .~ p)
+                      .  (voiceParams . at param . _Just .~ f)

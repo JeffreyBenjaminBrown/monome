@@ -35,9 +35,12 @@ sustainWindow = Window {
   , windowRoutine = handler
 }
 
-handler :: St -> ((X,Y), Switch) -> St
+handler :: St
+        -> ( (X,Y) -- ^ ignored, since the sustain window has only one button
+           , Switch)
+        -> St
 handler    st    (_ , False)      = st
-handler    st    (xy0, True)      = let
+handler    st    (_,  True)      = let
   st1 = updateSt st
   kbdMsgs :: [LedMsg] =
     if not $ _stSustainOn st1
@@ -49,8 +52,9 @@ handler    st    (xy0, True)      = let
     if not $ _stSustainOn st1
     then map silenceMsg $ S.toList $ get_voicesToSilence st
     else []
-  st2 = st1 & stPending_Monome .~ ( ( label, (xy0, _stSustainOn st1) )
-                                    : kbdMsgs )
+  sustainButtonMsg = ( label
+                     , (theButton, _stSustainOn st1) )
+  st2 = st1 & stPending_Monome .~ ( sustainButtonMsg : kbdMsgs )
         & stPending_Vivid %~ (sdMsgs ++)
   in foldr updateVoice st2 sdMsgs
 
