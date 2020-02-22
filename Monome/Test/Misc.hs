@@ -1,4 +1,4 @@
-module Monome.Test.Test (tests) where
+module Monome.Test.Misc (tests) where
 
 import Data.Map as M
 import Data.Set as S
@@ -10,8 +10,8 @@ import Monome.Types.Window
 import Monome.Window.Common
 
 
-tests :: IO Counts
-tests = runTestTT $ TestList [
+tests :: Test
+tests = TestList [
     TestLabel "testBelongsHere" testBelongsHere
   , TestLabel "testDependentPitchClass" testDependentPitchClass
   ]

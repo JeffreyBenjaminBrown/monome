@@ -30,8 +30,10 @@ library
     , Monome.Network.ListenAndPrintOsc
     , Monome.Network.Monome
     , Monome.Network.Util
+    , Monome.Test
     , Monome.Test.HandTest
-    , Monome.Test.Test
+--    , Monome.Test.Misc
+--    , Monome.Test.Windows
     , Monome.Types.Button
     , Monome.Types.Device
     , Monome.Types.Initial

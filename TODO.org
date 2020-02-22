@@ -23,6 +23,9 @@ if that voice is sustained, that key cannot sound a new note,
 even when it no longer represents the same pitch.
 *** ? or at all
 * TODO features
+** TODO tone the board
+higher tones are harsher
+rightward tones are (warblier?)
 ** TODO flash the anchor
 ** TODO sustain: two buttons, "add these" and "release all"
 "add these" stays in effect until it is released.
