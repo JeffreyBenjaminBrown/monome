@@ -4,8 +4,9 @@
 #-}
 
 module Monome.Window.Sustain (
-    sustainWindow
+    handler
   , label
+  , sustainWindow
   ) where
 
 import           Control.Lens

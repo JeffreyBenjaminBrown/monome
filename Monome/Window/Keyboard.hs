@@ -5,7 +5,8 @@
 #-}
 
 module Monome.Window.Keyboard (
-    keyboardWindow
+    handler
+  , keyboardWindow
   , label
   ) where
 

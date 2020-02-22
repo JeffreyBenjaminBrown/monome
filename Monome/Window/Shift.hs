@@ -1,8 +1,12 @@
 {-# LANGUAGE TupleSections, ScopedTypeVariables #-}
 
 module Monome.Window.Shift (
-    shiftWindow
+    handler
   , label
+  , shiftWindow
+
+  , shift
+  , leftArrow, rightArrow, upArrow, downArrow, upOctave, downOctave -- ^ (X,Y)
   ) where
 
 import           Prelude hiding (pred)
@@ -30,11 +34,15 @@ downOctave = (13,14)
 
 -- | PITFALL: Remember (see Button.hs),
 -- higher Y => lower (closer to you) on the monome.
+-- | PITFALL: There are multiple ways to represent an octave shift.
+-- Here I've chosen one arbitrarily.
 shift :: (X,Y) -> (X,Y)
 shift xy | xy == rightArrow = ( 1, 0)
          | xy == downArrow  = ( 0, 1)
+           -- origin at top-left => down means add to Y
          | xy == leftArrow  = (-1, 0)
          | xy == upOctave   = (-5,-1)
+           -- lowering the origin raises the coordinate values of a given key, hence raising its pitch
          | xy == upArrow    = ( 0,-1)
          | xy == downOctave = ( 5, 1)
          | otherwise = error $ "shift: unexpected input: " ++ show xy
@@ -53,8 +61,8 @@ shiftWindow = Window {
 handler :: St -> ((X,Y), Switch) -> St
 handler    st0   (_,  False)      = st0
 handler    st0   (xy, True )      = let
-  st' = st0 & stXyShift %~ addPair (shift xy)
-  lit  = M.keys $ _stLit st0
+  st' :: St = st0 & stXyShift %~ addPair (shift xy)
+  lit :: [PitchClass] = M.keys $ _stLit st0
   msgs :: [LedMsg] =
     map (Kbd.label,) $
     (map (,False) $ concatMap (pcToXys $ _stXyShift st0) lit) ++
