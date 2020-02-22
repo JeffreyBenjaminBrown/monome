@@ -7,6 +7,7 @@ module Monome.Window.Sustain (
     handler
   , label
   , sustainWindow
+  , theButton
   ) where
 
 import           Control.Lens
@@ -54,8 +55,8 @@ handler    st    (_,  True)      = let
     else []
   sustainButtonMsg = ( label
                      , (theButton, _stSustainOn st1) )
-  st2 = st1 & stPending_Monome .~ ( sustainButtonMsg : kbdMsgs )
-        & stPending_Vivid %~ (sdMsgs ++)
+  st2 = st1 & stPending_Monome %~ flip (++) (sustainButtonMsg : kbdMsgs)
+            & stPending_Vivid  %~ flip (++) sdMsgs
   in foldr updateVoice st2 sdMsgs
 
 get_voicesToSilence :: St -> Set VoiceId

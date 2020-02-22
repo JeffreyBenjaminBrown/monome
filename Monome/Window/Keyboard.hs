@@ -32,10 +32,10 @@ keyboardWindow =  Window {
   , windowContains = \(x,y) -> let pred = numBetween 0 15
                                in pred x && pred y
   , windowInit = \st ->
-      st { _stPending_Monome =
-            map ( (label,) . (,True) ) $
-            concatMap (pcToXys $ _stXyShift st) $
-            M.keys $ _stLit st }
+      st & stPending_Monome %~
+      flip (++) ( map ( (label,) . (,True) ) $
+                  concatMap (pcToXys $ _stXyShift st) $
+                  M.keys $ _stLit st )
   , windowRoutine = handler }
 
 handler :: St
@@ -65,8 +65,8 @@ handler st press @ (xy,sw) =
       st1 :: St = st
         & stFingers        .~ fingers'
         & stLit            .~ lit'
-        & stPending_Monome %~ (kbdMsgs ++)
-        & stPending_Vivid  %~ (soundMsgs ++)
+        & stPending_Monome %~ flip (++) kbdMsgs
+        & stPending_Vivid  %~ flip (++) soundMsgs
   in foldr updateVoice st1 soundMsgs
 
 updateStLit :: ((X,Y), Switch)
