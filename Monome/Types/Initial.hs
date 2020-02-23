@@ -105,7 +105,8 @@ data St = St {
     _stWindowLayers :: [Window] -- ^ PITFALL: Order matters.
       -- Key presses are handled by the first window containing them.
       -- Windows listed earlier are thus "above" later ones.
-  , _stToMonome :: Socket
+  , _stToMonome :: Socket -- ^ PITFALL: It's tempting to remove this from St.
+    -- That's feasible now, ll want it here when using multiple monomes.
   , _stVoices :: Map VoiceId Voice
     -- ^ TODO ? This is expensive, precluding the use of big synths.
     -- Maybe I could make them dynamically without much speed penalty.
