@@ -60,7 +60,6 @@ et31 monomePort = do
     , _stFingers = mempty
     , _stLit = mempty
       -- M.singleton (2 :: PitchClass) $ S.singleton LedBecauseAnchor
-    , _stSustainOn = False
     , _stSustained = mempty
     }
 

@@ -69,9 +69,8 @@ test_sustainHandler = TestCase $ do
 
   assertBool "turning ON sustain changes the sustain state, the set of sustained voices, the set of reasons for keys to be lit, and the messages pending to the monome." $
     Su.handler st1 (meh, True)
-    =^= st1 { _stSustainOn = True
-            , _stSustained =
-              S.singleton (soundingVoice, soundingPc)
+    =^= st1 { _stSustained = Just $
+                             S.singleton (soundingVoice, soundingPc)
             , _stLit = M.singleton soundingPc $
                        S.fromList [ LedBecauseSustain
                                   , LedBecauseSwitch fingerAt ]
@@ -85,15 +84,15 @@ test_sustainHandler = TestCase $ do
                ++ "adds messages for the monome to turn off the sustain button and the keys that were sustained and are not fingered\n" ++
                " adds messages for Vivid to turn off any pitches from voices that were sustained and are not fingered\n" ++
                "Pitch 0 is fingered, and 0 and 1 sounding; 1 turns off.") $
-    let st1' = st1 & stSustainOn .~ True
+    let st1' = st1
           & stLit .~
           M.fromList [ (0, S.fromList [ LedBecauseSustain
                                       , LedBecauseSwitch fingerAt ] )
                      , (1, S.fromList [ LedBecauseSustain ] ) ]
-          & stSustained .~ S.fromList [ ((0,0), 0)
-                                      , ((0,1), 1) ]
+          & stSustained .~ Just ( S.fromList [ ((0,0), 0)
+                                             , ((0,1), 1) ] )
     in Su.handler st1' (meh, True)
-       =^=  ( st1' & stSustainOn .~ False
+       =^=  ( st1'
               & stSustained .~ mempty
               & stLit .~ M.singleton 0 (S.singleton $
                                         LedBecauseSwitch fingerAt )

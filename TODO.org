@@ -1,6 +1,4 @@
 * TODO infrastructure
-** TODO merge stSustained and stSustainOn
-it makes some invalid state impossible
 ** TODO add tests
 *** TODO test_keyboardHandler
 remove a finger from the anchor

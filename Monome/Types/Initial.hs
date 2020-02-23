@@ -10,7 +10,7 @@ module Monome.Types.Initial (
   , Window(..)
   , SoundMsg(..), soundMsgVoiceId, soundMsgPitch, soundMsgVal, soundMsgParam
   , St(..), stWindowLayers, stToMonome, stVoices, stPending_Monome
-    , stPending_Vivid, stXyShift, stFingers, stLit, stSustainOn, stSustained
+    , stPending_Vivid, stXyShift, stFingers, stLit, stSustained
   , Voice(..), voiceSynth, voicePitch, voiceParams
   ) where
 
@@ -121,9 +121,7 @@ data St = St {
     -- and what each is lighting up.
   , _stLit :: LitPitches
 
-  , _stSustainOn :: Bool
-    -- ^ TODO ? This could be eliminated by making the next field a Maybe.
-  , _stSustained :: Set (VoiceId, PitchClass)
+  , _stSustained :: Maybe (Set (VoiceId, PitchClass))
     -- ^ PITFALL: In spirit, the thing sustained is a Pitch,
     -- but it's represented as a voice,
     -- identified by the key that originally launched it.
