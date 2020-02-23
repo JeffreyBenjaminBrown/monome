@@ -24,8 +24,6 @@ use "synth" to make a synth, "free" to free it:
   s <- synth boop
   set s (toI f :: I "amp")
   free s
-** _soundMsgPitch seems silly
-Either record all the param-value pairs, or none.
 * TODO bugfix
 ** TODO sustained pitches should not disable keys
 *** after spatial drift
@@ -34,7 +32,7 @@ if that voice is sustained, that key cannot sound a new note,
 even when it no longer represents the same pitch.
 *** ? or at all
 * TODO features
-** TODO tone the board
+** TODO timbre the board
 higher tones are harsher
 rightward tones are (warblier?)
 ** TODO flash the anchor

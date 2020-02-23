@@ -95,7 +95,9 @@ instance Show Window where
 
 data Voice = Voice {
     _voiceSynth  :: Synth BoopParams
-  , _voicePitch  :: Pitch
+  , _voicePitch  :: Pitch -- ^ PITFALL: This looks redundant, but isn't.
+    -- The frequency is indeed stored in the _voiceParams field,
+    -- but that's a float; it's nice to have the integer Pitch around too.
   , _voiceParams :: Map String Float }
   deriving (Show, Eq, Ord)
 
