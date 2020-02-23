@@ -32,31 +32,28 @@ meh = error "not relevant to this test"
 
 test_shiftHandler :: Test
 test_shiftHandler = TestCase $ do
-  let st :: St = -- we need a lit `PitchClass` to move
-        st0 & stLit .~ M.singleton 0 (S.singleton LedBecauseAnchor)
-
   assertBool "releasing a shift button does nothing" $
     Sh.handler st_0a (meh, False) =^= st_0a
 
   assertBool "shift the notes one space closer to player's body" $ let
-    oldShift = _stXyShift st
+    oldShift = _stXyShift st_0a
     newShift = addPair oldShift $ Sh.shift Sh.downArrow
     msgs :: [LedMsg] = map (K.label,)
-      $  map (,False) (pcToXys oldShift 0)
-      ++ map (,True)  (pcToXys newShift 0)
-    in Sh.handler st (Sh.downArrow, True)
-    =^= st { _stPending_Monome = msgs
-            , _stXyShift = newShift }
+      $  map (,False) (pcToXys oldShift pc0)
+      ++ map (,True)  (pcToXys newShift pc0)
+    in Sh.handler st_0a (Sh.downArrow, True)
+    =^= st_0a { _stPending_Monome = msgs
+              , _stXyShift = newShift }
 
   assertBool "shift the notes an octave higher" $ let
-    oldShift = _stXyShift st
+    oldShift = _stXyShift st_0a
     newShift = addPair oldShift $ Sh.shift Sh.upOctave
     msgs :: [LedMsg] = map (K.label,)
-      $  map (,False) (pcToXys oldShift 0)
-      ++ map (,True)  (pcToXys newShift 0)
-    in Sh.handler st (Sh.upOctave, True) =^=
-       st { _stPending_Monome = msgs
-          , _stXyShift = newShift }
+      $  map (,False) (pcToXys oldShift pc0)
+      ++ map (,True)  (pcToXys newShift pc0)
+    in Sh.handler st_0a (Sh.upOctave, True) =^=
+       st_0a { _stPending_Monome = msgs
+             , _stXyShift = newShift }
 
 test_sustainHandler :: Test
 test_sustainHandler = TestCase $ do

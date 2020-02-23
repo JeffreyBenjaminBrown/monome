@@ -42,7 +42,7 @@ st0 = St {
   }
 
 st_0a = -- 0 is the anchor pitch
-  st0 & stLit . at pc0 . _Just %~ S.insert LedBecauseAnchor
+  st0 & stLit %~ M.insert pc0 (S.singleton LedBecauseAnchor)
 
 st_0f = -- fingering key 0 only
   st0 & stFingers .~ M.fromList [ ( xy0, ( v0, pc0) ) ]
