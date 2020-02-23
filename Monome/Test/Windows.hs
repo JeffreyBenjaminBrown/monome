@@ -113,41 +113,43 @@ test_keyboardHandler = TestCase $ do
       xy1    :: (X,Y)   = (0,1)
       pitch0 :: Pitch   = xyToEt31_st st0 xy0
       pitch1 :: Pitch   = xyToEt31_st st0 xy1
-      st_0 = -- pressing key 0 only
+      st_0f = -- fingering key 0 only
         st0 & stFingers .~ M.fromList [ ( xy0, ( v0, mod pitch0 31) ) ]
         & stLit .~  M.fromList
         [ ( mod pitch0 31, S.singleton $ LedBecauseSwitch xy0) ]
-      st_01 = -- pressing keys 0 and 1
+      st_01f = -- fingering keys 0 and 1
         st0 & stFingers .~ M.fromList [ ( xy0, ( v0, mod pitch0 31) )
                                       , ( xy1, ( v1, mod pitch1 31) ) ]
         & stLit .~ M.fromList
         [ ( mod pitch0 31, S.singleton $ LedBecauseSwitch xy0)
         , ( mod pitch1 31, S.singleton $ LedBecauseSwitch xy1) ]
-      st_0s = -- 0 is both fingered and sustained
-        st_0
+      st_0fs = -- 0 is both fingered and sustained
+        st_0f
         & stSustained .~ Just (S.singleton (v0, mod pitch0 31) )
         & stLit .~  ( M.singleton (mod pitch0 31)
                       $ S.fromList [ LedBecauseSwitch xy0
                                    , LedBecauseSustain ] )
-      st_0a = -- 0 is both fingered and the anchor pitch
-        st_0 & stLit . at (mod pitch0 31) . _Just %~ S.insert LedBecauseAnchor
-      st_0a_1 = --  is both fingered and the anchor pitch, and 1 is fingered
-        st_01 & stLit . at (mod pitch0 31) . _Just %~ S.insert LedBecauseAnchor
+      st_0af = -- 0 is both fingered and the anchor pitch
+        st_0f & stLit . at (mod pitch0 31) . _Just
+        %~ S.insert LedBecauseAnchor
+      st_0af_1f = --  is both fingered and the anchor pitch, and 1 is fingered
+        st_01f & stLit . at (mod pitch0 31) . _Just
+        %~ S.insert LedBecauseAnchor
 
   assertBool "releasing a key sends off-messages to monome, sends off-messages to Vivid, removes something from _stFingers, and removes some things from _stLit" $
-    K.handler st_01 (xy1, False)
-    =^= ( st_0
+    K.handler st_01f (xy1, False)
+    =^= ( st_0f
           & ( stPending_Monome .~
               map (\xy -> (K.label, (xy, False)) )
-              (pcToXys (_stXyShift st_01) pitch1 ) )
+              (pcToXys (_stXyShift st_01f) pitch1 ) )
           & stPending_Vivid .~ [SoundMsg { _soundMsgVoiceId = v1
                                          , _soundMsgPitch = Nothing
                                          , _soundMsgVal = 0
                                          , _soundMsgParam = "amp" } ] )
 
   assertBool "releasing a key that's also the anchor pitch sends no monome messages" $
-    K.handler st_0a (xy0, False)
-    =^= ( st_0a
+    K.handler st_0af (xy0, False)
+    =^= ( st_0af
           & ( stLit . at (mod pitch0 31) . _Just
               .~ S.singleton LedBecauseAnchor )
           & stFingers .~ mempty
@@ -157,16 +159,16 @@ test_keyboardHandler = TestCase $ do
                                          , _soundMsgParam = "amp" } ] )
 
   assertBool "releasing a key that's a sustained voice sends no vivid or monome messages, but updates lit and fingers" $
-    K.handler st_0s (xy0, False)
-    =^= ( st_0s
+    K.handler st_0fs (xy0, False)
+    =^= ( st_0fs
           & ( stLit . at (mod pitch0 31) . _Just
               .~ S.singleton LedBecauseSustain )
           & stFingers .~ mempty )
 
   assertBool "pressing a key sends on-messages to monome, sends on-messages to Vivid, adds something to _stFingers, and asdds something from _stLit" $
-    K.handler st_0 (xy1, True)
-    =^= ( st_01
+    K.handler st_0f (xy1, True)
+    =^= ( st_01f
           & ( stPending_Monome .~
               map (\xy -> (K.label, (xy, True)) )
-              (pcToXys (_stXyShift st_01) pitch1 ) )
+              (pcToXys (_stXyShift st_01f) pitch1 ) )
           & stPending_Vivid .~ keyMsg st0 (xy1,True) )

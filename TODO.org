@@ -2,7 +2,6 @@
 ** TODO add tests
 *** TODO test_keyboardHandler
 press a key that's also sustained
-release a key that's also sustained
 *** TODO test multiple handlers
 **** hold 2 notes, press sustain, shift, release one of them
 **** hold 2 notes, press sustain, shift, release one of them, release sustain
