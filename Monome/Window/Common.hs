@@ -1,5 +1,5 @@
 {-# OPTIONS_GHC -fno-warn-type-defaults #-}
-
+{-# OPTIONS_GHC -fno-warn-missing-fields #-}
 {-# LANGUAGE TupleSections
 , ScopedTypeVariables #-}
 
@@ -43,13 +43,12 @@ soundKeySt st (xy, sw) = do
   if S.member xy $ S.map fst $ _stSustained st
     then [] -- it's already sounding due to sustain
     else if sw
-         then let freqMsg = SoundMsg { _soundMsgVoiceId = xy
-                                     , _soundMsgPitch = Just pitch
-                                     , _soundMsgVal = 100 * et31ToFreq pitch
-                                     , _soundMsgParam = "freq" }
-              in [ freqMsg
-                 , freqMsg & soundMsgVal .~ 0.15
-                           & soundMsgParam .~ "amp" ]
+         then let msg = SoundMsg { _soundMsgVoiceId = xy
+                                 , _soundMsgPitch = Just pitch }
+              in [ msg & soundMsgVal .~ 100 * et31ToFreq pitch
+                       & soundMsgParam .~ "freq"
+                 , msg & soundMsgVal .~ 0.15
+                       & soundMsgParam .~ "amp" ]
          else [silenceMsg xy]
 
 updateVoice :: SoundMsg -> St -> St
