@@ -8,6 +8,9 @@ module Monome.Window.Sustain (
   , label
   , sustainWindow
   , theButton
+
+  , insertOneSustainedNote -- ^ PitchClass -> LitPitches -> LitPitches
+  , deleteOneSustainedNote -- ^ PitchClass -> LitPitches -> LitPitches
   ) where
 
 import           Control.Lens

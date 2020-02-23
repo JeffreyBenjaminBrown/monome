@@ -7,7 +7,9 @@ import Test.HUnit
 
 import           Control.Lens
 import qualified Data.Map as M
+import           Data.Map (Map)
 import qualified Data.Set as S
+import           Data.Set (Set)
 
 import Monome.Math31
 import Monome.Test.Data
@@ -20,7 +22,28 @@ import Monome.Window.Sustain  as Su
 tests :: Test
 tests = TestList [
     TestLabel "test_sustainHandler" test_sustainHandler
+  , TestLabel "test_deleteOneSustainedNote_and_insertOneSustainedNote"
+    test_deleteOneSustainedNote_and_insertOneSustainedNote
   ]
+
+test_deleteOneSustainedNote_and_insertOneSustainedNote :: Test
+test_deleteOneSustainedNote_and_insertOneSustainedNote = TestCase $ do
+  let pc = 0
+      lit_a :: Map PitchClass (Set LedBecause) = -- lit b/c anchor
+        M.singleton pc $ S.singleton LedBecauseAnchor
+      lit_s :: Map PitchClass (Set LedBecause) = -- lit b/c/ sustain
+        M.singleton pc $ S.singleton LedBecauseSustain
+      lit_as :: Map PitchClass (Set LedBecause) = -- lit b/c both
+        M.singleton pc $ S.fromList [LedBecauseAnchor, LedBecauseSustain]
+  assertBool "add sustain to the reasons a lit (because anchored) key is lit"
+    $ insertOneSustainedNote pc lit_a == lit_as
+  assertBool "add sustain to the previously empty set of reasons a key is lit"
+    $ insertOneSustainedNote pc mempty == lit_s
+
+  assertBool "if sustain was the only reason, then upon releasing sustain, there are no more reasons" $
+    deleteOneSustainedNote pc lit_s == mempty
+  assertBool "if the anchor note is sustained, then upon releasing sustain, the anchor reemains as reason to light the key" $
+    deleteOneSustainedNote pc lit_as == lit_a
 
 test_sustainHandler :: Test
 test_sustainHandler = TestCase $ do
