@@ -31,6 +31,7 @@ library
     , Monome.Network.Monome
     , Monome.Network.Util
     , Monome.Test
+    , Monome.Test.Data
     , Monome.Test.HandTest
     , Monome.Test.Misc
     , Monome.Test.Windows

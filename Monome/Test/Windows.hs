@@ -1,4 +1,3 @@
-{-# OPTIONS_GHC -fno-warn-missing-fields #-}
 {-# LANGUAGE TupleSections, ScopedTypeVariables #-}
 
 module Monome.Test.Windows where
@@ -10,6 +9,7 @@ import qualified Data.Map as M
 import qualified Data.Set as S
 
 import Monome.Math31
+import Monome.Test.Data
 import Monome.Types.Button
 import Monome.Types.Initial
 import Monome.Util
@@ -28,28 +28,6 @@ tests = TestList [
 
 meh :: a
 meh = error "not relevant to this test"
-
-st0 :: St
-st0 = St {
-    _stVoices = mempty
-  , _stPending_Monome = []
-  , _stPending_Vivid = []
-  , _stXyShift = (3,5)
-  , _stFingers = mempty
-  , _stLit = mempty
-  , _stSustainOn = False
-  , _stSustained = mempty
-  }
-
-(=^=) :: St -> St -> Bool
-(=^=) x y = and [
-    _stPending_Monome x == _stPending_Monome y
-  , _stPending_Vivid x  == _stPending_Vivid y
-  , _stXyShift x        == _stXyShift y
-  , _stFingers x        == _stFingers y
-  , _stLit x            == _stLit y
-  , _stSustainOn x      == _stSustainOn y
-  , _stSustained x      == _stSustained y]
 
 test_shiftHandler :: Test
 test_shiftHandler = TestCase $ do

@@ -4,6 +4,7 @@ import Data.Map as M
 import Data.Set as S
 import Test.HUnit
 
+import Monome.Test.Data
 import Monome.Types.Button
 import Monome.Types.Initial
 import Monome.Types.Window
