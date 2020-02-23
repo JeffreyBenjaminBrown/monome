@@ -24,7 +24,8 @@ source-repository head
 
 library
   exposed-modules:
-      Monome.Instances.TypesafeArgs
+      Monome.Config
+    , Monome.Instances.TypesafeArgs
     , Monome.Main
     , Monome.Math31
     , Monome.Network.ListenAndPrintOsc

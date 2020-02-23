@@ -1,14 +1,19 @@
-module Monome.Test.Misc (tests) where
+{-# LANGUAGE TupleSections
+, ScopedTypeVariables #-}
+
+module Monome.Test.Misc where
 
 import Data.Map as M
 import Data.Set as S
 import Test.HUnit
 
-import Monome.Test.Data
-import Monome.Types.Button
-import Monome.Types.Initial
-import Monome.Types.Window
-import Monome.Window.Common
+import qualified Monome.Config as Config
+import           Monome.Math31
+import           Monome.Test.Data
+import           Monome.Types.Button
+import           Monome.Types.Initial
+import           Monome.Types.Window
+import           Monome.Window.Common
 
 
 tests :: Test
@@ -20,7 +25,32 @@ tests = TestList [
 
 test_keyOnMsg :: Test
 test_keyOnMsg = TestCase $ do
-  return ()
+  let sustainedVoice :: VoiceId = (0,0)
+      sustainedPc :: PitchClass = mod (xyToEt31_st st sustainedVoice) 31
+      newVoice :: VoiceId = (0,1)
+      st = st0 { _stSustained =
+                 S.singleton (sustainedVoice, sustainedPc) }
+      newPitch = xyToEt31_st st newVoice
+  assertBool "pressing a key that's sustained has no effect" $
+    keyOnMsg st (sustainedVoice, True) == []
+  assertBool "releasing a key that's sustained has no effect" $
+    keyOnMsg st (sustainedVoice, False) == []
+  assertBool "press a key that's not sustained" $
+    keyOnMsg st (newVoice, True) ==
+    [ SoundMsg { _soundMsgVoiceId = newVoice
+               , _soundMsgPitch = Just newPitch
+               , _soundMsgVal = 100 * et31ToFreq newPitch
+               , _soundMsgParam = "freq" }
+    , SoundMsg { _soundMsgVoiceId = newVoice
+               , _soundMsgPitch = Just newPitch
+               , _soundMsgVal = Config.voiceAmplitude
+               , _soundMsgParam = "amp" } ]
+  assertBool "release a key that's not sustained" $
+    keyOnMsg st (newVoice, False) ==
+    [ SoundMsg { _soundMsgVoiceId = newVoice
+               , _soundMsgPitch = Nothing
+               , _soundMsgVal = 0
+               , _soundMsgParam = "amp" } ]
 
 testDependentPitchClass :: Test
 testDependentPitchClass = TestCase $ do

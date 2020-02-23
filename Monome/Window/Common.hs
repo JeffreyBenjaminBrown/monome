@@ -16,9 +16,10 @@ import qualified Data.Map as M
 import           Data.Maybe
 import qualified Data.Set as S
 
-import Monome.Math31
-import Monome.Types.Button
-import Monome.Types.Initial
+import qualified Monome.Config as Config
+import           Monome.Math31
+import           Monome.Types.Button
+import           Monome.Types.Initial
 
 
 -- Todo (#speed) Instead, keep a map from xy to pitchclass
@@ -47,7 +48,7 @@ keyOnMsg st (xy, sw) = do
                                  , _soundMsgPitch = Just pitch }
               in [ msg & soundMsgVal .~ 100 * et31ToFreq pitch
                        & soundMsgParam .~ "freq"
-                 , msg & soundMsgVal .~ 0.15
+                 , msg & soundMsgVal .~ Config.voiceAmplitude
                        & soundMsgParam .~ "amp" ]
          else [silenceMsg xy]
 

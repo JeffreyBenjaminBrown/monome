@@ -1,7 +1,8 @@
 * TODO infrastructure
+** TODO rename keyOnMsg -> keyMsg
+** TODO merge stSustained and stSustainOn
+it makes some invalid state impossible
 ** TODO add tests
-*** TODO soundKeySt :: St -> ((X,Y), Switch) -> [SoundMsg]
-test_keyboardHandler assumes it works
 *** TODO test_keyboardHandler
 remove a finger from the anchor
 press a key that's also sustained
@@ -11,11 +12,11 @@ release a key that's also sustained
 **** hold 2 notes, press sustain, shift, release one of them, release sustain
 **** hold a note, shift, press another note, press sustain
 **** hold a note, shift, press another note, press sustain, release them
-** TODO voices: improve representation
-LedBecause: maybe don't distinguish between keys and sustain,
+** TODO improve representation
+*** LedBecause: maybe don't distinguish between keys and sustain,
   just use VoiceId
-stFingers :: Map (X,Y) VoiceId
-stSustained :: S.Set VoiceID
+*** stFingers :: Map (X,Y) VoiceId
+*** stSustained :: S.Set VoiceID
 ** redraw the whole screen often
 *** why
 Dropped messages to LEDs stop being a (hypothetical) problem.

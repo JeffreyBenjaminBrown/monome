@@ -1,4 +1,5 @@
-{-# LANGUAGE TupleSections, ScopedTypeVariables #-}
+{-# LANGUAGE TupleSections
+, ScopedTypeVariables #-}
 
 module Monome.Test.Windows where
 
