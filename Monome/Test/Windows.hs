@@ -123,6 +123,10 @@ test_keyboardHandler = TestCase $ do
         & stLit .~ M.fromList
         [ ( mod pitch0 31, S.singleton $ LedBecauseSwitch xy0)
         , ( mod pitch1 31, S.singleton $ LedBecauseSwitch xy1) ]
+      st_0a = -- 0 is both fingered and the anchor pitch
+        st_0 & stLit . at (mod pitch0 31) . _Just %~ S.insert LedBecauseAnchor
+      st_0a_1 = --  is both fingered and the anchor pitch, and 1 is fingered
+        st_01 & stLit . at (mod pitch0 31) . _Just %~ S.insert LedBecauseAnchor
 
   assertBool "releasing a key sends off-messages to monome, sends off-messages to Vivid, removes something from _stFingers, and removes some things from _stLit" $
     K.handler st_01 (xy1, False)
@@ -131,6 +135,17 @@ test_keyboardHandler = TestCase $ do
               map (\xy -> (K.label, (xy, False)) )
               (pcToXys (_stXyShift st_01) pitch1 ) )
           & stPending_Vivid .~ [SoundMsg { _soundMsgVoiceId = v1
+                                         , _soundMsgPitch = Nothing
+                                         , _soundMsgVal = 0
+                                         , _soundMsgParam = "amp" } ] )
+
+  assertBool "releasing a key that's also the anchor pitch sends no monome messages" $
+    K.handler st_0a (xy0, False)
+    =^= ( st_0a
+          & ( stLit . at (mod pitch0 31) . _Just
+              .~ S.singleton LedBecauseAnchor )
+          & stFingers .~ mempty
+          & stPending_Vivid .~ [SoundMsg { _soundMsgVoiceId = v0
                                          , _soundMsgPitch = Nothing
                                          , _soundMsgVal = 0
                                          , _soundMsgParam = "amp" } ] )
