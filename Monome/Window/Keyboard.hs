@@ -50,8 +50,8 @@ handler st press @ (xy,sw) =
         -- what the key represented when it was pressed,
         -- if it is now being released
       fingers' = case sw of
-        True  -> M.insert xy (xy,pcNow) $ _stFingers st
-        False -> M.delete xy            $ _stFingers st
+        True  -> M.insert xy xy $ _stFingers st
+        False -> M.delete xy    $ _stFingers st
       lit' :: LitPitches = updateStLit (xy,sw) pcNow pcThen $ _stLit st
       oldKeys :: Set PitchClass  = S.fromList $ M.keys $ _stLit st
       newKeys :: Set PitchClass  = S.fromList $ M.keys $ lit'

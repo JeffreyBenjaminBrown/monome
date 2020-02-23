@@ -62,13 +62,12 @@ test_sustainHandler = TestCase $ do
 
   assertBool "turning ON sustain changes the sustain state, the set of sustained voices, the set of reasons for keys to be lit, and the messages pending to the monome." $
     Su.handler st_0f (meh, True)
-    =^= st_0f { _stSustained = Just $
-                             S.singleton (v0, pc0)
-            , _stLit = M.singleton pc0 $
-                       S.fromList [ LedBecauseSustain
-                                  , LedBecauseSwitch xy0 ]
-            , _stPending_Monome =
-              [ (Su.label, (Su.theButton, True)) ] }
+    =^= st_0f { _stSustained = Just $ S.singleton v0
+              , _stLit = M.singleton pc0 $
+                         S.fromList [ LedBecauseSustain
+                                    , LedBecauseSwitch xy0 ]
+              , _stPending_Monome =
+                [ (Su.label, (Su.theButton, True)) ] }
 
   assertBool ( "turning sustain OFF does all this stuff:\n" ++
                "flip the sustain state\n" ++
@@ -82,8 +81,8 @@ test_sustainHandler = TestCase $ do
           M.fromList [ (0, S.fromList [ LedBecauseSustain
                                       , LedBecauseSwitch xy0 ] )
                      , (1, S.fromList [ LedBecauseSustain ] ) ]
-          & stSustained .~ Just ( S.fromList [ ((0,0), 0)
-                                             , ((0,1), 1) ] )
+          & stSustained .~ Just ( S.fromList [ (0,0)
+                                             , (0,1) ] )
     in Su.handler st_0f' (meh, True)
        =^=  ( st_0f'
               & stSustained .~ mempty
@@ -133,7 +132,7 @@ test_keyboardHandler = TestCase $ do
     K.handler st_0s (xy0, True)
     =^= ( st_0s & ( stLit . at pc0 . _Just
                     %~ S.insert (LedBecauseSwitch xy0) )
-          & stFingers .~ M.fromList [ ( xy0, ( v0, pc0) ) ] )
+          & stFingers .~ M.fromList [ (xy0,v0) ] )
 
   assertBool "pressing a key sends on-messages to monome, sends on-messages to Vivid, adds something to _stFingers, and asdds something from _stLit" $
     K.handler st_0f (xy1, True)

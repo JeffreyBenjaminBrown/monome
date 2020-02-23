@@ -41,7 +41,7 @@ silenceMsg xy = SoundMsg {
 keyMsg :: St -> ((X,Y), Switch) -> [SoundMsg]
 keyMsg st (xy, sw) = do
   let pitch = xyToEt31_st st xy
-  if maybe False (S.member xy . S.map fst) $ _stSustained st
+  if maybe False (S.member xy) $ _stSustained st
     then [] -- it's already sounding due to sustain
     else if sw
          then let msg = SoundMsg { _soundMsgVoiceId = xy

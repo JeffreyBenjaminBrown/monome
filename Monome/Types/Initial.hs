@@ -119,12 +119,12 @@ data St = St {
   , _stPending_Vivid :: [SoundMsg]
 
   , _stXyShift :: (X,Y) -- ^ this is relative -- a vector, not a point
-  , _stFingers :: Map (X,Y) (VoiceId, PitchClass)
+  , _stFingers :: Map (X,Y) VoiceId
     -- ^ Where fingers are, what each is sounding,
     -- and what each is lighting up.
   , _stLit :: LitPitches
 
-  , _stSustained :: Maybe (Set (VoiceId, PitchClass))
+  , _stSustained :: Maybe (Set VoiceId)
     -- ^ PITFALL: In spirit, the thing sustained is a Pitch,
     -- but it's represented as a voice,
     -- identified by the key that originally launched it.

@@ -45,7 +45,7 @@ st_0a = -- 0 is the anchor pitch
   st0 & stLit %~ M.insert pc0 (S.singleton LedBecauseAnchor)
 
 st_0f = -- fingering key 0 only
-  st0 & stFingers .~ M.fromList [ ( xy0, ( v0, pc0) ) ]
+  st0 & stFingers .~ M.fromList [ (xy0, v0) ]
   & stLit .~  M.fromList
   [ ( pc0, S.singleton $ LedBecauseSwitch xy0) ]
 
@@ -53,18 +53,18 @@ st_0s = -- sustaining key 0 only
   st0
   & stLit .~  M.singleton pc0
   (S.singleton LedBecauseSustain)
-  & stSustained .~ Just (S.singleton (v0, pc0) )
+  & stSustained .~ Just (S.singleton v0)
 
 st_01f = -- fingering keys 0 and 1
-  st0 & stFingers .~ M.fromList [ ( xy0, ( v0, pc0) )
-                                , ( xy1, ( v1, pc1) ) ]
+  st0 & stFingers .~ M.fromList [ (xy0, v0)
+                                , (xy1, v1) ]
   & stLit .~ M.fromList
   [ ( pc0, S.singleton $ LedBecauseSwitch xy0)
   , ( pc1, S.singleton $ LedBecauseSwitch xy1) ]
 
 st_0fs = -- 0 is both fingered and sustained
   st_0f
-  & stSustained .~ Just (S.singleton (v0, pc0) )
+  & stSustained .~ Just (S.singleton v0)
   & stLit .~  ( M.singleton pc0
                 $ S.fromList [ LedBecauseSwitch xy0
                              , LedBecauseSustain ] )
