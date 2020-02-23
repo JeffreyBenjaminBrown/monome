@@ -1,5 +1,6 @@
 * TODO infrastructure
 ** TODO add tests
+*** TODO use more of Test.Data in test_shiftHandler
 *** TODO test multiple handlers
 **** hold 2 notes, press sustain, shift, release one of them
 **** hold 2 notes, press sustain, shift, release one of them, release sustain

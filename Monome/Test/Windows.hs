@@ -34,17 +34,20 @@ test_shiftHandler :: Test
 test_shiftHandler = TestCase $ do
   let st :: St = -- we need a lit `PitchClass` to move
         st0 & stLit .~ M.singleton 0 (S.singleton LedBecauseAnchor)
+
   assertBool "releasing a shift button does nothing" $
-    Sh.handler st (meh, False) =^= st
+    Sh.handler st_0a (meh, False) =^= st_0a
+
   assertBool "shift the notes one space closer to player's body" $ let
     oldShift = _stXyShift st
     newShift = addPair oldShift $ Sh.shift Sh.downArrow
     msgs :: [LedMsg] = map (K.label,)
       $  map (,False) (pcToXys oldShift 0)
       ++ map (,True)  (pcToXys newShift 0)
-    in Sh.handler st (Sh.downArrow, True) =^=
-       st { _stPending_Monome = msgs
-          , _stXyShift = newShift }
+    in Sh.handler st (Sh.downArrow, True)
+    =^= st { _stPending_Monome = msgs
+            , _stXyShift = newShift }
+
   assertBool "shift the notes an octave higher" $ let
     oldShift = _stXyShift st
     newShift = addPair oldShift $ Sh.shift Sh.upOctave
@@ -57,23 +60,16 @@ test_shiftHandler = TestCase $ do
 
 test_sustainHandler :: Test
 test_sustainHandler = TestCase $ do
-  let fingerAt :: (X,Y) = (0,0)
-      soundingVoice :: VoiceId = (0,0)
-      soundingPc :: PitchClass = 0
-      st1 :: St = st0
-        & stFingers .~ M.singleton fingerAt (soundingVoice, soundingPc)
-        & stLit .~ M.singleton 0 (S.singleton $ LedBecauseSwitch fingerAt)
-
   assertBool "releasing (not turning off) the sustain button has no effect"
     $ Su.handler st0 (meh , False) =^= st0
 
   assertBool "turning ON sustain changes the sustain state, the set of sustained voices, the set of reasons for keys to be lit, and the messages pending to the monome." $
-    Su.handler st1 (meh, True)
-    =^= st1 { _stSustained = Just $
-                             S.singleton (soundingVoice, soundingPc)
-            , _stLit = M.singleton soundingPc $
+    Su.handler st_0f (meh, True)
+    =^= st_0f { _stSustained = Just $
+                             S.singleton (v0, pc0)
+            , _stLit = M.singleton pc0 $
                        S.fromList [ LedBecauseSustain
-                                  , LedBecauseSwitch fingerAt ]
+                                  , LedBecauseSwitch xy0 ]
             , _stPending_Monome =
               [ (Su.label, (Su.theButton, True)) ] }
 
@@ -84,22 +80,22 @@ test_sustainHandler = TestCase $ do
                ++ "adds messages for the monome to turn off the sustain button and the keys that were sustained and are not fingered\n" ++
                " adds messages for Vivid to turn off any pitches from voices that were sustained and are not fingered\n" ++
                "Pitch 0 is fingered, and 0 and 1 sounding; 1 turns off.") $
-    let st1' = st1
+    let st_0f' = st_0f
           & stLit .~
           M.fromList [ (0, S.fromList [ LedBecauseSustain
-                                      , LedBecauseSwitch fingerAt ] )
+                                      , LedBecauseSwitch xy0 ] )
                      , (1, S.fromList [ LedBecauseSustain ] ) ]
           & stSustained .~ Just ( S.fromList [ ((0,0), 0)
                                              , ((0,1), 1) ] )
-    in Su.handler st1' (meh, True)
-       =^=  ( st1'
+    in Su.handler st_0f' (meh, True)
+       =^=  ( st_0f'
               & stSustained .~ mempty
               & stLit .~ M.singleton 0 (S.singleton $
-                                        LedBecauseSwitch fingerAt )
+                                        LedBecauseSwitch xy0 )
               & stPending_Monome .~
               ( ( Su.label, (Su.theButton, False)) :
                 map (\xy -> (K.label, (xy, False)))
-                (pcToXys (_stXyShift st1') 1) )
+                (pcToXys (_stXyShift st_0f') 1) )
               & stPending_Vivid .~ [ SoundMsg { _soundMsgVoiceId = (0,1)
                                               , _soundMsgPitch = Nothing
                                               , _soundMsgVal = 0
@@ -107,39 +103,6 @@ test_sustainHandler = TestCase $ do
 
 test_keyboardHandler :: Test
 test_keyboardHandler = TestCase $ do
-  let v0     :: VoiceId = (0,0)
-      v1     :: VoiceId = (0,1)
-      xy0    :: (X,Y)   = v0
-      xy1    :: (X,Y)   = v1
-      pitch0 :: Pitch   = xyToEt31_st st0 xy0
-      pitch1 :: Pitch   = xyToEt31_st st0 xy1
-
-      st_0f = -- fingering key 0 only
-        st0 & stFingers .~ M.fromList [ ( xy0, ( v0, mod pitch0 31) ) ]
-        & stLit .~  M.fromList
-        [ ( mod pitch0 31, S.singleton $ LedBecauseSwitch xy0) ]
-      st_0s = -- sustaining key 0 only
-        st0
-        & stLit .~  M.singleton (mod pitch0 31)
-        (S.singleton LedBecauseSustain)
-        & stSustained .~ Just (S.singleton (v0, mod pitch0 31) )
-      st_01f = -- fingering keys 0 and 1
-        st0 & stFingers .~ M.fromList [ ( xy0, ( v0, mod pitch0 31) )
-                                      , ( xy1, ( v1, mod pitch1 31) ) ]
-        & stLit .~ M.fromList
-        [ ( mod pitch0 31, S.singleton $ LedBecauseSwitch xy0)
-        , ( mod pitch1 31, S.singleton $ LedBecauseSwitch xy1) ]
-
-      st_0fs = -- 0 is both fingered and sustained
-        st_0f
-        & stSustained .~ Just (S.singleton (v0, mod pitch0 31) )
-        & stLit .~  ( M.singleton (mod pitch0 31)
-                      $ S.fromList [ LedBecauseSwitch xy0
-                                   , LedBecauseSustain ] )
-      st_0af = -- 0 is both fingered and the anchor pitch
-        st_0f & stLit . at (mod pitch0 31) . _Just
-        %~ S.insert LedBecauseAnchor
-
   assertBool "releasing a key sends off-messages to monome, sends off-messages to Vivid, removes something from _stFingers, and removes some things from _stLit" $
     K.handler st_01f (xy1, False)
     =^= ( st_0f
