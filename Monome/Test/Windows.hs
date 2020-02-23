@@ -76,9 +76,10 @@ test_sustainHandler = TestCase $ do
   let fingerAt :: (X,Y) = (0,0)
       soundingVoice :: VoiceId = (0,0)
       soundingPc :: PitchClass = 0
-      st1 :: St = st0 & stFingers .~
-        M.singleton fingerAt (soundingVoice, soundingPc)
-        -- TODO : this should also have a lit key.
+      st1 :: St = st0
+        & stFingers .~ M.singleton fingerAt (soundingVoice, soundingPc)
+        & stLit .~ M.singleton 0 (S.singleton $ LedBecauseSwitch fingerAt)
+
   assertBool "releasing (not turning off) the sustain button has no effect"
     $ Su.handler st0 (meh , False) =^= st0
 
@@ -87,8 +88,9 @@ test_sustainHandler = TestCase $ do
     =^= st1 { _stSustainOn = True
             , _stSustained =
               S.singleton (soundingVoice, soundingPc)
-            , _stLit =
-              M.singleton soundingPc $ S.singleton LedBecauseSustain
+            , _stLit = M.singleton soundingPc $
+                       S.fromList [ LedBecauseSustain
+                                  , LedBecauseSwitch fingerAt ]
             , _stPending_Monome =
               [ (Su.label, (Su.theButton, True)) ] }
 
