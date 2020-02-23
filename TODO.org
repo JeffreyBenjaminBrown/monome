@@ -1,5 +1,9 @@
 * TODO infrastructure
-** TODO add tests for handlers
+** TODO add tests
+*** test soundKeySt :: St -> ((X,Y), Switch) -> [SoundMsg]
+(test_keyboardHandler assumes it works)
+*** test_keyboardHandler: remove a finger from the anchor
+*** test_keyboardHandler: press a key that's already sustained
 ** TODO voices: improve representation
 LedBecause: maybe don't distinguish between keys and sustain,
   just use VoiceId

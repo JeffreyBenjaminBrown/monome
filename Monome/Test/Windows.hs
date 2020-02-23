@@ -13,6 +13,7 @@ import Monome.Math31
 import Monome.Types.Button
 import Monome.Types.Initial
 import Monome.Util
+import Monome.Window.Common
 import Monome.Window.Keyboard as K
 import Monome.Window.Shift    as Sh
 import Monome.Window.Sustain  as Su
@@ -22,6 +23,7 @@ tests :: Test
 tests = TestList [
     TestLabel "test_shiftHandler" test_shiftHandler
   , TestLabel "test_sustainHandler" test_sustainHandler
+  , TestLabel "test_keyboardHandler" test_keyboardHandler
   ]
 
 meh :: a
@@ -124,3 +126,41 @@ test_sustainHandler = TestCase $ do
                                               , _soundMsgPitch = Nothing
                                               , _soundMsgVal = 0
                                               , _soundMsgParam = "amp" } ] )
+
+test_keyboardHandler :: Test
+test_keyboardHandler = TestCase $ do
+  let v0     :: VoiceId = (0,0)
+      v1     :: VoiceId = (0,1)
+      xy0    :: (X,Y)   = (0,0)
+      xy1    :: (X,Y)   = (0,1)
+      pitch0 :: Pitch   = xyToEt31_st st0 xy0
+      pitch1 :: Pitch   = xyToEt31_st st0 xy1
+      st_0 = -- pressing key 0 only
+        st0 & stFingers .~ M.fromList [ ( xy0, ( v0, mod pitch0 31) ) ]
+        & stLit .~ M.fromList
+        [ ( mod pitch0 31, S.singleton $ LedBecauseSwitch xy0) ]
+      st_01 = -- pressing keys 0 and 1
+        st0 & stFingers .~ M.fromList [ ( xy0, ( v0, mod pitch0 31) )
+                                      , ( xy1, ( v1, mod pitch1 31) ) ]
+        & stLit .~ M.fromList
+        [ ( mod pitch0 31, S.singleton $ LedBecauseSwitch xy0)
+        , ( mod pitch1 31, S.singleton $ LedBecauseSwitch xy1) ]
+
+  assertBool "releasing a key sends off-messages to monome, sends off-messages to Vivid, removes something from _stFingers, and removes some things from _stLit" $
+    K.handler st_01 (xy1, False)
+    =^= ( st_0
+          & ( stPending_Monome .~
+              map (\xy -> (K.label, (xy, False)) )
+              (pcToXys (_stXyShift st_01) pitch1 ) )
+          & stPending_Vivid .~ [SoundMsg { _soundMsgVoiceId = v1
+                                         , _soundMsgPitch = Nothing
+                                         , _soundMsgVal = 0
+                                         , _soundMsgParam = "amp" } ] )
+
+  assertBool "pressing a key sends on-messages to monome, sends on-messages to Vivid, adds something to _stFingers, and asdds something from _stLit" $
+    K.handler st_0 (xy1, True)
+    =^= ( st_01
+          & ( stPending_Monome .~
+              map (\xy -> (K.label, (xy, True)) )
+              (pcToXys (_stXyShift st_01) pitch1 ) )
+          & stPending_Vivid .~ soundKeySt st0 (xy1,True) )
