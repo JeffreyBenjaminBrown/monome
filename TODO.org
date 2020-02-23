@@ -1,5 +1,4 @@
 * TODO infrastructure
-** TODO rename keyOnMsg -> keyMsg
 ** TODO merge stSustained and stSustainOn
 it makes some invalid state impossible
 ** TODO add tests

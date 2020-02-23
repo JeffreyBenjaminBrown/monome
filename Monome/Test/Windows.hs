@@ -142,4 +142,4 @@ test_keyboardHandler = TestCase $ do
           & ( stPending_Monome .~
               map (\xy -> (K.label, (xy, True)) )
               (pcToXys (_stXyShift st_01) pitch1 ) )
-          & stPending_Vivid .~ keyOnMsg st0 (xy1,True) )
+          & stPending_Vivid .~ keyMsg st0 (xy1,True) )
