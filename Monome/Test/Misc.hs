@@ -14,7 +14,12 @@ tests :: Test
 tests = TestList [
     TestLabel "testBelongsHere" testBelongsHere
   , TestLabel "testDependentPitchClass" testDependentPitchClass
+  , TestLabel "test_keyOnMsg" test_keyOnMsg
   ]
+
+test_keyOnMsg :: Test
+test_keyOnMsg = TestCase $ do
+  return ()
 
 testDependentPitchClass :: Test
 testDependentPitchClass = TestCase $ do
