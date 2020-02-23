@@ -26,7 +26,6 @@ tests = TestList [
 test_keyMsg :: Test
 test_keyMsg = TestCase $ do
   let sustainedVoice :: VoiceId = (0,0)
-      sustainedPc :: PitchClass = mod (xyToEt31_st st sustainedVoice) 31
       newVoice :: VoiceId = (0,1)
       st = st0 { _stSustained =
                  Just $ S.singleton sustainedVoice }

@@ -12,6 +12,9 @@ import Monome.Types.Initial
 import Monome.Math31
 
 
+meh :: a
+meh = error "not relevant to this test"
+
 (=^=) :: St -> St -> Bool
 (=^=) x y = and [
     _stPending_Monome x == _stPending_Monome y

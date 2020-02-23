@@ -36,6 +36,7 @@ library
     , Monome.Test.Data
     , Monome.Test.HandTest
     , Monome.Test.Misc
+    , Monome.Test.Sustain
     , Monome.Test.Windows
     , Monome.Types.Button
     , Monome.Types.Device
