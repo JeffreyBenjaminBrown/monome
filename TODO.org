@@ -15,6 +15,8 @@ use "synth" to make a synth, "free" to free it:
   s <- synth boop
   set s (toI f :: I "amp")
   free s
+** _soundMsgPitch seems silly
+Either record all the param-value pairs, or none.
 * TODO bugfix
 ** TODO sustained pitches should not disable keys
 *** after spatial drift

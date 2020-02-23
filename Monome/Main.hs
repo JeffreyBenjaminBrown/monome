@@ -14,7 +14,7 @@ import Control.Concurrent (forkIO, killThread)
 import Control.Concurrent.MVar
 import Control.Lens
 import qualified Data.Map as M
-import qualified Data.Set as S
+--import qualified Data.Set as S
 import Vivid
 import Vivid.OSC
 
@@ -58,8 +58,8 @@ et31 monomePort = do
 
     , _stXyShift = (0,0)
     , _stFingers = mempty
-    , _stLit = M.singleton (2 :: PitchClass)
-              $ S.singleton LedBecauseAnchor
+    , _stLit = mempty
+      -- M.singleton (2 :: PitchClass) $ S.singleton LedBecauseAnchor
     , _stSustainOn = False
     , _stSustained = mempty
     }
