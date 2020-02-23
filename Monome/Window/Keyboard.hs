@@ -43,7 +43,7 @@ handler :: St
         -> St
 handler st press @ (xy,sw) =
   let pcNow :: PitchClass =
-        mod (xyToEt31 $ addPair xy $ negPair $ _stXyShift st) 31
+        mod (xyToEt31_st st xy) 31
         -- what the key represents currently
       pcThen :: Maybe PitchClass =
         ledBecause_toPitchClass (_stLit st) $ LedBecauseSwitch xy

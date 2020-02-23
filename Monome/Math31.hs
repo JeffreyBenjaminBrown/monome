@@ -6,6 +6,7 @@
 module Monome.Math31 (
     et31ToFreq      -- ^ Pitch -> Float
   , xyToEt31        -- ^ (X,Y) -> Pitch
+  , xyToEt31_st
   , et31ToLowXY     -- ^ PitchClass -> (X,Y)
   , enharmonicToXYs -- ^ (X,Y) -> [(X,Y)]
   , pcToXys         -- ^ PitchClass -> (X,Y) -> [(X,Y)]
@@ -24,6 +25,11 @@ et31ToFreq f = 2**(fi f / 31)
 -- (notice the 0 at the end).
 xyToEt31 :: (X,Y) -> Pitch
 xyToEt31 (x,y) = 6 * x + y
+
+xyToEt31_st :: St -> (X,Y) -> Pitch
+xyToEt31_st st xy =
+  xyToEt31 $ addPair xy $ negPair $ _stXyShift st
+
 
 -- | The numerically lowest (closest to the top-left corner)
 -- member of a pitch class, if the monome is not shifted (modulo octaves).
