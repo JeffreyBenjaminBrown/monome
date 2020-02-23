@@ -12,6 +12,7 @@ import qualified Data.Set as S
 import Monome.Math31
 import Monome.Types.Button
 import Monome.Types.Initial
+import Monome.Util
 import Monome.Window.Keyboard as K
 import Monome.Window.Shift    as Sh
 import Monome.Window.Sustain  as Su
@@ -31,7 +32,7 @@ st0 = St {
     _stVoices = mempty
   , _stPending_Monome = []
   , _stPending_Vivid = []
-  , _stXyShift = (0,0)
+  , _stXyShift = (3,5)
   , _stFingers = mempty
   , _stLit = mempty
   , _stSustainOn = False
@@ -50,26 +51,28 @@ st0 = St {
 
 test_shiftHandler :: Test
 test_shiftHandler = TestCase $ do
-  let st :: St = st0 { _stLit =
-                       M.singleton 0 $ S.singleton LedBecauseAnchor }
+  let st :: St = -- we need a lit `PitchClass` to move
+        st0 & stLit .~ M.singleton 0 (S.singleton LedBecauseAnchor)
   assertBool "releasing a shift button does nothing" $
     Sh.handler st (meh, False) =^= st
-  assertBool "shift the notes one space closer to player's body" $
-    let nudge :: (X,Y) = Sh.shift Sh.downArrow
-        msgs :: [LedMsg] = map (K.label,)
-                           $  map (,False) (pcToXys (0,0) 0)
-                           ++ map (,True)  (pcToXys nudge 0)
+  assertBool "shift the notes one space closer to player's body" $ let
+    oldShift = _stXyShift st
+    newShift = addPair oldShift $ Sh.shift Sh.downArrow
+    msgs :: [LedMsg] = map (K.label,)
+      $  map (,False) (pcToXys oldShift 0)
+      ++ map (,True)  (pcToXys newShift 0)
     in Sh.handler st (Sh.downArrow, True) =^=
        st { _stPending_Monome = msgs
-          , _stXyShift = nudge }
-  assertBool "shift the notes an octave higher" $
-    let nudge :: (X,Y) = Sh.shift Sh.upOctave
-        msgs :: [LedMsg] = map (K.label,)
-          $  map (,False) (pcToXys (0,0) 0)
-          ++ map (,True)  (pcToXys nudge 0)
+          , _stXyShift = newShift }
+  assertBool "shift the notes an octave higher" $ let
+    oldShift = _stXyShift st
+    newShift = addPair oldShift $ Sh.shift Sh.upOctave
+    msgs :: [LedMsg] = map (K.label,)
+      $  map (,False) (pcToXys oldShift 0)
+      ++ map (,True)  (pcToXys newShift 0)
     in Sh.handler st (Sh.upOctave, True) =^=
        st { _stPending_Monome = msgs
-          , _stXyShift = nudge }
+          , _stXyShift = newShift }
 
 test_sustainHandler :: Test
 test_sustainHandler = TestCase $ do
