@@ -33,6 +33,14 @@ test_toggleSustain = TestCase $ do
     toggleSustain st_0f =^=
     ( st_0f & ( stLit . at pc0 . _Just %~ S.insert LedBecauseSustain )
       & stSustained .~ Just (S.singleton v0 ) )
+  assertBool "turn sustain off" $
+    toggleSustain st_0s
+    =^= ( st_0s & stLit .~ mempty
+          & stSustained .~ Nothing )
+  assertBool "turn sustain off, but finger persists" $
+    toggleSustain st_0fs
+    =^= ( st_0fs & stLit . at pc0 . _Just %~ S.delete LedBecauseSustain
+          & stSustained .~ Nothing )
 
 test_deleteOneSustainedNote_and_insertOneSustainedNote :: Test
 test_deleteOneSustainedNote_and_insertOneSustainedNote = TestCase $ do
@@ -82,15 +90,15 @@ test_sustainHandler = TestCase $ do
           & stSustained .~ Just ( S.fromList [ (0,0)
                                              , (0,1) ] )
     in Su.handler st_0f' (meh, True)
-       =^=  ( st_0f'
-              & stSustained .~ mempty
-              & stLit .~ M.singleton 0 (S.singleton $
-                                        LedBecauseSwitch xy0 )
-              & stPending_Monome .~
-              ( ( Su.label, (Su.theButton, False)) :
-                map (\xy -> (K.label, (xy, False)))
-                (pcToXys (_stXyShift st_0f') 1) )
-              & stPending_Vivid .~ [ SoundMsg { _soundMsgVoiceId = (0,1)
-                                              , _soundMsgPitch = Nothing
-                                              , _soundMsgVal = 0
-                                              , _soundMsgParam = "amp" } ] )
+    =^= ( st_0f'
+          & stSustained .~ mempty
+          & stLit .~ M.singleton 0 (S.singleton $
+                                    LedBecauseSwitch xy0 )
+          & stPending_Monome .~
+          ( ( Su.label, (Su.theButton, False)) :
+            map (\xy -> (K.label, (xy, False)))
+            (pcToXys (_stXyShift st_0f') 1) )
+          & stPending_Vivid .~ [ SoundMsg { _soundMsgVoiceId = (0,1)
+                                          , _soundMsgPitch = Nothing
+                                          , _soundMsgVal = 0
+                                          , _soundMsgParam = "amp" } ] )
