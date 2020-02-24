@@ -67,7 +67,6 @@ test_deleteOneSustainedNote_and_insertOneSustainedNote = TestCase $ do
   assertBool "if the anchor note is sustained, then upon releasing sustain, the anchor reemains as reason to light the key" $
     deleteOneSustainedNote pc lit_as == lit_a
 
-
 test_sustainHandler :: Test
 test_sustainHandler = TestCase $ do
   assertBool "releasing (not turning off) the sustain button has no effect"
@@ -97,7 +96,7 @@ test_sustainHandler = TestCase $ do
               & stPending_Monome .~
               ( ( Su.label, (Su.theButton, False)) :
                 map (\xy -> (K.label, (xy, False)))
-                (pcToXys (_stXyShift st_0fs_1s) 1) )
+                (pcToXys (_stXyShift st_0fs_1s) pc1) )
               & stPending_Vivid .~ [ SoundMsg { _soundMsgVoiceId = v1
                                               , _soundMsgPitch = Nothing
                                               , _soundMsgVal = 0
