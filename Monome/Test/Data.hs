@@ -35,7 +35,8 @@ pc1    :: PitchClass = mod pitch1 31
 
 st0 :: St
 st0 = St {
-    _stVoices = mempty
+    _stVoices = M.fromList [ (v0, Voice { _voicePitch = pitch0 } )
+                           , (v1, Voice { _voicePitch = pitch1 } ) ]
   , _stPending_Monome = []
   , _stPending_Vivid = []
   , _stXyShift = (3,5)
