@@ -66,6 +66,6 @@ updateVoice sdMsg st = let
 
 vid_to_pitch :: St -> VoiceId -> PitchClass
 vid_to_pitch st v = maybe
-  (error "pitchClassesToDarken_uponSustainOff: voice not found")
+  (error "vid_to_pitch: voice not found")
   (flip mod 31 . _voicePitch)
   $ M.lookup v (_stVoices st)
