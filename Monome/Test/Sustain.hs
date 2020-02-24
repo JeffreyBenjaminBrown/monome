@@ -67,6 +67,7 @@ test_deleteOneSustainedNote_and_insertOneSustainedNote = TestCase $ do
   assertBool "if the anchor note is sustained, then upon releasing sustain, the anchor reemains as reason to light the key" $
     deleteOneSustainedNote pc lit_as == lit_a
 
+
 test_sustainHandler :: Test
 test_sustainHandler = TestCase $ do
   assertBool "releasing (not turning off) the sustain button has no effect"
@@ -88,22 +89,17 @@ test_sustainHandler = TestCase $ do
                ++ "adds messages for the monome to turn off the sustain button and the keys that were sustained and are not fingered\n" ++
                " adds messages for Vivid to turn off any pitches from voices that were sustained and are not fingered\n" ++
                "Pitch 0 is fingered, and 0 and 1 sounding; 1 turns off.") $
-    let st_0f' = st_0f
-          & stLit .~
-          M.fromList [ (pc0, S.fromList [ LedBecauseSustain
-                                        , LedBecauseSwitch xy0 ] )
-                     , (pc1, S.fromList [ LedBecauseSustain ] ) ]
-          & stSustained .~ Just ( S.fromList [ v0, v1 ] )
-    in Su.handler st_0f' (meh, True)
-    =^= ( st_0f'
-          & stSustained .~ mempty
-          & stLit .~ M.singleton pc0 ( S.singleton $
-                                       LedBecauseSwitch xy0 )
-          & stPending_Monome .~
-          ( ( Su.label, (Su.theButton, False)) :
-            map (\xy -> (K.label, (xy, False)))
-            (pcToXys (_stXyShift st_0f') 1) )
-          & stPending_Vivid .~ [ SoundMsg { _soundMsgVoiceId = v1
-                                          , _soundMsgPitch = Nothing
-                                          , _soundMsgVal = 0
-                                          , _soundMsgParam = "amp" } ] )
+    let x = Su.handler st_0fs_1s (meh, True)
+        y = ( st_0fs_1s
+              & stSustained .~ mempty
+              & stLit .~ M.singleton pc0 ( S.singleton $
+                                           LedBecauseSwitch xy0 )
+              & stPending_Monome .~
+              ( ( Su.label, (Su.theButton, False)) :
+                map (\xy -> (K.label, (xy, False)))
+                (pcToXys (_stXyShift st_0fs_1s) 1) )
+              & stPending_Vivid .~ [ SoundMsg { _soundMsgVoiceId = v1
+                                              , _soundMsgPitch = Nothing
+                                              , _soundMsgVal = 0
+                                              , _soundMsgParam = "amp" } ] )
+    in x =^= y
