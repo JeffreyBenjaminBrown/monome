@@ -90,21 +90,20 @@ test_sustainHandler = TestCase $ do
                "Pitch 0 is fingered, and 0 and 1 sounding; 1 turns off.") $
     let st_0f' = st_0f
           & stLit .~
-          M.fromList [ (0, S.fromList [ LedBecauseSustain
-                                      , LedBecauseSwitch xy0 ] )
-                     , (1, S.fromList [ LedBecauseSustain ] ) ]
-          & stSustained .~ Just ( S.fromList [ (0,0)
-                                             , (0,1) ] )
+          M.fromList [ (pc0, S.fromList [ LedBecauseSustain
+                                        , LedBecauseSwitch xy0 ] )
+                     , (pc1, S.fromList [ LedBecauseSustain ] ) ]
+          & stSustained .~ Just ( S.fromList [ v0, v1 ] )
     in Su.handler st_0f' (meh, True)
     =^= ( st_0f'
           & stSustained .~ mempty
-          & stLit .~ M.singleton 0 (S.singleton $
-                                    LedBecauseSwitch xy0 )
+          & stLit .~ M.singleton pc0 ( S.singleton $
+                                       LedBecauseSwitch xy0 )
           & stPending_Monome .~
           ( ( Su.label, (Su.theButton, False)) :
             map (\xy -> (K.label, (xy, False)))
             (pcToXys (_stXyShift st_0f') 1) )
-          & stPending_Vivid .~ [ SoundMsg { _soundMsgVoiceId = (0,1)
+          & stPending_Vivid .~ [ SoundMsg { _soundMsgVoiceId = v1
                                           , _soundMsgPitch = Nothing
                                           , _soundMsgVal = 0
                                           , _soundMsgParam = "amp" } ] )
