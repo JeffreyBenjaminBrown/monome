@@ -1,4 +1,24 @@
 * TODO create voices on the fly
+** PITFALLS
+Create it before telling it to do something.
+  Or else create it with those parameters.
+Kill it after silencing it.
+** how: sub-tasks
+Monome.Util.nextVoice :: M.Map VoiceId a -> VoiceId
+** how: loops
+*** when a key is pressed
+It doesn't matter if anything is sustaining, chords are playing, etc.
+Get a new voiceId.
+Create a voice with that ID and default parameters.
+Send control messages as normal to it.
+*** when a key is released
+Look up whether it is sustained.
+If not, turn it off, then kill it.
+*** when a chord is sustained
+Nothing different?
+*** when a chord is released
+in addition to "off", send "kill"
+** optimize ? No need to turn it off.
 ** Vivid: voice creation, use and deletion
 use "synth" to make a synth, "free" to free it:
   s <- synth boop

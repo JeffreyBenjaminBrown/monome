@@ -13,6 +13,7 @@ import           Monome.Test.Data
 import           Monome.Types.Button
 import           Monome.Types.Initial
 import           Monome.Types.Window
+import           Monome.Util
 import           Monome.Window.Common
 
 
@@ -21,7 +22,15 @@ tests = TestList [
     TestLabel "testBelongsHere" testBelongsHere
   , TestLabel "testDependentPitchClass" testDependentPitchClass
   , TestLabel "test_keyMsg" test_keyMsg
+  , TestLabel "test_nextVoice" test_nextVoice
   ]
+
+test_nextVoice :: Test
+test_nextVoice = TestCase $ do
+  assertBool "next of mempty is (0,0)" $
+    nextVoice mempty == (0,0)
+  assertBool "after (0,0) is (1,0)" $
+    nextVoice (M.singleton (0,1) meh) == (1,0)
 
 test_keyMsg :: Test
 test_keyMsg = TestCase $ do
