@@ -11,6 +11,7 @@ if that voice is sustained, that key cannot sound a new note,
 even when it no longer represents the same pitch.
 ** ? or at all
 * TODO features
+** timbre control, store timbre
 ** two keyboards, split keyboard
 ** sustain: two buttons, "add these" and "release all"
 "add these" has on/off state, stays in effect until it is released.
@@ -18,7 +19,7 @@ even when it no longer represents the same pitch.
 ** store pitchsets from sustain
 ** transpose {pitchsets, ongoing notes, either keyboard}
 ** make pitchsets available on a per-degree basis
-** timbre the board
+** ? timbre-xy interaction
 higher tones are harsher
 rightward tones are (warblier?)
 ** redraw the whole screen often

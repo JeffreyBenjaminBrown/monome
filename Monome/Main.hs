@@ -35,18 +35,20 @@ initialPitch = 50
 et31 :: Int -- ^ The monome address, as serialoscd reports on startup.
      -> IO St
 et31 monomePort = do
-  inbox :: Socket <- receivesAt "127.0.0.1" 8000
+  inbox :: Socket <-
+    receivesAt "127.0.0.1" 8000
     -- I don't know why it's port 8000, or why it used to be 11111.
-  toMonome :: Socket <- sendsTo (unpack localhost) monomePort
+  toMonome :: Socket <-
+    sendsTo (unpack localhost) monomePort
     -- to find the port number above, use the first part of HandTest.hs
   voices :: M.Map VoiceId Voice <-
+    -- `mempty` in `defaultVoiceState is inaccurate. Initially each voice has
+    -- amp 0 and freq 100, because those ares the `Boop` defaults.
+    -- Since none are sounding, I don't think it matters.
     let voiceIds = [(a,b) | a <- [0..15], b <- [0..15]]
         defaultVoiceState s = Voice { _voiceSynth = s
                                     , _voicePitch = initialPitch
                                     , _voiceParams = mempty }
-          -- `mempty` above is inaccurate -- initially each voice has
-          -- amp 0 and freq 100, because those ares the `Boop` defaults.
-          -- Since none are sounding, I don't think it matters.
     in M.fromList . zip voiceIds . map defaultVoiceState
        <$> mapM (synth boop) (replicate 256 ())
   mst <- newMVar $ St {
@@ -64,8 +66,8 @@ et31 monomePort = do
     }
 
   initAllWindows mst
-
-  responder <- forkIO $ forever $ do
+  responder <-
+    forkIO $ forever $ do -- forever is inaccurate; `loop` below can kill it
     decodeOSC <$> recv inbox 4096 >>= \case
       Left text -> putStrLn . show $ text
       Right osc -> let switch = readSwitchOSC osc
@@ -75,12 +77,10 @@ et31 monomePort = do
         getChar >>= \case
         'q' -> do -- quit
           close inbox
-          mapM_ (free . (^. voiceSynth)) (M.elems voices)
-            -- TODO Once `voices` are dynamic,
-            -- this should read that value from `mst`.
           killThread responder
           st <- readMVar mst
-          _ <- send toMonome $ allLedOsc "/monome" False
+          mapM_ (free . (^. voiceSynth)) (M.elems $ _stVoices st)
+          _ <- send (_stToMonome st) $ allLedOsc "/monome" False
           return $ st { _stVoices = mempty }
         _   -> loop
     in putStrLn "press 'q' to quit"
