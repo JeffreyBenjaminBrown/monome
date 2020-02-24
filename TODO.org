@@ -11,11 +11,13 @@ if that voice is sustained, that key cannot sound a new note,
 even when it no longer represents the same pitch.
 ** ? or at all
 * TODO features
-** two keyboards
+** two keyboards, split keyboard
 ** sustain: two buttons, "add these" and "release all"
-"add these" stays in effect until it is released.
-"release all" works as soon as it's touched; holding on it does nothing.
-** store chords
+"add these" has on/off state, stays in effect until it is released.
+"release all" has no state -- it fires as soon as it's touched, and holding it does nothing.
+** store pitchsets from sustain
+** transpose {pitchsets, ongoing notes, either keyboard}
+** make pitchsets available on a per-degree basis
 ** timbre the board
 higher tones are harsher
 rightward tones are (warblier?)
@@ -24,22 +26,14 @@ rightward tones are (warblier?)
 Dropped messages to LEDs stop being a (hypothetical) problem.
 Shading on both monomes becomes easier.
 ** flash the anchor
-** sustain to middle of bottom, and duplicate at both top corners
-so that usually something can touch it
-** add to ongoing sustained group
-** transpose ongoing notes
-** save to chord bank from sustain
-** sustain these and future
-This is what most piano sustain pedals do.
-** loop bank
-** volume control for sustained notes
-** timbre
-** split keyboard
+** volume, timbre control for {sustained notes, either keyboard}
 ** reset buttons
 *** silence all voices
 *** redraw entire grid
-*** restore shift to 1
+*** ? restore shift to identity vector
 to remove floating point error
+** sustain to middle of bottom, and duplicate at both top corners
+so that usually something can touch it
 * infrastructure
 ** add tests
 *** TODO test multiple handlers
@@ -50,11 +44,7 @@ to remove floating point error
 ** LedBecause: maybe don't distinguish between keys and sustain
  just use VoiceId
 * Montevideo - Monome Tidal Vivid
-** Things to represent on the monome
-synth param
-rhythm
-chord
-melody
+esp. for looping
 * separate projects
 ** separate Vivid.Jbb from Vivid
 this will make starting the repl faster
