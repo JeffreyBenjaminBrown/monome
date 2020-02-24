@@ -83,12 +83,12 @@ pitchClassesToDarken_uponSustainOff oldSt newSt =
       S.map (vid_to_pitch oldSt) $ voicesToSilence_uponSustainOff oldSt
 
 voicesToSilence_uponSustainOff :: St -> Set VoiceId
-voicesToSilence_uponSustainOff oldSt = let
-  wereSustained :: Set VoiceId =
-    maybe mempty id $ _stSustained oldSt
-  wereFingered :: Set VoiceId = -- could also call this "areFingered"
-    S.fromList $ M.keys $ _stFingers oldSt
-  in S.difference wereSustained wereFingered
+voicesToSilence_uponSustainOff st = let
+  sustained :: Set VoiceId =
+    maybe mempty id $ _stSustained st
+  fingered :: Set VoiceId =
+    S.fromList $ M.keys $ _stFingers st
+  in S.difference sustained fingered
 
 -- | When the sustain button is toggled --
 -- which happens only when it is pressed, not when it is released --
