@@ -25,7 +25,13 @@ tests = TestList [
   , TestLabel "test_deleteOneSustainedNote_and_insertOneSustainedNote"
     test_deleteOneSustainedNote_and_insertOneSustainedNote
   , TestLabel "test_toggleSustain" test_toggleSustain
+  , TestLabel "test_voicesToSilence_uponSustainOff" test_voicesToSilence_uponSustainOff
   ]
+
+test_voicesToSilence_uponSustainOff :: Test
+test_voicesToSilence_uponSustainOff = TestCase $ do
+  assertBool "Turn off sustain. Voice 0 is fingered, 1 is turned off." $
+    voicesToSilence_uponSustainOff st_0fs_1s == S.singleton v1
 
 test_toggleSustain :: Test
 test_toggleSustain = TestCase $ do

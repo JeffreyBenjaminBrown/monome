@@ -76,3 +76,6 @@ st_0fs = -- 0 is both fingered and sustained
 st_0af = -- 0 is both fingered and the anchor pitch
   st_0f & stLit . at pc0 . _Just
   %~ S.insert LedBecauseAnchor
+
+st_0fs_1s = -- 0 is both fingered and sustained, 1 is sustained
+  st_0fs & stSustained . _Just %~ S.insert v1

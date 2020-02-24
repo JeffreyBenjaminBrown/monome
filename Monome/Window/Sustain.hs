@@ -9,7 +9,8 @@ module Monome.Window.Sustain (
   , sustainWindow
   , theButton
 
-  , toggleSustain          -- ^ St -> St
+  , voicesToSilence_uponSustainOff -- ^ St -> Set VoiceId
+  , toggleSustain                  -- ^ St -> St
   , insertOneSustainedNote -- ^ PitchClass -> LitPitches -> LitPitches
   , deleteOneSustainedNote -- ^ PitchClass -> LitPitches -> LitPitches
   ) where
