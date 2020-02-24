@@ -1,48 +1,29 @@
-* TODO infrastructure
-** TODO add tests
-*** TODO test multiple handlers
-**** hold 2 notes, press sustain, shift, release one of them
-**** hold 2 notes, press sustain, shift, release one of them, release sustain
-**** hold a note, shift, press another note, press sustain
-**** hold a note, shift, press another note, press sustain, release them
-** TODO improve representation
-*** LedBecause: maybe don't distinguish between keys and sustain,
-  just use VoiceId
-*** stFingers :: Map (X,Y) VoiceId
-*** stSustained :: S.Set VoiceID
-** redraw the whole screen often
-*** why
-Dropped messages to LEDs stop being a (hypothetical) problem.
-Shading on both monomes becomes easier.
-** create voices on the fly
-*** Vivid: voice creation, use and deletion
+* TODO create voices on the fly
+** Vivid: voice creation, use and deletion
 use "synth" to make a synth, "free" to free it:
   s <- synth boop
   set s (toI f :: I "amp")
   free s
-* TODO bugfix
-** TODO sustained pitches should not disable keys
-*** after spatial drift
+* TODO sustained pitches should not disable keys
+** after spatial drift
 Currently, because each voice is identified with a key,
 if that voice is sustained, that key cannot sound a new note,
 even when it no longer represents the same pitch.
-*** ? or at all
+** ? or at all
 * TODO features
-** TODO timbre the board
-higher tones are harsher
-rightward tones are (warblier?)
-** TODO flash the anchor
-** TODO sustain: two buttons, "add these" and "release all"
+** two keyboards
+** sustain: two buttons, "add these" and "release all"
 "add these" stays in effect until it is released.
 "release all" works as soon as it's touched; holding on it does nothing.
-** TODO store chords
-* Montevideo - Monome Tidal Vivid
-** Things to represent on the monome
-synth param
-rhythm
-chord
-melody
-* features
+** store chords
+** timbre the board
+higher tones are harsher
+rightward tones are (warblier?)
+** redraw the whole screen often
+*** why
+Dropped messages to LEDs stop being a (hypothetical) problem.
+Shading on both monomes becomes easier.
+** flash the anchor
 ** sustain to middle of bottom, and duplicate at both top corners
 so that usually something can touch it
 ** add to ongoing sustained group
@@ -59,6 +40,21 @@ This is what most piano sustain pedals do.
 *** redraw entire grid
 *** restore shift to 1
 to remove floating point error
+* infrastructure
+** add tests
+*** TODO test multiple handlers
+**** hold 2 notes, press sustain, shift, release one of them
+**** hold 2 notes, press sustain, shift, release one of them, release sustain
+**** hold a note, shift, press another note, press sustain
+**** hold a note, shift, press another note, press sustain, release them
+** LedBecause: maybe don't distinguish between keys and sustain
+ just use VoiceId
+* Montevideo - Monome Tidal Vivid
+** Things to represent on the monome
+synth param
+rhythm
+chord
+melody
 * separate projects
 ** separate Vivid.Jbb from Vivid
 this will make starting the repl faster
