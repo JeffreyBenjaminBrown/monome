@@ -6,8 +6,9 @@
 module Monome.Window.Common (
     ledBecause_toPitchClass -- ^ LitPitches -> LedBecause -> Maybe PitchClass
   , silenceMsg              -- ^ (X,Y) -> SoundMsg
-  , keyMsg                -- ^ St -> ((X,Y), Switch) -> [SoundMsg]
+  , keyMsg                  -- ^ St -> ((X,Y), Switch) -> [SoundMsg]
   , updateVoice             -- ^ SoundMsg -> St -> St
+  , vid_to_pitch            -- ^ St -> VoiceId -> PitchClass
   ) where
 
 import           Prelude hiding (pred)
@@ -62,3 +63,9 @@ updateVoice sdMsg st = let
             Just p -> stVoices . at vid . _Just
                       %~ (voicePitch                     .~ p)
                       .  (voiceParams . at param . _Just .~ f)
+
+vid_to_pitch :: St -> VoiceId -> PitchClass
+vid_to_pitch st v = maybe
+  (error "pitchClassesToDarken_uponSustainOff: voice not found")
+  (flip mod 31 . _voicePitch)
+  $ M.lookup v (_stVoices st)

@@ -24,7 +24,15 @@ tests = TestList [
     TestLabel "test_sustainHandler" test_sustainHandler
   , TestLabel "test_deleteOneSustainedNote_and_insertOneSustainedNote"
     test_deleteOneSustainedNote_and_insertOneSustainedNote
+  , TestLabel "test_toggleSustain" test_toggleSustain
   ]
+
+test_toggleSustain :: Test
+test_toggleSustain = TestCase $ do
+  assertBool "turn sustain on" $
+    toggleSustain st_0f =^=
+    ( st_0f & ( stLit . at pc0 . _Just %~ S.insert LedBecauseSustain )
+      & stSustained .~ Just (S.singleton v0 ) )
 
 test_deleteOneSustainedNote_and_insertOneSustainedNote :: Test
 test_deleteOneSustainedNote_and_insertOneSustainedNote = TestCase $ do

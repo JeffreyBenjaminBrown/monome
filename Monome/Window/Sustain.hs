@@ -9,6 +9,7 @@ module Monome.Window.Sustain (
   , sustainWindow
   , theButton
 
+  , toggleSustain          -- ^ St -> St
   , insertOneSustainedNote -- ^ PitchClass -> LitPitches -> LitPitches
   , deleteOneSustainedNote -- ^ PitchClass -> LitPitches -> LitPitches
   ) where
@@ -46,7 +47,7 @@ handler :: St
         -> St
 handler    st    (_ , False)      = st
 handler    st    (_,  True)      = let
-  st1 = updateSt st
+  st1 = toggleSustain st
   kbdMsgs :: [LedMsg] =
     if null $ _stSustained st1
     then map ( (Kbd.label,) . (,False) ) $
@@ -78,13 +79,8 @@ pitchClassesToDarken_uponSustainOff oldSt newSt =
       Just s -> if null s
         then error "pitchClassesToDarken_uponSustainOff: null value in LitPitches."
         else True
-    voicesToSilence_pcs :: Set PitchClass = let
-      vid_to_pitch :: VoiceId -> PitchClass
-      vid_to_pitch v = maybe
-        (error "pitchClassesToDarken_uponSustainOff: voice not found")
-        (flip mod 31 . _voicePitch)
-        $ M.lookup v (_stVoices oldSt)
-      in S.map vid_to_pitch $ voicesToSilence_uponSustainOff oldSt
+    voicesToSilence_pcs :: Set PitchClass =
+      S.map (vid_to_pitch oldSt) $ voicesToSilence_uponSustainOff oldSt
 
 voicesToSilence_uponSustainOff :: St -> Set VoiceId
 voicesToSilence_uponSustainOff oldSt = let
@@ -96,10 +92,10 @@ voicesToSilence_uponSustainOff oldSt = let
 
 -- | When the sustain button is toggled --
 -- which happens only when it is pressed, not when it is released --
--- the sustainOn value flips, the set of sustained pitches changes,
+-- the set of sustained pitches changes
 -- and the set of lit keys gains new reasons to be lit.
-updateSt :: St -> St
-updateSt st = let
+toggleSustain :: St -> St
+toggleSustain st = let
   sustainOn' :: Bool = -- new sustain state
     not $ isJust $ _stSustained st
   sustainedVs :: Maybe (Set VoiceId) =
@@ -108,10 +104,11 @@ updateSt st = let
 
   lit' | sustainOn' =
          foldr insertOneSustainedNote (_stLit st)
-         $ map snd $ M.elems $ _stFingers st
+         $ map (vid_to_pitch st)
+         $ M.elems $ _stFingers st
        | otherwise =
          foldr deleteOneSustainedNote (_stLit st)
-         $ S.toList $ S.map snd
+         $ map (vid_to_pitch st) $ S.toList
          $ maybe (error "impossible") id $ _stSustained st
   in st { _stSustained = sustainedVs
         , _stLit       = lit'      }
