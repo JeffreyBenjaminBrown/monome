@@ -36,8 +36,8 @@ test_keyMsg :: Test
 test_keyMsg = TestCase $ do
   let sustainedVoice :: VoiceId = (0,0)
       newVoice :: VoiceId = (0,1)
-      st = st0 { _stSustained =
-                 Just $ S.singleton sustainedVoice }
+      st = st0_2voices_35shift {
+        _stSustained = Just $ S.singleton sustainedVoice }
       newPitch = xyToEt31_st st newVoice
   assertBool "pressing a key that's sustained has no effect" $
     keyMsg st (sustainedVoice, True) == []

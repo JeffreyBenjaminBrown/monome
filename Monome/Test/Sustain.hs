@@ -70,7 +70,7 @@ test_deleteOneSustainedNote_and_insertOneSustainedNote = TestCase $ do
 test_sustainHandler :: Test
 test_sustainHandler = TestCase $ do
   assertBool "releasing (not turning off) the sustain button has no effect"
-    $ Su.handler (meh , False) st0 =^= st0
+    $ Su.handler (meh , False) st0_2voices_35shift =^= st0_2voices_35shift
 
   assertBool "turning ON sustain changes the sustain state, the set of sustained voices, the set of reasons for keys to be lit, and the messages pending to the monome." $
     Su.handler (meh, True) st_0f

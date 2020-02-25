@@ -5,6 +5,7 @@
 module Monome.Test.Data where
 
 import           Control.Lens
+import           Data.List
 import qualified Data.Map as M
 import qualified Data.Set as S
 
@@ -24,29 +25,38 @@ meh = error "not relevant to this test"
   , _stLit x            == _stLit y
   , _stSustained x      == _stSustained y]
 
+st0 :: St
+st0 = St {
+    _stWindowLayers   = meh
+  , _stToMonome       = meh
+  , _stVoices         = mempty
+  , _stPending_Monome = []
+  , _stPending_Vivid  = []
+  , _stXyShift        = (0,0)
+  , _stFingers        = mempty
+  , _stLit            = mempty
+  , _stSustained      = Nothing
+  }
+
 v0     :: VoiceId    = (0,0)
 v1     :: VoiceId    = (0,1)
 xy0    :: (X,Y)      = v0
 xy1    :: (X,Y)      = v1
-pitch0 :: Pitch      = xyToEt31_st st0 xy0
-pitch1 :: Pitch      = xyToEt31_st st0 xy1
+pitch0 :: Pitch      = xyToEt31_st st0_2voices_35shift xy0
+pitch1 :: Pitch      = xyToEt31_st st0_2voices_35shift xy1
 pc0    :: PitchClass = mod pitch0 31
 pc1    :: PitchClass = mod pitch1 31
 
-st0 :: St
-st0 = St {
-    _stVoices = M.fromList [ (v0, Voice { _voicePitch = pitch0 } )
-                           , (v1, Voice { _voicePitch = pitch1 } ) ]
-  , _stPending_Monome = []
-  , _stPending_Vivid = []
-  , _stXyShift = (3,5)
-  , _stFingers = mempty
-  , _stLit = mempty
-  , _stSustained = Nothing
-  }
+st0_2voices_35shift :: St
+st0_2voices_35shift =
+  st0 { _stVoices = let v = Voice { _voiceSynth = Left ()
+                                  , _voiceParams = mempty }
+          in M.fromList [ (v0, v & voicePitch .~ pitch0)
+                        , (v1, v & voicePitch .~ pitch1) ]
+      , _stXyShift = (3,5) }
 
 printSt :: St -> IO ()
-printSt = mapM_ putStrLn . showSt
+printSt = mapM_ putStrLn . intersperse "" . showSt
 
 showSt :: St -> [String]
 showSt st = [
@@ -59,21 +69,21 @@ showSt st = [
   , "Sustained: "      ++ show (_stSustained st) ]
 
 st_0a = -- 0 is the anchor pitch
-  st0 & stLit %~ M.insert pc0 (S.singleton LedBecauseAnchor)
+  st0_2voices_35shift & stLit %~ M.insert pc0 (S.singleton LedBecauseAnchor)
 
 st_0f = -- fingering key 0 only
-  st0 & stFingers .~ M.fromList [ (xy0, v0) ]
+  st0_2voices_35shift & stFingers .~ M.fromList [ (xy0, v0) ]
   & stLit .~  M.fromList
   [ ( pc0, S.singleton $ LedBecauseSwitch xy0) ]
 
 st_0s = -- sustaining key 0 only
-  st0
+  st0_2voices_35shift
   & stLit .~  M.singleton pc0
   (S.singleton LedBecauseSustain)
   & stSustained .~ Just (S.singleton v0)
 
 st_01f = -- fingering keys 0 and 1
-  st0 & stFingers .~ M.fromList [ (xy0, v0)
+  st0_2voices_35shift & stFingers .~ M.fromList [ (xy0, v0)
                                 , (xy1, v1) ]
   & stLit .~ M.fromList
   [ ( pc0, S.singleton $ LedBecauseSwitch xy0)
