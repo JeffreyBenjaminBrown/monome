@@ -1,10 +1,14 @@
+* TODO replace error with either in vid_to_pitch
 * TODO solve, then test : hold a note, press sustain, release the note
 ** TODO lets try getting all the way there with handlers
-+f = (1,15) -- key to play
-+st0_f     = st0    & K.handler (f,True) -- finger on
-+st0_fs    = st0_f  & Su.handler (meh,True) -- sustain off
-+st0_fs_rf = st0_fs & K.handler (f,True) -- finger off
-+(x,y,z) = (st0_f, st0_fs, st0_fs_rf)
+add this code to Test/Windows.sh:
+
+import Monome.Window.Sustain  as Su
+f = (1,15) -- key to play
+st0_f     = st0    & K.handler (f,True) -- finger on
+st0_fs    = st0_f  & Su.handler (meh,True) -- sustain off
+st0_fs_rf = st0_fs & K.handler (f,True) -- finger off
+(x,y,z) = (st0_f, st0_fs, st0_fs_rf)
 ** buggy _stLit when (live) I finger a note and then sustain it
 > printSt st_fs
 Voices: []                                                                     Pending_Monome: []

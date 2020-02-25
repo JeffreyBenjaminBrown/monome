@@ -6,6 +6,7 @@ module Monome.Test.Windows where
 import Test.HUnit
 
 import           Control.Lens
+import           Data.Either
 import qualified Data.Map as M
 import qualified Data.Set as S
 
@@ -28,7 +29,8 @@ tests = TestList [
 test_shiftHandler :: Test
 test_shiftHandler = TestCase $ do
   assertBool "releasing a shift button does nothing" $
-    Sh.handler (meh, False) st_0a =^= st_0a
+    fromRight meh (Sh.handler (meh, False) st_0a)
+    =^= st_0a
 
   assertBool "shift the notes one space closer to player's body" $ let
     oldShift = _stXyShift st_0a
@@ -36,9 +38,9 @@ test_shiftHandler = TestCase $ do
     msgs :: [LedMsg] = map (K.label,)
       $  map (,False) (pcToXys oldShift pc0)
       ++ map (,True)  (pcToXys newShift pc0)
-    in Sh.handler (Sh.downArrow, True) st_0a
-    =^= st_0a { _stPending_Monome = msgs
-              , _stXyShift = newShift }
+    in fromRight meh (Sh.handler (Sh.downArrow, True) st_0a)
+       =^= st_0a { _stPending_Monome = msgs
+                 , _stXyShift = newShift }
 
   assertBool "shift the notes an octave higher" $ let
     oldShift = _stXyShift st_0a
@@ -46,9 +48,9 @@ test_shiftHandler = TestCase $ do
     msgs :: [LedMsg] = map (K.label,)
       $  map (,False) (pcToXys oldShift pc0)
       ++ map (,True)  (pcToXys newShift pc0)
-    in Sh.handler (Sh.upOctave, True) st_0a =^=
-       st_0a { _stPending_Monome = msgs
-             , _stXyShift = newShift }
+    in fromRight meh (Sh.handler (Sh.upOctave, True) st_0a)
+       =^= st_0a { _stPending_Monome = msgs
+                 , _stXyShift = newShift }
 
 test_keyboardHandler :: Test
 test_keyboardHandler = TestCase $ do
@@ -65,22 +67,23 @@ test_keyboardHandler = TestCase $ do
                              , SoundMsgFree v1 ]
     in do
     assertBool "releasing a key sends off-messages to monome" $
-      _stPending_Monome (K.handler (xy1, False) st_01f)
+      _stPending_Monome (fromRight meh $ K.handler (xy1, False) st_01f)
       == _stPending_Monome st_01f_r1
     assertBool "releasing a key sends off-messages to Vivid" $
-      _stPending_Vivid (K.handler (xy1, False) st_01f)
+      _stPending_Vivid (fromRight meh $ K.handler (xy1, False) st_01f)
       == _stPending_Vivid st_01f_r1
     assertBool "releasing a key removes something from _stFingers" $
-      _stFingers (K.handler (xy1, False) st_01f)
+      _stFingers (fromRight meh $ K.handler (xy1, False) st_01f)
       == _stFingers st_01f_r1
     assertBool "releasing a key removes somehing from _stLit" $
-      _stLit (K.handler (xy1, False) st_01f)
+      _stLit (fromRight meh $ K.handler (xy1, False) st_01f)
       == _stLit st_01f_r1
     assertBool "releasing a key (all the above tests combined)" $
-      K.handler (xy1, False) st_01f =^= st_01f_r1
+      fromRight meh (K.handler (xy1, False) st_01f)
+      =^= st_01f_r1
 
   assertBool "releasing a key that's also the anchor pitch sends no monome messages" $
-    K.handler (xy0, False) st_0af
+    fromRight meh (K.handler (xy0, False) st_0af)
     =^= ( st_0af
           & ( stLit . at pc0 . _Just
               .~ S.singleton LedBecauseAnchor )
@@ -93,20 +96,20 @@ test_keyboardHandler = TestCase $ do
                                , SoundMsgFree v0 ] )
 
   assertBool "releasing a key that's a sustained voice sends no vivid or monome messages, but updates lit and fingers" $
-    K.handler (xy0, False) st_0fs
+    fromRight meh (K.handler (xy0, False) st_0fs)
     =^= ( st_0fs
           & ( stLit . at pc0 . _Just
               .~ S.singleton LedBecauseSustain )
           & stFingers .~ mempty )
 
   assertBool "pressing a key that's a sustained voice updates stFingers and stLit" $
-    K.handler (xy0, True) st_0s
+    fromRight meh (K.handler (xy0, True) st_0s)
     =^= ( st_0s & ( stLit . at pc0 . _Just
                     %~ S.insert (LedBecauseSwitch xy0) )
           & stFingers .~ M.fromList [ (xy0,v0) ] )
 
   assertBool "pressing a key sends on-messages to monome, sends on-messages to Vivid, adds something to _stFingers, and asdds something from _stLit" $
-    K.handler (xy1, True) st_0f
+    fromRight meh (K.handler (xy1, True) st_0f)
     =^= ( st_01f
           & ( stPending_Monome .~
               map (\xy -> (K.label, (xy, True)) )

@@ -58,8 +58,8 @@ shiftWindow = Window {
   , windowHandler = handler
 }
 
-handler :: ((X,Y), Switch) -> St -> St
-handler    (_,  False)        st0 = st0
+handler :: ((X,Y), Switch) -> St -> Either String St
+handler    (_,  False)        st0 = Right st0
 handler    (xy, True )        st0 = let
   st' :: St = st0 & stXyShift %~ addPair (shift xy)
   lit :: [PitchClass] = M.keys $ _stLit st0
@@ -67,4 +67,4 @@ handler    (xy, True )        st0 = let
     map (Kbd.label,) $
     (map (,False) $ concatMap (pcToXys $ _stXyShift st0) lit) ++
     (map (,True)  $ concatMap (pcToXys $ _stXyShift st') lit)
-  in st' & stPending_Monome %~ flip (++) msgs
+  in Right $ st' & stPending_Monome %~ flip (++) msgs

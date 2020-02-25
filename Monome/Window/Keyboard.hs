@@ -43,7 +43,7 @@ keyboardWindow =  Window {
                   M.keys $ _stLit st )
   , windowHandler = handler }
 
-handler :: ((X,Y), Switch) -> St -> St
+handler :: ((X,Y), Switch) -> St -> Either String St
 handler    press @ (xy,sw)    st =
   let pcNow :: PitchClass =
         mod (xyToEt31_st st xy) 31
@@ -70,7 +70,7 @@ handler    press @ (xy,sw)    st =
         & stLit            .~ lit'
         & stPending_Monome %~ flip (++) kbdMsgs
         & stPending_Vivid  %~ flip (++) soundMsgs
-  in foldr updateVoice st1 soundMsgs
+  in Right $ foldr updateVoice st1 soundMsgs
 
 updateStLit :: ((X,Y), Switch)
        -> PitchClass       -- ^ what xy represents now

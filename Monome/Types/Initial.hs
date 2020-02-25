@@ -89,7 +89,7 @@ data Window = Window {
   , windowInit :: St -> St
   , windowHandler :: -- ^ Acts on messages from the monome.
       ((X,Y), Switch) -- ^ the incoming button press|release
-      -> St -> St
+      -> St -> Either String St
   }
 
 instance Eq Window where

@@ -6,6 +6,7 @@ module Monome.Test.Sustain where
 import Test.HUnit
 
 import           Control.Lens
+import           Data.Either
 import qualified Data.Map as M
 import           Data.Map (Map)
 import qualified Data.Set as S
@@ -36,15 +37,15 @@ test_voicesToSilence_uponSustainOff = TestCase $ do
 test_toggleSustain :: Test
 test_toggleSustain = TestCase $ do
   assertBool "turn sustain on" $
-    toggleSustain st_0f =^=
+    fromRight meh (toggleSustain st_0f) =^=
     ( st_0f & ( stLit . at pc0 . _Just %~ S.insert LedBecauseSustain )
       & stSustained .~ Just (S.singleton v0 ) )
   assertBool "turn sustain off" $
-    toggleSustain st_0s
+    fromRight meh (toggleSustain st_0s)
     =^= ( st_0s & stLit .~ mempty
           & stSustained .~ Nothing )
   assertBool "turn sustain off, but finger persists" $
-    toggleSustain st_0fs
+    fromRight meh (toggleSustain st_0fs)
     =^= ( st_0fs & stLit . at pc0 . _Just %~ S.delete LedBecauseSustain
           & stSustained .~ Nothing )
 
@@ -70,10 +71,11 @@ test_deleteOneSustainedNote_and_insertOneSustainedNote = TestCase $ do
 test_sustainHandler :: Test
 test_sustainHandler = TestCase $ do
   assertBool "releasing (not turning off) the sustain button has no effect"
-    $ Su.handler (meh , False) st0_2voices_35shift =^= st0_2voices_35shift
+    $ fromRight meh (Su.handler (meh , False) st0_2voices_35shift)
+    =^= st0_2voices_35shift
 
   assertBool "turning ON sustain changes the sustain state, the set of sustained voices, the set of reasons for keys to be lit, and the messages pending to the monome." $
-    Su.handler (meh, True) st_0f
+    fromRight meh (Su.handler (meh, True) st_0f)
     =^= st_0f { _stSustained = Just $ S.singleton v0
               , _stLit = M.singleton pc0 $
                          S.fromList [ LedBecauseSustain
@@ -97,14 +99,14 @@ test_sustainHandler = TestCase $ do
                              , SoundMsgFree v1 ]
     in do
     assertBool "turning sustain OFF remove all `LedBecauseSustain`s from reasons for lit keys" $
-      _stLit (Su.handler (meh, True) st_0fs_1s)
+      _stLit (fromRight meh $ Su.handler (meh, True) st_0fs_1s)
       == _stLit st_0fs_1s_sustainOff
     assertBool "turning sustain OFF adds messages for the monome to turn off the sustain button and the keys that were sustained and are not fingered" $
-      _stLit (Su.handler (meh, True) st_0fs_1s)
+      _stLit (fromRight meh $ Su.handler (meh, True) st_0fs_1s)
       == _stLit st_0fs_1s_sustainOff
     assertBool "turning sustain OFF adds messages for Vivid to turn off any pitches from voices that were sustained and are not fingered" $
-      _stPending_Vivid (Su.handler (meh, True) st_0fs_1s)
+      _stPending_Vivid (fromRight meh $ Su.handler (meh, True) st_0fs_1s)
       == _stPending_Vivid st_0fs_1s_sustainOff
     assertBool "turning sustain OFF (any remaining fields)" $
-      Su.handler (meh, True) st_0fs_1s
+      fromRight meh (Su.handler (meh, True) st_0fs_1s)
       =^= st_0fs_1s_sustainOff

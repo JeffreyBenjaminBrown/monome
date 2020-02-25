@@ -7,7 +7,7 @@ module Monome.Window.Common (
   , silenceMsg              -- ^ (X,Y) -> SoundMsg
   , keyMsg                  -- ^ St -> ((X,Y), Switch) -> [SoundMsg]
   , updateVoice             -- ^ SoundMsg -> St -> St
-  , vid_to_pitch            -- ^ St -> VoiceId -> PitchClass
+  , vid_to_pitch            -- ^ St -> VoiceId -> Either String PitchClass
   ) where
 
 import           Prelude hiding (pred)
@@ -69,8 +69,8 @@ updateVoice (SoundMsg sdMsg) st = let
 updateVoice _ st = st -- Making or freeing voices is handled in Types.Window,
                       -- because making a voice requires IO.
 
-vid_to_pitch :: St -> VoiceId -> PitchClass
-vid_to_pitch st v = maybe
-  (error "vid_to_pitch: voice not found")
-  (flip mod 31 . _voicePitch)
-  $ M.lookup v (_stVoices st)
+vid_to_pitch :: St -> VoiceId -> Either String PitchClass
+vid_to_pitch st vid = maybe
+  (Left $ "vid_to_pitch: voiceId " ++ show vid ++ " not found")
+  (Right . flip mod 31 . _voicePitch)
+  $ M.lookup vid (_stVoices st)
