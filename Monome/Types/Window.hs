@@ -26,6 +26,7 @@ import qualified Data.Map as M
 import           Vivid hiding (pitch, synth, Param)
 import qualified Vivid as V
 
+import Monome.Config
 import Monome.Network.Util
 import Monome.Synth.Boop
 import Monome.Types.Button
@@ -70,8 +71,9 @@ doSoundMessage :: St -> SoundMsg               -> IO St
 doSoundMessage    st    (SoundMsgCreate vid)    = do
   s <- V.synth boop ()
   return $ st & stVoices %~ M.insert vid
-    (Voice { _voiceSynth = s,
-             _voiceParams = mempty } )
+    (Voice { _voiceSynth = s
+           , _voicePitch = initialPitch
+           , _voiceParams = mempty } )
 doSoundMessage    st    (SoundMsgFree vid)      = do
   let mv = M.lookup vid $ _stVoices st
   case mv of

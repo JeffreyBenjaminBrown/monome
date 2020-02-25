@@ -98,13 +98,13 @@ voicesToSilence_uponSustainOff st = let
 -- and the set of lit keys gains new reasons to be lit.
 toggleSustain :: St -> St
 toggleSustain st = let
-  sustainOn' :: Bool = -- new sustain state
+  sustainOnNow :: Bool = -- new sustain state
     not $ isJust $ _stSustained st
   sustainedVs :: Maybe (Set VoiceId) =
-    if not sustainOn' then Nothing
+    if not sustainOnNow then Nothing
     else Just $ S.fromList $ M.elems $ _stFingers st
 
-  lit' | sustainOn' =
+  lit' | sustainOnNow =
          foldr insertOneSustainedNote (_stLit st)
          $ map (vid_to_pitch st)
          $ M.elems $ _stFingers st

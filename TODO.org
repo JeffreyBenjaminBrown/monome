@@ -1,3 +1,5 @@
+* TODO solve, then test
+** hold a note, press sustain, release the note
 * TODO create voices on the fly
 ** TODO use nextVoice
 Monome.Util.nextVoice :: M.Map VoiceId a -> VoiceId
