@@ -1,7 +1,11 @@
-* TODO find uninitialized fields
 * TODO solve, then test : hold a note, press sustain, release the note
-*** TODO lets try getting all the way there with handlers
-*** buggy _stLit when (live) I finger a note and then sustain it
+** TODO lets try getting all the way there with handlers
++f = (1,15) -- key to play
++st0_f     = st0    & K.handler (f,True) -- finger on
++st0_fs    = st0_f  & Su.handler (meh,True) -- sustain off
++st0_fs_rf = st0_fs & K.handler (f,True) -- finger off
++(x,y,z) = (st0_f, st0_fs, st0_fs_rf)
+** buggy _stLit when (live) I finger a note and then sustain it
 > printSt st_fs
 Voices: []                                                                     Pending_Monome: []
 Pending_Vivid: []
@@ -9,7 +13,7 @@ XyShift: (0,0)
 Fingers: fromList [((1,15),(1,15))]
 Lit: fromList [ (19,fromList [LedBecauseSustain]),
                 (21,fromList [LedBecauseSwitch (1,15)])]
-*** here, it looks like Kbd.handler does everything right
+** here, it looks like Kbd.handler does everything right
 If I start from synthetic data with 0 fingered and sustained,
 and then use the handler to release the finger.
 
