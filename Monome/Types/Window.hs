@@ -1,4 +1,3 @@
-{-# OPTIONS_GHC -fno-warn-missing-fields #-}
 {-# LANGUAGE DataKinds
 , ScopedTypeVariables #-}
 

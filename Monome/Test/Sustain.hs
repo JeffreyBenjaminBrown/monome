@@ -15,7 +15,6 @@ import Monome.Math31
 import Monome.Test.Data
 import Monome.Types.Button
 import Monome.Types.Initial
-import Monome.Window.Common
 import Monome.Window.Keyboard as K
 import Monome.Window.Sustain  as Su
 

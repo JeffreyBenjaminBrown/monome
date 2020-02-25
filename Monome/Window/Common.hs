@@ -1,5 +1,4 @@
 {-# OPTIONS_GHC -fno-warn-type-defaults #-}
-{-# OPTIONS_GHC -fno-warn-missing-fields #-}
 {-# LANGUAGE TupleSections
 , ScopedTypeVariables #-}
 
@@ -47,13 +46,14 @@ keyMsg st (xy, sw) = do
   if maybe False (S.member xy) $ _stSustained st
     then [] -- it's already sounding due to sustain
     else if sw
-         then let pm = ParamMsg { _paramMsgVoiceId = xy
-                                , _paramMsgPitch = Just pitch }
+         then let freqMsg = ParamMsg { _paramMsgVoiceId = xy
+                                     , _paramMsgPitch = Just pitch
+                                     , _paramMsgVal = 100 * et31ToFreq pitch
+                                     , _paramMsgParam = "freq" }
               in [ SoundMsgCreate xy -- PITFALL: Must come first.
-                 , SoundMsg $ pm & paramMsgVal .~ 100 * et31ToFreq pitch
-                                 & paramMsgParam .~ "freq"
-                 , SoundMsg $ pm & paramMsgVal .~ Config.voiceAmplitude
-                                 & paramMsgParam .~ "amp" ]
+                 , SoundMsg $ freqMsg
+                 , SoundMsg $ freqMsg & paramMsgVal .~ Config.voiceAmplitude
+                                      & paramMsgParam .~ "amp" ]
          else silenceMsg xy
 
 updateVoice :: SoundMsg -> St -> St
