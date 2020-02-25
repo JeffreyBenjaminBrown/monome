@@ -8,6 +8,11 @@ module Monome.Window.Keyboard (
     handler
   , keyboardWindow
   , label
+
+  , updateStLit -- ^ ((X,Y), Switch)
+    -- ^ PitchClass        -- ^ what xy represents now
+    -- -> Maybe PitchClass -- ^ what xy represented when it was last pressed
+    -- -> LitPitches -> LitPitches
   ) where
 
 import           Prelude hiding (pred)
@@ -51,10 +56,10 @@ handler    press @ (xy,sw)    st =
         True  -> M.insert xy xy $ _stFingers st
         False -> M.delete xy    $ _stFingers st
       lit' :: LitPitches = updateStLit (xy,sw) pcNow pcThen $ _stLit st
-      oldKeys :: Set PitchClass  = S.fromList $ M.keys $ _stLit st
-      newKeys :: Set PitchClass  = S.fromList $ M.keys $ lit'
-      toDark  ::    [PitchClass] = S.toList $ S.difference oldKeys newKeys
-      toLight ::    [PitchClass] = S.toList $ S.difference newKeys oldKeys
+      oldLitPcs :: Set PitchClass  = S.fromList $ M.keys $ _stLit st
+      newLitPcs :: Set PitchClass  = S.fromList $ M.keys $ lit'
+      toDark  ::    [PitchClass] = S.toList $ S.difference oldLitPcs newLitPcs
+      toLight ::    [PitchClass] = S.toList $ S.difference newLitPcs oldLitPcs
       kbdMsgs :: [LedMsg] =
         map (label,) $
         (map (,False) $ concatMap (pcToXys $ _stXyShift st) toDark) ++

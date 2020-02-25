@@ -1,5 +1,42 @@
-* TODO solve, then test
-** hold a note, press sustain, release the note
+* TODO ? Make the voiceSynth field a sum, Uninitialized | Voice.
+That way in `printSt` I could actually show the voice.
+* TODO solve, then test : hold a note, press sustain, release the note
+*** TODO lets try getting all the way there with handlers
+*** buggy _stLit when (live) I finger a note and then sustain it
+> printSt st_fs
+Voices: []                                                                     Pending_Monome: []
+Pending_Vivid: []
+XyShift: (0,0)
+Fingers: fromList [((1,15),(1,15))]
+Lit: fromList [ (19,fromList [LedBecauseSustain]),
+                (21,fromList [LedBecauseSwitch (1,15)])]
+*** here, it looks like Kbd.handler does everything right
+If I start from synthetic data with 0 fingered and sustained,
+and then use the handler to release the finger.
+
+st = Su.handler (meh , True) st_0f -- sustain on
+press@(xy,sw) = (xy0,False)              -- release finger.
+st' = K.handler (xy, sw) st        -- release finger.
+  -- Problem: Monome loses image, when it shouldn't.
+  -- Problem: pending_Monome is empty, when it shouldn't be.
+
+-- working through Kbd.handler
+pcNow = mod (xyToEt31_st st xy) 31
+pcThen :: Maybe PitchClass =
+  ledBecause_toPitchClass (_stLit st) $ LedBecauseSwitch xy
+fingers' = case sw of
+  True  -> M.insert xy xy $ _stFingers st
+  False -> M.delete xy    $ _stFingers st
+lit' :: LitPitches = updateStLit (xy,sw) pcNow pcThen $ _stLit st
+oldLitPcs :: Set PitchClass  = S.fromList $ M.keys $ _stLit st
+newLitPcs :: Set PitchClass  = S.fromList $ M.keys $ lit'
+toDark  ::    [PitchClass] = S.toList $ S.difference oldLitPcs newLitPcs
+toLight ::    [PitchClass] = S.toList $ S.difference newLitPcs oldLitPcs
+kbdMsgs :: [LedMsg] =
+  map (K.label,) $
+  (map (,False) $ concatMap (pcToXys $ _stXyShift st) toDark) ++
+  (map (,True)  $ concatMap (pcToXys $ _stXyShift st) toLight)
+soundMsgs :: [SoundMsg] = keyMsg st press
 * TODO create voices on the fly
 ** TODO use nextVoice
 Monome.Util.nextVoice :: M.Map VoiceId a -> VoiceId

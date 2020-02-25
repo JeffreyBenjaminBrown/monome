@@ -15,6 +15,7 @@ import Monome.Math31
 import Monome.Test.Data
 import Monome.Types.Button
 import Monome.Types.Initial
+import Monome.Window.Common
 import Monome.Window.Keyboard as K
 import Monome.Window.Sustain  as Su
 
@@ -108,4 +109,3 @@ test_sustainHandler = TestCase $ do
     assertBool "turning sustain OFF (any remaining fields)" $
       Su.handler (meh, True) st_0fs_1s
       =^= st_0fs_1s_sustainOff
-
