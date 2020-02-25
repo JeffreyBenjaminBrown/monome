@@ -45,6 +45,18 @@ st0 = St {
   , _stSustained = Nothing
   }
 
+printSt :: St -> IO ()
+printSt = mapM_ putStrLn . showSt
+
+showSt :: St -> [String]
+showSt st = [ "Voices: "         ++ show (_stVoices st)
+            , "Pending_Monome: " ++ show (_stPending_Monome st)
+            , "Pending_Vivid: "  ++ show (_stPending_Vivid st)
+            , "XyShift: "        ++ show (_stXyShift st)
+            , "Fingers: "        ++ show (_stFingers st)
+            , "Lit: "            ++ show (_stLit st)
+            , "Sustained: "      ++ show (_stSustained st) ]
+
 st_0a = -- 0 is the anchor pitch
   st0 & stLit %~ M.insert pc0 (S.singleton LedBecauseAnchor)
 

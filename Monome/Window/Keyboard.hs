@@ -75,8 +75,7 @@ updateStLit :: ((X,Y), Switch)
        -> LitPitches
        -> LitPitches
 
--- | When a button is newly pressed,
--- it adds anoother LedBecause to the LitPitches.
+-- | When a button is pressed, add an LedBecause to the LitPitches.
 updateStLit (xy,True) pcNow _ m =
   M.insert pcNow new m where
   new = case M.lookup pcNow m of
