@@ -28,7 +28,7 @@ tests = TestList [
 test_shiftHandler :: Test
 test_shiftHandler = TestCase $ do
   assertBool "releasing a shift button does nothing" $
-    Sh.handler st_0a (meh, False) =^= st_0a
+    Sh.handler (meh, False) st_0a =^= st_0a
 
   assertBool "shift the notes one space closer to player's body" $ let
     oldShift = _stXyShift st_0a
@@ -36,7 +36,7 @@ test_shiftHandler = TestCase $ do
     msgs :: [LedMsg] = map (K.label,)
       $  map (,False) (pcToXys oldShift pc0)
       ++ map (,True)  (pcToXys newShift pc0)
-    in Sh.handler st_0a (Sh.downArrow, True)
+    in Sh.handler (Sh.downArrow, True) st_0a
     =^= st_0a { _stPending_Monome = msgs
               , _stXyShift = newShift }
 
@@ -46,7 +46,7 @@ test_shiftHandler = TestCase $ do
     msgs :: [LedMsg] = map (K.label,)
       $  map (,False) (pcToXys oldShift pc0)
       ++ map (,True)  (pcToXys newShift pc0)
-    in Sh.handler st_0a (Sh.upOctave, True) =^=
+    in Sh.handler (Sh.upOctave, True) st_0a =^=
        st_0a { _stPending_Monome = msgs
              , _stXyShift = newShift }
 
@@ -65,22 +65,22 @@ test_keyboardHandler = TestCase $ do
                              , SoundMsgFree v1 ]
     in do
     assertBool "releasing a key sends off-messages to monome" $
-      _stPending_Monome (K.handler st_01f (xy1, False))
+      _stPending_Monome (K.handler (xy1, False) st_01f)
       == _stPending_Monome st_01f_r1
     assertBool "releasing a key sends off-messages to Vivid" $
-      _stPending_Vivid (K.handler st_01f (xy1, False))
+      _stPending_Vivid (K.handler (xy1, False) st_01f)
       == _stPending_Vivid st_01f_r1
     assertBool "releasing a key removes something from _stFingers" $
-      _stFingers (K.handler st_01f (xy1, False))
+      _stFingers (K.handler (xy1, False) st_01f)
       == _stFingers st_01f_r1
     assertBool "releasing a key removes somehing from _stLit" $
-      _stLit (K.handler st_01f (xy1, False))
+      _stLit (K.handler (xy1, False) st_01f)
       == _stLit st_01f_r1
     assertBool "releasing a key (all the above tests combined)" $
-      K.handler st_01f (xy1, False) =^= st_01f_r1
+      K.handler (xy1, False) st_01f =^= st_01f_r1
 
   assertBool "releasing a key that's also the anchor pitch sends no monome messages" $
-    K.handler st_0af (xy0, False)
+    K.handler (xy0, False) st_0af
     =^= ( st_0af
           & ( stLit . at pc0 . _Just
               .~ S.singleton LedBecauseAnchor )
@@ -93,20 +93,20 @@ test_keyboardHandler = TestCase $ do
                                , SoundMsgFree v0 ] )
 
   assertBool "releasing a key that's a sustained voice sends no vivid or monome messages, but updates lit and fingers" $
-    K.handler st_0fs (xy0, False)
+    K.handler (xy0, False) st_0fs
     =^= ( st_0fs
           & ( stLit . at pc0 . _Just
               .~ S.singleton LedBecauseSustain )
           & stFingers .~ mempty )
 
   assertBool "pressing a key that's a sustained voice updates stFingers and stLit" $
-    K.handler st_0s (xy0, True)
+    K.handler (xy0, True) st_0s
     =^= ( st_0s & ( stLit . at pc0 . _Just
                     %~ S.insert (LedBecauseSwitch xy0) )
           & stFingers .~ M.fromList [ (xy0,v0) ] )
 
   assertBool "pressing a key sends on-messages to monome, sends on-messages to Vivid, adds something to _stFingers, and asdds something from _stLit" $
-    K.handler st_0f (xy1, True)
+    K.handler (xy1, True) st_0f
     =^= ( st_01f
           & ( stPending_Monome .~
               map (\xy -> (K.label, (xy, True)) )

@@ -70,10 +70,10 @@ test_deleteOneSustainedNote_and_insertOneSustainedNote = TestCase $ do
 test_sustainHandler :: Test
 test_sustainHandler = TestCase $ do
   assertBool "releasing (not turning off) the sustain button has no effect"
-    $ Su.handler st0 (meh , False) =^= st0
+    $ Su.handler (meh , False) st0 =^= st0
 
   assertBool "turning ON sustain changes the sustain state, the set of sustained voices, the set of reasons for keys to be lit, and the messages pending to the monome." $
-    Su.handler st_0f (meh, True)
+    Su.handler (meh, True) st_0f
     =^= st_0f { _stSustained = Just $ S.singleton v0
               , _stLit = M.singleton pc0 $
                          S.fromList [ LedBecauseSustain
@@ -97,15 +97,15 @@ test_sustainHandler = TestCase $ do
                              , SoundMsgFree v1 ]
     in do
     assertBool "turning sustain OFF remove all `LedBecauseSustain`s from reasons for lit keys" $
-      _stLit (Su.handler st_0fs_1s (meh, True))
+      _stLit (Su.handler (meh, True) st_0fs_1s)
       == _stLit st_0fs_1s_sustainOff
     assertBool "turning sustain OFF adds messages for the monome to turn off the sustain button and the keys that were sustained and are not fingered" $
-      _stLit (Su.handler st_0fs_1s (meh, True))
+      _stLit (Su.handler (meh, True) st_0fs_1s)
       == _stLit st_0fs_1s_sustainOff
     assertBool "turning sustain OFF adds messages for Vivid to turn off any pitches from voices that were sustained and are not fingered" $
-      _stPending_Vivid (Su.handler st_0fs_1s (meh, True))
+      _stPending_Vivid (Su.handler (meh, True) st_0fs_1s)
       == _stPending_Vivid st_0fs_1s_sustainOff
     assertBool "turning sustain OFF (any remaining fields)" $
-      Su.handler st_0fs_1s (meh, True)
+      Su.handler (meh, True) st_0fs_1s
       =^= st_0fs_1s_sustainOff
 

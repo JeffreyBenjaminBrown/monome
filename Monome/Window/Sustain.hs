@@ -43,12 +43,11 @@ sustainWindow = Window {
   , windowHandler = handler
 }
 
-handler :: St
-        -> ( (X,Y) -- ^ ignored, since the sustain window has only one button
+handler :: ( (X,Y) -- ^ ignored, since the sustain window has only one button
            , Switch)
-        -> St
-handler    st    (_ , False)      = st
-handler    st    (_,  True)      = let
+        -> St -> St
+handler (_ , False) st = st
+handler (_,  True)  st = let
   st1 = toggleSustain st
   kbdMsgs :: [LedMsg] =
     if null $ _stSustained st1

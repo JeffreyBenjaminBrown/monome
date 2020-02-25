@@ -57,7 +57,7 @@ handleSwitch    mst        sw @ (btn,_)     = do
       go    (w:ws)   =
         case windowContains w btn of
           True -> do
-            let st1 = windowHandler w st0 sw
+            let st1 = windowHandler w sw st0
             st2 <- foldM doSoundMessage st1 (_stPending_Vivid  st1)
             mapM_ (doLedMessage st2)   $ _stPending_Monome st2
             putMVar mst st2 { _stPending_Monome = []

@@ -58,9 +58,9 @@ shiftWindow = Window {
   , windowHandler = handler
 }
 
-handler :: St -> ((X,Y), Switch) -> St
-handler    st0   (_,  False)      = st0
-handler    st0   (xy, True )      = let
+handler :: ((X,Y), Switch) -> St -> St
+handler    (_,  False)        st0 = st0
+handler    (xy, True )        st0 = let
   st' :: St = st0 & stXyShift %~ addPair (shift xy)
   lit :: [PitchClass] = M.keys $ _stLit st0
   msgs :: [LedMsg] =

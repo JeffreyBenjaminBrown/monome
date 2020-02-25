@@ -38,10 +38,8 @@ keyboardWindow =  Window {
                   M.keys $ _stLit st )
   , windowHandler = handler }
 
-handler :: St
-        -> ((X,Y), Switch)
-        -> St
-handler st press @ (xy,sw) =
+handler :: ((X,Y), Switch) -> St -> St
+handler    press @ (xy,sw)    st =
   let pcNow :: PitchClass =
         mod (xyToEt31_st st xy) 31
         -- what the key represents currently
