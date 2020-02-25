@@ -50,7 +50,7 @@ printSt = mapM_ putStrLn . showSt
 
 showSt :: St -> [String]
 showSt st = [
-    "Voices: "         ++ show (M.keys $ _stVoices st)
+    "Voices: "         ++ show (_stVoices st)
   , "Pending_Monome: " ++ show (_stPending_Monome st)
   , "Pending_Vivid: "  ++ show (_stPending_Vivid st)
   , "XyShift: "        ++ show (_stXyShift st)

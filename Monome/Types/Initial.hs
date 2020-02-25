@@ -99,7 +99,7 @@ instance Show Window where
   show = windowLabel
 
 data Voice = Voice {
-    _voiceSynth  :: Synth BoopParams
+    _voiceSynth  :: Either () (Synth BoopParams) -- ^ () when uninitialized
   , _voicePitch  :: Pitch -- ^ PITFALL: This looks redundant, but isn't.
     -- The frequency is indeed stored in the _voiceParams field,
     -- but that's a float; it's nice to have the integer Pitch around too.

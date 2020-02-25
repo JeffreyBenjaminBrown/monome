@@ -73,7 +73,7 @@ doSoundMessage :: St -> SoundMsg               -> IO St
 doSoundMessage    st    (SoundMsgCreate vid)    = do
   s <- V.synth boop ()
   return $ st & stVoices %~ M.insert vid
-    (Voice { _voiceSynth = s
+    (Voice { _voiceSynth = Right s
            , _voicePitch = initialPitch
            , _voiceParams = mempty } )
 doSoundMessage    st    (SoundMsgFree vid)      = do
@@ -81,20 +81,24 @@ doSoundMessage    st    (SoundMsgFree vid)      = do
   case mv of
     Nothing -> putStrLn $ "ERROR! doSoundMessage: voice "
                ++ show vid ++ "not found."
-    Just v -> free $ _voiceSynth v
+    Just v -> either
+              (const $ return ()) -- TODO ? throw an error instead?
+              free $ _voiceSynth v
   return $ st & stVoices %~ M.delete vid
 
 doSoundMessage    st   (SoundMsg sdMsg)         = do
   let vid   :: VoiceId = _paramMsgVoiceId sdMsg
       param :: Param   = _paramMsgParam   sdMsg
       f     :: Float   = _paramMsgVal     sdMsg
-      v     :: Synth BoopParams =
+      ev    :: Either () (Synth BoopParams) =
         (_stVoices st M.! vid) ^. voiceSynth
-  case param of
-    "amp"  -> set v (toI f :: I "amp")
-    "freq" -> set v (toI f :: I "freq")
-    _      -> error $
-      "doSoundMessage: unrecognized parameter " ++ param
+  case ev of
+    Left () -> return () -- TODO ? should this throw an error?
+    Right v -> case param of
+      "amp"  -> set v (toI f :: I "amp")
+      "freq" -> set v (toI f :: I "freq")
+      _      -> error $
+        "doSoundMessage: unrecognized parameter " ++ param
   return st
 
 doLedMessage :: St -> LedMsg -> IO ()

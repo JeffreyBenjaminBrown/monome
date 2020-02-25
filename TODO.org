@@ -1,5 +1,4 @@
-* TODO ? Make the voiceSynth field a sum, Uninitialized | Voice.
-That way in `printSt` I could actually show the voice.
+* TODO find uninitialized fields
 * TODO solve, then test : hold a note, press sustain, release the note
 *** TODO lets try getting all the way there with handlers
 *** buggy _stLit when (live) I finger a note and then sustain it

@@ -12,9 +12,7 @@ module Monome.Main (
 
 import Control.Concurrent (forkIO, killThread)
 import Control.Concurrent.MVar
-import Control.Lens
 import qualified Data.Map as M
---import qualified Data.Set as S
 import Vivid
 import Vivid.OSC
 
@@ -65,7 +63,10 @@ et31 monomePort = do
           close inbox
           killThread responder
           st <- readMVar mst
-          mapM_ (free . (^. voiceSynth)) (M.elems $ _stVoices st)
+          let freeIfDefined :: Either () (Synth a) -> IO ()
+              freeIfDefined (Left ()) = return ()
+              freeIfDefined (Right s) = free s
+            in mapM_ (freeIfDefined . _voiceSynth) $ M.elems $ _stVoices st
           _ <- send (_stToMonome st) $ allLedOsc "/monome" False
           return $ st { _stVoices = mempty }
         _   -> loop
