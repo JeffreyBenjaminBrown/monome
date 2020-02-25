@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds
+, LambdaCase
 , ScopedTypeVariables
 , TupleSections
 #-}
@@ -97,23 +98,25 @@ voicesToSilence_uponSustainOff st = let
 -- the set of sustained pitches changes
 -- and the set of lit keys gains new reasons to be lit.
 toggleSustain :: St -> St
-toggleSustain st = let
-  sustainOnNow :: Bool = -- new sustain state
-    not $ isJust $ _stSustained st
-  sustainedVs :: Maybe (Set VoiceId) =
-    if not sustainOnNow then Nothing
-    else Just $ S.fromList $ M.elems $ _stFingers st
-
-  lit' | sustainOnNow =
-         foldr insertOneSustainedNote (_stLit st)
-         $ map (vid_to_pitch st)
-         $ M.elems $ _stFingers st
-       | otherwise =
-         foldr deleteOneSustainedNote (_stLit st)
-         $ map (vid_to_pitch st) $ S.toList
-         $ maybe (error "impossible") id $ _stSustained st
-  in st { _stSustained = sustainedVs
-        , _stLit       = lit'      }
+toggleSustain st
+  | null (_stSustained st) && null (_stFingers st) = st
+  | otherwise = let
+    sustainOnNow :: Bool =
+      isNothing $ _stSustained st
+    sustainedVs :: Maybe (Set VoiceId) = if sustainOnNow
+      then Just $ S.fromList $ M.elems $ _stFingers st
+      else Nothing
+  
+    lit' | sustainOnNow =
+           foldr insertOneSustainedNote (_stLit st)
+           $ map (vid_to_pitch st)
+           $ M.elems $ _stFingers st
+         | otherwise =
+           foldr deleteOneSustainedNote (_stLit st)
+           $ map (vid_to_pitch st) $ S.toList
+           $ maybe (error "impossible") id $ _stSustained st
+    in st { _stSustained = sustainedVs
+          , _stLit       = lit'      }
 
 -- | When sustain is toggled, the reasons for having LEDs on change.
 -- If it is turned on, some LEDs are now lit for two reasons:
