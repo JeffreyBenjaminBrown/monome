@@ -34,8 +34,8 @@ if that voice is sustained, that key cannot sound a new note,
 even when it no longer represents the same pitch.
 ** ? or at all
 * TODO features
-** timbre control, store timbre
 ** two keyboards, split keyboard
+** timbre control, store timbre
 ** sustain: two buttons, "add these" and "release all"
 "add these" has on/off state, stays in effect until it is released.
 "release all" has no state -- it fires as soon as it's touched, and holding it does nothing.

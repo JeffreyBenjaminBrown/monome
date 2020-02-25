@@ -81,25 +81,31 @@ test_sustainHandler = TestCase $ do
               , _stPending_Monome =
                 [ (Su.label, (Su.theButton, True)) ] }
 
-  assertBool ( "turning sustain OFF does all this stuff:\n" ++
-               "flip the sustain state\n" ++
-               "emptiy the set of sustained voices\n" ++
-               "remove all `LedBecauseSustain`s from reasons for lit keys\n"
-               ++ "adds messages for the monome to turn off the sustain button and the keys that were sustained and are not fingered\n" ++
-               " adds messages for Vivid to turn off any pitches from voices that were sustained and are not fingered\n" ++
-               "Pitch 0 is fingered, and 0 and 1 sounding; 1 turns off.") $
-    Su.handler st_0fs_1s (meh, True)
-    =^= ( st_0fs_1s
-          & stSustained .~ mempty
-          & stLit .~ M.singleton pc0 ( S.singleton $
-                                       LedBecauseSwitch xy0 )
-          & stPending_Monome .~
-          ( ( Su.label, (Su.theButton, False)) :
-            map (\xy -> (K.label, (xy, False)))
-            (pcToXys (_stXyShift st_0fs_1s) pc1) )
-          & stPending_Vivid .~ [ SoundMsg $ ParamMsg
-                                 { _paramMsgVoiceId = v1
-                                 , _paramMsgPitch = Nothing
-                                 , _paramMsgVal = 0
-                                 , _paramMsgParam = "amp" } ] )
+  let st_0fs_1s_sustainOff = st_0fs_1s
+        & stSustained .~ mempty
+        & stLit .~ M.singleton pc0 ( S.singleton $
+                                     LedBecauseSwitch xy0 )
+        & stPending_Monome .~
+        ( ( Su.label, (Su.theButton, False)) :
+          map (\xy -> (K.label, (xy, False)))
+          (pcToXys (_stXyShift st_0fs_1s) pc1) )
+        & stPending_Vivid .~ [ SoundMsg $ ParamMsg
+                               { _paramMsgVoiceId = v1
+                               , _paramMsgPitch = Nothing
+                               , _paramMsgVal = 0
+                               , _paramMsgParam = "amp" }
+                             , SoundMsgFree v1 ]
+    in do
+    assertBool "turning sustain OFF remove all `LedBecauseSustain`s from reasons for lit keys" $
+      _stLit (Su.handler st_0fs_1s (meh, True))
+      == _stLit st_0fs_1s_sustainOff
+    assertBool "turning sustain OFF adds messages for the monome to turn off the sustain button and the keys that were sustained and are not fingered" $
+      _stLit (Su.handler st_0fs_1s (meh, True))
+      == _stLit st_0fs_1s_sustainOff
+    assertBool "turning sustain OFF adds messages for Vivid to turn off any pitches from voices that were sustained and are not fingered" $
+      _stPending_Vivid (Su.handler st_0fs_1s (meh, True))
+      == _stPending_Vivid st_0fs_1s_sustainOff
+    assertBool "turning sustain OFF (any remaining fields)" $
+      Su.handler st_0fs_1s (meh, True)
+      =^= st_0fs_1s_sustainOff
 
