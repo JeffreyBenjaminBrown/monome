@@ -45,7 +45,8 @@ test_keyMsg = TestCase $ do
     keyMsg st (sustainedVoice, False) == []
   assertBool "press a key that's not sustained" $
     keyMsg st (newVoice, True) ==
-    [ SoundMsg $ ParamMsg { _paramMsgVoiceId = newVoice
+    [ SoundMsgCreate newVoice
+    , SoundMsg $ ParamMsg { _paramMsgVoiceId = newVoice
                           , _paramMsgPitch = Just newPitch
                           , _paramMsgVal = 100 * et31ToFreq newPitch
                           , _paramMsgParam = "freq" }
@@ -58,7 +59,8 @@ test_keyMsg = TestCase $ do
     [ SoundMsg $ ParamMsg  { _paramMsgVoiceId = newVoice
                            , _paramMsgPitch = Nothing
                            , _paramMsgVal = 0
-                           , _paramMsgParam = "amp" } ]
+                           , _paramMsgParam = "amp" }
+    , SoundMsgFree newVoice ]
 
 testDependentPitchClass :: Test
 testDependentPitchClass = TestCase $ do

@@ -1,4 +1,7 @@
 * TODO create voices on the fly
+** TODO use nextVoice
+Monome.Util.nextVoice :: M.Map VoiceId a -> VoiceId
+** TODO use something other than pairs for voiceId
 ** PITFALLS
 Create it before telling it to do something.
   Or else create it with those parameters.

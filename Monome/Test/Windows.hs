@@ -52,17 +52,32 @@ test_shiftHandler = TestCase $ do
 
 test_keyboardHandler :: Test
 test_keyboardHandler = TestCase $ do
-  assertBool "releasing a key sends off-messages to monome, sends off-messages to Vivid, removes something from _stFingers, and removes some things from _stLit" $
-    K.handler st_01f (xy1, False)
-    =^= ( st_0f
-          & ( stPending_Monome .~
-              map (\xy -> (K.label, (xy, False)) )
-              (pcToXys (_stXyShift st_01f) pitch1 ) )
-          & stPending_Vivid .~ [SoundMsg $ ParamMsg
-                                { _paramMsgVoiceId = v1
-                                , _paramMsgPitch = Nothing
-                                , _paramMsgVal = 0
-                                , _paramMsgParam = "amp" } ] )
+  let st_01f_r1 = -- st_0f after releasing key 1
+        st_0f
+        & ( stPending_Monome .~
+            map (\xy -> (K.label, (xy, False)) )
+            (pcToXys (_stXyShift st_01f) pitch1 ) )
+        & stPending_Vivid .~ [ SoundMsg $ ParamMsg
+                               { _paramMsgVoiceId = v1
+                               , _paramMsgPitch = Nothing
+                               , _paramMsgVal = 0
+                               , _paramMsgParam = "amp" }
+                             , SoundMsgFree v1 ]
+    in do
+    assertBool "releasing a key sends off-messages to monome" $
+      _stPending_Monome (K.handler st_01f (xy1, False))
+      == _stPending_Monome st_01f_r1
+    assertBool "releasing a key sends off-messages to Vivid" $
+      _stPending_Vivid (K.handler st_01f (xy1, False))
+      == _stPending_Vivid st_01f_r1
+    assertBool "releasing a key removes something from _stFingers" $
+      _stFingers (K.handler st_01f (xy1, False))
+      == _stFingers st_01f_r1
+    assertBool "releasing a key removes somehing from _stLit" $
+      _stLit (K.handler st_01f (xy1, False))
+      == _stLit st_01f_r1
+    assertBool "releasing a key (all the above tests combined)" $
+      K.handler st_01f (xy1, False) =^= st_01f_r1
 
   assertBool "releasing a key that's also the anchor pitch sends no monome messages" $
     K.handler st_0af (xy0, False)
@@ -74,7 +89,8 @@ test_keyboardHandler = TestCase $ do
                                  { _paramMsgVoiceId = v0
                                  , _paramMsgPitch = Nothing
                                  , _paramMsgVal = 0
-                                 , _paramMsgParam = "amp" } ] )
+                                 , _paramMsgParam = "amp" }
+                               , SoundMsgFree v0 ] )
 
   assertBool "releasing a key that's a sustained voice sends no vivid or monome messages, but updates lit and fingers" $
     K.handler st_0fs (xy0, False)

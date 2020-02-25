@@ -40,6 +40,7 @@ silenceMsg xy =
                         , _paramMsgParam = "amp" }
   , SoundMsgFree xy ] -- PITFALL: Should come last.
 
+-- todo ? this is only used so far in Window.Keyboard
 keyMsg :: St -> ((X,Y), Switch) -> [SoundMsg]
 keyMsg st (xy, sw) = do
   let pitch = xyToEt31_st st xy
