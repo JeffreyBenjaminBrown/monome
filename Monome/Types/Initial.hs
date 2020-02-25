@@ -87,7 +87,7 @@ data Window = Window {
     -- Every Window therefore needs a nontrivial windowContains field,
     -- even the background Window.
   , windowInit :: St -> St
-  , windowRoutine :: -- ^ Acts on messages from the monome.
+  , windowHandler :: -- ^ Acts on messages from the monome.
       St
       -> ((X,Y), Switch) -- ^ the incoming button press|release
       -> St

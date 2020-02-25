@@ -55,7 +55,7 @@ shiftWindow = Window {
   , windowInit = stPending_Monome %~ flip (++)
     ( (label,) . (,True) <$>
       [ upArrow, downArrow, leftArrow, rightArrow ] )
-  , windowRoutine = handler
+  , windowHandler = handler
 }
 
 handler :: St -> ((X,Y), Switch) -> St

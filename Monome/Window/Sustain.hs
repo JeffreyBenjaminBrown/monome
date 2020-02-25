@@ -40,7 +40,7 @@ sustainWindow = Window {
     windowLabel = label
   , windowContains = (==) theButton
   , windowInit = id
-  , windowRoutine = handler
+  , windowHandler = handler
 }
 
 handler :: St

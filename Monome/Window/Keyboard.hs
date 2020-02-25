@@ -36,7 +36,7 @@ keyboardWindow =  Window {
       flip (++) ( map ( (label,) . (,True) ) $
                   concatMap (pcToXys $ _stXyShift st) $
                   M.keys $ _stLit st )
-  , windowRoutine = handler }
+  , windowHandler = handler }
 
 handler :: St
         -> ((X,Y), Switch)
