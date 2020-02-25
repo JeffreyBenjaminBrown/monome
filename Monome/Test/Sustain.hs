@@ -97,8 +97,9 @@ test_sustainHandler = TestCase $ do
           ( ( Su.label, (Su.theButton, False)) :
             map (\xy -> (K.label, (xy, False)))
             (pcToXys (_stXyShift st_0fs_1s) pc1) )
-          & stPending_Vivid .~ [ SoundMsg { _soundMsgVoiceId = v1
-                                          , _soundMsgPitch = Nothing
-                                          , _soundMsgVal = 0
-                                          , _soundMsgParam = "amp" } ] )
+          & stPending_Vivid .~ [ SoundMsg $ ParamMsg
+                                 { _paramMsgVoiceId = v1
+                                 , _paramMsgPitch = Nothing
+                                 , _paramMsgVal = 0
+                                 , _paramMsgParam = "amp" } ] )
 

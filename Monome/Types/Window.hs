@@ -80,10 +80,10 @@ doSoundMessage    st    (SoundMsgFree vid)      = do
     Just v -> free $ _voiceSynth v
   return $ st & stVoices %~ M.delete vid
 
-doSoundMessage    st   sdMsg@(SoundMsg _ _ _ _) = do
-  let vid   :: VoiceId = _soundMsgVoiceId sdMsg
-      param :: Param   = _soundMsgParam   sdMsg
-      f     :: Float   = _soundMsgVal     sdMsg
+doSoundMessage    st   (SoundMsg sdMsg)         = do
+  let vid   :: VoiceId = _paramMsgVoiceId sdMsg
+      param :: Param   = _paramMsgParam   sdMsg
+      f     :: Float   = _paramMsgVal     sdMsg
       v     :: Synth BoopParams =
         (_stVoices st M.! vid) ^. voiceSynth
   case param of

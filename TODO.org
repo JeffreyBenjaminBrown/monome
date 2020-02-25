@@ -1,5 +1,4 @@
 * TODO create voices on the fly
-** TODO Refactor SoundMsg so each constructor has only one field.
 ** PITFALLS
 Create it before telling it to do something.
   Or else create it with those parameters.

@@ -57,7 +57,8 @@ handler    st    (_,  True)      = let
     else []
   sdMsgs :: [SoundMsg] =
     if null $ _stSustained st1
-    then map silenceMsg $ S.toList $ voicesToSilence_uponSustainOff st
+    then concatMap silenceMsg $ S.toList $
+         voicesToSilence_uponSustainOff st
     else []
   sustainButtonMsg = ( label
                      , (theButton, isJust $ _stSustained st1) )
@@ -66,7 +67,7 @@ handler    st    (_,  True)      = let
   in foldr updateVoice st2 sdMsgs
 
 pitchClassesToDarken_uponSustainOff :: St -> St -> Set PitchClass
-  -- TODO ? speed: This calls `voicesToSilence_uponSustainOff`.
+  -- todo ? speed: This calls `voicesToSilence_uponSustainOff`.
   -- Would it be faster to pass the result of `voicesToSilence_uponSustainOff`
   -- as a precomputed argument? (I'm guessing the compiler fogures it out.)
 pitchClassesToDarken_uponSustainOff oldSt newSt =
@@ -126,7 +127,7 @@ insertOneSustainedNote pc m =
   in M.insert pc (S.insert LedBecauseSustain reasons) m
 deleteOneSustainedNote pc m =
   case M.lookup pc m of
-    Nothing -> m -- TODO ? Should this throw an error? It shouldn't happen.
+    Nothing -> m -- todo ? Should this throw an error? It shouldn't happen.
     Just reasons -> let
       reasons' = S.delete LedBecauseSustain reasons
       in if null reasons'

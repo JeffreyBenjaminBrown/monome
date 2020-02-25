@@ -8,7 +8,8 @@ module Monome.Types.Initial (
   , X, Y, Switch, Led
   , LedBecause(..)
   , Window(..)
-  , SoundMsg(..), soundMsgVoiceId, soundMsgPitch, soundMsgVal, soundMsgParam
+  , SoundMsg(..)
+  , ParamMsg(..), paramMsgVoiceId, paramMsgPitch, paramMsgVal, paramMsgParam
   , St(..), stWindowLayers, stToMonome, stVoices, stPending_Monome
     , stPending_Vivid, stXyShift, stFingers, stLit, stSustained
   , Voice(..), voiceSynth, voicePitch, voiceParams
@@ -48,14 +49,16 @@ type LitPitches = Map PitchClass (Set LedBecause)
   -- The Set is a Set because an LED could be on for multiple reasons.
 
 type LedMsg   = (WindowId, ((X,Y), Led))
-data SoundMsg = -- TODO : Refactor so each constructor has only one field.
-    SoundMsgCreate VoiceId
-  | SoundMsgFree VoiceId
-  | SoundMsg {
-        _soundMsgVoiceId :: VoiceId
-      , _soundMsgPitch   :: Maybe Pitch -- ^ off-messages don't need one
-      , _soundMsgVal     :: Float
-      , _soundMsgParam   :: Param }
+data SoundMsg = SoundMsgCreate VoiceId
+              | SoundMsgFree VoiceId
+              | SoundMsg ParamMsg
+  deriving (Show, Eq, Ord)
+
+data ParamMsg = ParamMsg
+  { _paramMsgVoiceId :: VoiceId
+  , _paramMsgPitch   :: Maybe Pitch -- ^ off-messages don't need one
+  , _paramMsgVal     :: Float
+  , _paramMsgParam   :: Param }
   deriving (Show, Eq, Ord)
 
 -- | X and Y are coordinates on the monome.
@@ -111,9 +114,6 @@ data St = St {
   , _stToMonome :: Socket -- ^ PITFALL: It's tempting to remove this from St.
     -- That's feasible now, ll want it here when using multiple monomes.
   , _stVoices :: Map VoiceId Voice
-    -- ^ TODO ? This is expensive, precluding the use of big synths.
-    -- Maybe I could make them dynamically without much speed penalty.
-    -- Tom of Vivid thinks so.
 
   -- | The purpose of `_stPending_Monome` and `_stPending_Vivid`
   -- is to isolate side-effects to a small portion of the code. Elsewhere,
@@ -133,6 +133,7 @@ data St = St {
     -- identified by the key that originally launched it.
   } deriving (Show, Eq)
 
-makeLenses ''SoundMsg
+makePrisms ''SoundMsg
+makeLenses ''ParamMsg
 makeLenses ''Voice
 makeLenses ''St

@@ -23,7 +23,7 @@ import           Monome.Types.Button
 import           Monome.Types.Initial
 
 
--- Todo (#speed) Instead, keep a map from xy to pitchclass
+-- todo (#speed) Instead, keep a map from xy to pitchclass
 ledBecause_toPitchClass :: LitPitches -> LedBecause -> Maybe PitchClass
 ledBecause_toPitchClass m ldr =
   fst <$> mPair
@@ -32,12 +32,12 @@ ledBecause_toPitchClass m ldr =
             $ filter (S.member ldr . snd)
             $ M.toList m
 
-silenceMsg :: (X,Y) -> SoundMsg
+silenceMsg :: (X,Y) -> [SoundMsg]
 silenceMsg xy =
-  [ SoundMsg { _soundMsgVoiceId = xy
-             , _soundMsgPitch = Nothing
-             , _soundMsgVal = 0
-             , _soundMsgParam = "amp" }
+  [ SoundMsg $ ParamMsg { _paramMsgVoiceId = xy
+                        , _paramMsgPitch = Nothing
+                        , _paramMsgVal = 0
+                        , _paramMsgParam = "amp" }
   , SoundMsgFree xy ] -- PITFALL: Should come last.
 
 keyMsg :: St -> ((X,Y), Switch) -> [SoundMsg]
@@ -46,27 +46,27 @@ keyMsg st (xy, sw) = do
   if maybe False (S.member xy) $ _stSustained st
     then [] -- it's already sounding due to sustain
     else if sw
-         then let msg = SoundMsg { _soundMsgVoiceId = xy
-                                 , _soundMsgPitch = Just pitch }
+         then let pm = ParamMsg { _paramMsgVoiceId = xy
+                                , _paramMsgPitch = Just pitch }
               in [ SoundMsgCreate xy -- PITFALL: Must come first.
-                 , msg & soundMsgVal .~ 100 * et31ToFreq pitch
-                       & soundMsgParam .~ "freq"
-                 , msg & soundMsgVal .~ Config.voiceAmplitude
-                       & soundMsgParam .~ "amp" ]
-         else [silenceMsg xy]
+                 , SoundMsg $ pm & paramMsgVal .~ 100 * et31ToFreq pitch
+                                 & paramMsgParam .~ "freq"
+                 , SoundMsg $ pm & paramMsgVal .~ Config.voiceAmplitude
+                                 & paramMsgParam .~ "amp" ]
+         else silenceMsg xy
 
 updateVoice :: SoundMsg -> St -> St
-updateVoice sdMsg@(SoundMsg _ _ _ _) st = let
-  vid   :: VoiceId = _soundMsgVoiceId sdMsg
-  param :: Param   = _soundMsgParam   sdMsg
-  f     :: Float   = _soundMsgVal     sdMsg
-  in st & case _soundMsgPitch sdMsg of
+updateVoice (SoundMsg sdMsg) st = let
+  vid   :: VoiceId = _paramMsgVoiceId sdMsg
+  param :: Param   = _paramMsgParam   sdMsg
+  f     :: Float   = _paramMsgVal     sdMsg
+  in st & case _paramMsgPitch sdMsg of
             Nothing -> id
             Just p -> stVoices . at vid . _Just
                       %~ (voicePitch                     .~ p)
                       .  (voiceParams . at param . _Just .~ f)
 updateVoice _ st = st -- Making or freeing voices is handled in Types.Window,
-  -- because making a voice requires IO.
+                      -- because making a voice requires IO.
 
 vid_to_pitch :: St -> VoiceId -> PitchClass
 vid_to_pitch st v = maybe
