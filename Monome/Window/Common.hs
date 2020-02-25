@@ -66,8 +66,17 @@ updateVoice (SoundMsg sdMsg) st = let
             Just p -> stVoices . at vid . _Just
                       %~ (voicePitch                     .~ p)
                       .  (voiceParams . at param . _Just .~ f)
-updateVoice _ st = st -- Making or freeing voices is handled in Types.Window,
-                      -- because making a voice requires IO.
+updateVoice (SoundMsgCreate vid) st =
+  -- The message also goes to Types.Window,
+  -- which creates the voice (using IO)
+  st & stVoices %~ M.insert vid
+  ( Voice { _voiceSynth = Left ()
+          , _voicePitch = Config.initialPitch
+          , _voiceParams = mempty } )
+updateVoice (SoundMsgFree vid) st =
+  -- The message also goes to Types.Window,
+  -- which destroys the voice (using IO)
+  st & stVoices %~ M.delete vid
 
 vid_to_pitch :: St -> VoiceId -> Either String PitchClass
 vid_to_pitch st vid = maybe

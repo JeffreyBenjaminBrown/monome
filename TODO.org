@@ -1,14 +1,31 @@
-* TODO replace error with either in vid_to_pitch
 * TODO solve, then test : hold a note, press sustain, release the note
+** TODO found a bug : Window.Sustain: Using vid_to_pitch before it makes sense
+`Su.handler` calls `toggleSustain` before `updateVoice`.
+`updateVoice` assigns (among other things) pitches to voice ids.
+`toggleSustain` calls `vid_to_pitch`.
+** TODO PROGRESS! try debugging this
+  st_f = st0 & fromRight meh . K.handler ((1,15),True)
+  st_fs = st_f & fromRight meh . toggleSustain
+  printSt st_f
+  printSt st_fs
+In st_fs, Lit field seems to have sustained the wrong pitch class -- 15 + 6 = 21, not 19.
+They are otherwise identical.
 ** TODO lets try getting all the way there with handlers
 add this code to Test/Windows.sh:
 
+import Monome.Window.Keyboard as K
+import Monome.Window.Shift    as Sh
 import Monome.Window.Sustain  as Su
+
 f = (1,15) -- key to play
-st0_f     = st0    & K.handler (f,True) -- finger on
+st0_f     = st0    & fromRight meh . K.handler (f,True)    -- finger on
 st0_fs    = st0_f  & Su.handler (meh,True) -- sustain off
-st0_fs_rf = st0_fs & K.handler (f,True) -- finger off
-(x,y,z) = (st0_f, st0_fs, st0_fs_rf)
+-- st0_fs_rf = st0_fs & fromRight meh . K.handler (f,True)    -- finger off
+(x,y) = (st0_f, st0_fs)
+** TODO ? redundant : redundant Voice creation
+`doSoundMessage` puts a new voice in the _stVoices field.
+So does `Window.Common.updateVoice`.
+`doSoundMessage` overwrites that, so it should all be good, but blech.
 ** buggy _stLit when (live) I finger a note and then sustain it
 > printSt st_fs
 Voices: []                                                                     Pending_Monome: []

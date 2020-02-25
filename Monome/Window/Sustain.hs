@@ -17,7 +17,7 @@ module Monome.Window.Sustain (
   ) where
 
 import           Control.Lens
-import           Data.Either.Combinators
+import           Data.Either.Combinators (mapLeft, mapBoth)
 import           Data.Map (Map)
 import qualified Data.Map as M
 import           Data.Maybe
@@ -103,9 +103,12 @@ voicesToSilence_uponSustainOff st = let
 -- which happens only when it is pressed, not when it is released --
 -- the set of sustained pitches changes
 -- and the set of lit keys gains new reasons to be lit.
+--
+-- If sustain is off and nothing is fingered, sustain cannot be turned on.
 toggleSustain :: St -> Either String St
 toggleSustain st
   | null (_stSustained st) && null (_stFingers st) = Right st
+    -- If sustain is off and nothing is fingered, sustain cannot be turned on.
   | otherwise = let
     sustainOnNow :: Bool =
       isNothing $ _stSustained st

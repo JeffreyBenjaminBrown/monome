@@ -5,7 +5,7 @@ import Control.Concurrent.MVar
 import Control.Lens hiding (set)
 
 import           Data.Either
-import           Data.Either.Combinators
+import           Data.Either.Combinators (mapLeft)
 import qualified Data.List as L
 import           Data.Map (Map)
 import qualified Data.Map  as M
@@ -16,3 +16,7 @@ import Test.HUnit
 
 import Vivid
 import Vivid.OSC
+
+import Monome.Window.Keyboard as K
+import Monome.Window.Shift    as Sh
+import Monome.Window.Sustain  as Su
