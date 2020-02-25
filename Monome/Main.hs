@@ -19,7 +19,6 @@ import Vivid
 import Vivid.OSC
 
 import Monome.Network.Util
-import Monome.Synth.Boop
 import Monome.Types.Button
 import Monome.Types.Initial
 import Monome.Types.Window
@@ -28,9 +27,6 @@ import Monome.Window.Keyboard
 import Monome.Window.Shift
 import Monome.Window.Sustain
 
-
-initialPitch :: Pitch
-initialPitch = 50
 
 et31 :: Int -- ^ The monome address, as serialoscd reports on startup.
      -> IO St
@@ -41,20 +37,10 @@ et31 monomePort = do
   toMonome :: Socket <-
     sendsTo (unpack localhost) monomePort
     -- to find the port number above, use the first part of HandTest.hs
-  voices :: M.Map VoiceId Voice <-
-    -- `mempty` in `defaultVoiceState is inaccurate. Initially each voice has
-    -- amp 0 and freq 100, because those ares the `Boop` defaults.
-    -- Since none are sounding, I don't think it matters.
-    let voiceIds = [(a,b) | a <- [0..15], b <- [0..15]]
-        defaultVoiceState s = Voice { _voiceSynth = s
-                                    , _voicePitch = initialPitch
-                                    , _voiceParams = mempty }
-    in M.fromList . zip voiceIds . map defaultVoiceState
-       <$> mapM (synth boop) (replicate 256 ())
   mst <- newMVar $ St {
       _stWindowLayers = [sustainWindow, shiftWindow, keyboardWindow]
     , _stToMonome = toMonome
-    , _stVoices = voices
+    , _stVoices = mempty
     , _stPending_Vivid = []
     , _stPending_Monome = []
 

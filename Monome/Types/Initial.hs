@@ -48,11 +48,14 @@ type LitPitches = Map PitchClass (Set LedBecause)
   -- The Set is a Set because an LED could be on for multiple reasons.
 
 type LedMsg   = (WindowId, ((X,Y), Led))
-data SoundMsg = SoundMsg {
-    _soundMsgVoiceId :: VoiceId
-  , _soundMsgPitch   :: Maybe Pitch -- ^ messages like "off" don't need one
-  , _soundMsgVal     :: Float
-  , _soundMsgParam   :: Param }
+data SoundMsg = -- TODO : Refactor so each constructor has only one field.
+    SoundMsgCreate VoiceId
+  | SoundMsgFree VoiceId
+  | SoundMsg {
+        _soundMsgVoiceId :: VoiceId
+      , _soundMsgPitch   :: Maybe Pitch -- ^ off-messages don't need one
+      , _soundMsgVal     :: Float
+      , _soundMsgParam   :: Param }
   deriving (Show, Eq, Ord)
 
 -- | X and Y are coordinates on the monome.

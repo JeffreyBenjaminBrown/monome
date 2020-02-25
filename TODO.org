@@ -1,4 +1,5 @@
 * TODO create voices on the fly
+** TODO Refactor SoundMsg so each constructor has only one field.
 ** PITFALLS
 Create it before telling it to do something.
   Or else create it with those parameters.
@@ -7,7 +8,7 @@ Kill it after silencing it.
 Monome.Util.nextVoice :: M.Map VoiceId a -> VoiceId
 ** how: loops
 *** when a key is pressed
-It doesn't matter if anything is sustaining, chords are playing, etc.
+Ignore whether anything is sustaining, chords are playing, etc.
 Get a new voiceId.
 Create a voice with that ID and default parameters.
 Send control messages as normal to it.
@@ -21,7 +22,7 @@ in addition to "off", send "kill"
 ** optimize ? No need to turn it off.
 ** Vivid: voice creation, use and deletion
 use "synth" to make a synth, "free" to free it:
-  s <- synth boop
+  s <- synth boop ()
   set s (toI f :: I "amp")
   free s
 * TODO sustained pitches should not disable keys

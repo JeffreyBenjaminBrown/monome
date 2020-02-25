@@ -33,11 +33,12 @@ ledBecause_toPitchClass m ldr =
             $ M.toList m
 
 silenceMsg :: (X,Y) -> SoundMsg
-silenceMsg xy = SoundMsg {
-    _soundMsgVoiceId = xy
-  , _soundMsgPitch = Nothing
-  , _soundMsgVal = 0
-  , _soundMsgParam = "amp" }
+silenceMsg xy =
+  [ SoundMsg { _soundMsgVoiceId = xy
+             , _soundMsgPitch = Nothing
+             , _soundMsgVal = 0
+             , _soundMsgParam = "amp" }
+  , SoundMsgFree xy ] -- PITFALL: Should come last.
 
 keyMsg :: St -> ((X,Y), Switch) -> [SoundMsg]
 keyMsg st (xy, sw) = do
@@ -47,14 +48,15 @@ keyMsg st (xy, sw) = do
     else if sw
          then let msg = SoundMsg { _soundMsgVoiceId = xy
                                  , _soundMsgPitch = Just pitch }
-              in [ msg & soundMsgVal .~ 100 * et31ToFreq pitch
+              in [ SoundMsgCreate xy -- PITFALL: Must come first.
+                 , msg & soundMsgVal .~ 100 * et31ToFreq pitch
                        & soundMsgParam .~ "freq"
                  , msg & soundMsgVal .~ Config.voiceAmplitude
                        & soundMsgParam .~ "amp" ]
          else [silenceMsg xy]
 
 updateVoice :: SoundMsg -> St -> St
-updateVoice sdMsg st = let
+updateVoice sdMsg@(SoundMsg _ _ _ _) st = let
   vid   :: VoiceId = _soundMsgVoiceId sdMsg
   param :: Param   = _soundMsgParam   sdMsg
   f     :: Float   = _soundMsgVal     sdMsg
@@ -63,6 +65,8 @@ updateVoice sdMsg st = let
             Just p -> stVoices . at vid . _Just
                       %~ (voicePitch                     .~ p)
                       .  (voiceParams . at param . _Just .~ f)
+updateVoice _ st = st -- Making or freeing voices is handled in Types.Window,
+  -- because making a voice requires IO.
 
 vid_to_pitch :: St -> VoiceId -> PitchClass
 vid_to_pitch st v = maybe

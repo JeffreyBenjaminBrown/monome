@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -fno-warn-missing-fields #-}
 {-# LANGUAGE DataKinds
 , ScopedTypeVariables #-}
 
@@ -23,6 +24,7 @@ import           Control.Lens hiding (set)
 import qualified Data.List as L
 import qualified Data.Map as M
 import           Vivid hiding (pitch, synth, Param)
+import qualified Vivid as V
 
 import Monome.Network.Util
 import Monome.Synth.Boop
@@ -55,15 +57,30 @@ handleSwitch    mst        sw @ (btn,_)     = do
         case windowContains w btn of
           True -> do
             let st1 = windowRoutine w st0 sw
-            mapM_ (doSoundMessage st1) $ _stPending_Vivid  st1
-            mapM_ (doLedMessage st1)   $ _stPending_Monome st1
-            putMVar mst st1 { _stPending_Monome = []
+            st2 <- foldM doSoundMessage st1 (_stPending_Vivid  st1)
+            mapM_ (doLedMessage st2)   $ _stPending_Monome st2
+            putMVar mst st2 { _stPending_Monome = []
                             , _stPending_Vivid = [] }
           False -> go ws
   go $ _stWindowLayers st0
 
-doSoundMessage :: St -> SoundMsg -> IO ()
-doSoundMessage    st   sdMsg     = do
+-- todo ? speed: If this accepted parameters,
+-- I could send fewer messages to Vivid.
+doSoundMessage :: St -> SoundMsg               -> IO St
+doSoundMessage    st    (SoundMsgCreate vid)    = do
+  s <- V.synth boop ()
+  return $ st & stVoices %~ M.insert vid
+    (Voice { _voiceSynth = s,
+             _voiceParams = mempty } )
+doSoundMessage    st    (SoundMsgFree vid)      = do
+  let mv = M.lookup vid $ _stVoices st
+  case mv of
+    Nothing -> putStrLn $ "ERROR! doSoundMessage: voice "
+               ++ show vid ++ "not found."
+    Just v -> free $ _voiceSynth v
+  return $ st & stVoices %~ M.delete vid
+
+doSoundMessage    st   sdMsg@(SoundMsg _ _ _ _) = do
   let vid   :: VoiceId = _soundMsgVoiceId sdMsg
       param :: Param   = _soundMsgParam   sdMsg
       f     :: Float   = _soundMsgVal     sdMsg
@@ -74,6 +91,7 @@ doSoundMessage    st   sdMsg     = do
     "freq" -> set v (toI f :: I "freq")
     _      -> error $
       "doSoundMessage: unrecognized parameter " ++ param
+  return st
 
 doLedMessage :: St -> LedMsg -> IO ()
 doLedMessage st (l, (xy,b)) =
