@@ -25,6 +25,7 @@ import Monome.Types.Button
 import Monome.Types.Initial
 import Monome.Types.Window
 import Monome.Util
+import Monome.Window.JI
 import Monome.Window.Keyboard
 import Monome.Window.Shift
 import Monome.Window.Sustain
@@ -90,8 +91,11 @@ et31 monomePort = do
        >> loop
 
 ji :: Int -- ^ The monome address, as serialoscd reports on startup.
+   -> [Float] -- ^ the base scale
+   -> [Float] -- ^ shifts of that scale
    -> IO (St JiApp)
-ji monomePort = do
+ji monomePort scale shifts = do
+
   inbox :: Socket <- receivesAt "127.0.0.1" 8000
     -- I don't know why it's port 8000, or why it used to be 11111.
   toMonome :: Socket <- sendsTo (unpack localhost) monomePort
@@ -106,15 +110,17 @@ ji monomePort = do
           -- Since none are sounding, I don't think it matters.
     in M.fromList . zip voiceIds . map defaultVoiceState
        <$> mapM (synth boop) (replicate 256 ())
+
   mst <- newMVar $ St {
       _stWindowLayers = []
     , _stToMonome = toMonome
     , _stVoices = voices
     , _stPending_Vivid = []
     , _stPending_Monome = []
-    , _stApp = JiApp (error "") (error "")
+    , _stApp = JiApp { _jiScale = scale
+                     , _jiShifts = shifts
+                     , _jiFingers = mempty }
     }
-
   initAllWindows mst
 
   responder <- forkIO $ forever $ do

@@ -135,8 +135,9 @@ data EtApp = EtApp
   } deriving (Show, Eq)
 
 data JiApp = JiApp
-  { scale :: [Float]
-  , shifts :: [Float] }
+  { _jiScale :: [Float]
+  , _jiShifts :: [Float]
+  , _jiFingers :: Map (X,Y) VoiceId }
   deriving (Show, Eq)
 
 makeLenses ''SoundMsg

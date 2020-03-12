@@ -53,7 +53,7 @@ etKeyMsg st (xy, sw) = do
                        & soundMsgParam .~ "amp" ]
          else [silenceMsg xy]
 
-updateVoice :: SoundMsg -> St EtApp -> St EtApp
+updateVoice :: SoundMsg -> St app -> St app
 updateVoice sdMsg st = let
   vid   :: VoiceId = _soundMsgVoiceId sdMsg
   param :: Param   = _soundMsgParam   sdMsg
