@@ -6,7 +6,7 @@
 module Monome.Window.Common (
     ledBecause_toPitchClass -- ^ LitPitches -> LedBecause -> Maybe PitchClass
   , silenceMsg              -- ^ (X,Y) -> SoundMsg
-  , keyMsg                  -- ^ St -> ((X,Y), Switch) -> [SoundMsg]
+  , etKeyMsg                -- ^ St -> ((X,Y), Switch) -> [SoundMsg]
   , updateVoice             -- ^ SoundMsg -> St -> St
   , vid_to_pitch            -- ^ St -> VoiceId -> PitchClass
   ) where
@@ -39,8 +39,8 @@ silenceMsg xy = SoundMsg {
   , _soundMsgVal = 0
   , _soundMsgParam = "amp" }
 
-keyMsg :: St EtApp -> ((X,Y), Switch) -> [SoundMsg]
-keyMsg st (xy, sw) = do
+etKeyMsg :: St EtApp -> ((X,Y), Switch) -> [SoundMsg]
+etKeyMsg st (xy, sw) = do
   let pitch = xyToEt31_st st xy
   if maybe False (S.member xy) $ st ^. stApp . stSustained
     then [] -- it's already sounding due to sustain

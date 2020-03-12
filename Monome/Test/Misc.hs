@@ -21,22 +21,22 @@ tests :: Test
 tests = TestList [
     TestLabel "testBelongsHere" testBelongsHere
   , TestLabel "testDependentPitchClass" testDependentPitchClass
-  , TestLabel "test_keyMsg" test_keyMsg
+  , TestLabel "test_etKeyMsg" test_etKeyMsg
   ]
 
-test_keyMsg :: Test
-test_keyMsg = TestCase $ do
+test_etKeyMsg :: Test
+test_etKeyMsg = TestCase $ do
   let sustainedVoice :: VoiceId = (0,0)
       newVoice :: VoiceId = (0,1)
       st = st0 & ( stApp . stSustained .~
                    Just (S.singleton sustainedVoice) )
       newPitch = xyToEt31_st st newVoice
   assertBool "pressing a key that's sustained has no effect" $
-    keyMsg st (sustainedVoice, True) == []
+    etKeyMsg st (sustainedVoice, True) == []
   assertBool "releasing a key that's sustained has no effect" $
-    keyMsg st (sustainedVoice, False) == []
+    etKeyMsg st (sustainedVoice, False) == []
   assertBool "press a key that's not sustained" $
-    keyMsg st (newVoice, True) ==
+    etKeyMsg st (newVoice, True) ==
     [ SoundMsg { _soundMsgVoiceId = newVoice
                , _soundMsgPitch = Just newPitch
                , _soundMsgVal = 100 * et31ToFreq newPitch
@@ -46,7 +46,7 @@ test_keyMsg = TestCase $ do
                , _soundMsgVal = Config.voiceAmplitude
                , _soundMsgParam = "amp" } ]
   assertBool "release a key that's not sustained" $
-    keyMsg st (newVoice, False) ==
+    etKeyMsg st (newVoice, False) ==
     [ SoundMsg { _soundMsgVoiceId = newVoice
                , _soundMsgPitch = Nothing
                , _soundMsgVal = 0

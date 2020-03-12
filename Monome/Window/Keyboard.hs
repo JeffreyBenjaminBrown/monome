@@ -65,7 +65,7 @@ handler st press @ (xy,sw) =
           concatMap (pcToXys $ st ^. stApp . stXyShift) toDark) ++
         ( map (,True)  $
           concatMap (pcToXys $ st ^. stApp . stXyShift) toLight)
-      soundMsgs :: [SoundMsg] = keyMsg st press
+      soundMsgs :: [SoundMsg] = etKeyMsg st press
       st1 :: St EtApp = st
         & stApp . stFingers .~ fingers'
         & stApp . stLit     .~ lit'

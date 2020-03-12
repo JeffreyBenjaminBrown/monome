@@ -112,7 +112,7 @@ ji monomePort = do
     , _stVoices = voices
     , _stPending_Vivid = []
     , _stPending_Monome = []
-    , _stApp = JiApp
+    , _stApp = JiApp (error "") (error "")
     }
 
   initAllWindows mst

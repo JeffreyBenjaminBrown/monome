@@ -135,6 +135,8 @@ data EtApp = EtApp
   } deriving (Show, Eq)
 
 data JiApp = JiApp
+  { scale :: [Float]
+  , shifts :: [Float] }
   deriving (Show, Eq)
 
 makeLenses ''SoundMsg
