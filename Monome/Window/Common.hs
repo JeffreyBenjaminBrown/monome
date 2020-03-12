@@ -39,10 +39,10 @@ silenceMsg xy = SoundMsg {
   , _soundMsgVal = 0
   , _soundMsgParam = "amp" }
 
-keyMsg :: St -> ((X,Y), Switch) -> [SoundMsg]
+keyMsg :: St EtApp -> ((X,Y), Switch) -> [SoundMsg]
 keyMsg st (xy, sw) = do
   let pitch = xyToEt31_st st xy
-  if maybe False (S.member xy) $ _stSustained st
+  if maybe False (S.member xy) $ st ^. stApp . stSustained
     then [] -- it's already sounding due to sustain
     else if sw
          then let msg = SoundMsg { _soundMsgVoiceId = xy
@@ -53,7 +53,7 @@ keyMsg st (xy, sw) = do
                        & soundMsgParam .~ "amp" ]
          else [silenceMsg xy]
 
-updateVoice :: SoundMsg -> St -> St
+updateVoice :: SoundMsg -> St EtApp -> St EtApp
 updateVoice sdMsg st = let
   vid   :: VoiceId = _soundMsgVoiceId sdMsg
   param :: Param   = _soundMsgParam   sdMsg
@@ -64,7 +64,7 @@ updateVoice sdMsg st = let
                       %~ (voicePitch                     .~ p)
                       .  (voiceParams . at param . _Just .~ f)
 
-vid_to_pitch :: St -> VoiceId -> PitchClass
+vid_to_pitch :: St EtApp -> VoiceId -> PitchClass
 vid_to_pitch st v = maybe
   (error "vid_to_pitch: voice not found")
   (flip mod 31 . _voicePitch)

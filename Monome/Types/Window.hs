@@ -35,21 +35,22 @@ import Monome.Types.Initial
 type LedRelay  = ((X,Y), Led) -> IO ()
 type LedFilter = (X,Y) -> Bool
 
-initAllWindows :: MVar St -> IO ()
+initAllWindows :: forall app. MVar (St app) -> IO ()
 initAllWindows mst = do
   st <- readMVar mst
-  let runWindowInit :: Window -> IO ()
+  let runWindowInit :: Window app -> IO ()
       runWindowInit w = let
-        st' :: St = windowInit w st
+        st' :: St app = windowInit w st
         in mapM_ (doLedMessage st') $ _stPending_Monome st'
   mapM_ runWindowInit $ _stWindowLayers st
 
 -- | called every time a monome button is pressed or released
-handleSwitch :: MVar St -> ((X,Y), Switch) -> IO ()
-handleSwitch    mst        sw @ (btn,_)     = do
+handleSwitch :: forall app.
+                MVar (St app) -> ((X,Y), Switch) -> IO ()
+handleSwitch    mst              sw @ (btn,_)     = do
   st0 <- takeMVar mst
-  let go :: [Window] -> IO ()
-      go    []       = error $
+  let go :: [Window app] -> IO ()
+      go    []            = error $
         "handleSwitch: Switch " ++ show sw ++ " claimed by no Window."
       go    (w:ws)   =
         case windowContains w btn of
@@ -62,8 +63,8 @@ handleSwitch    mst        sw @ (btn,_)     = do
           False -> go ws
   go $ _stWindowLayers st0
 
-doSoundMessage :: St -> SoundMsg -> IO ()
-doSoundMessage    st   sdMsg     = do
+doSoundMessage :: St app -> SoundMsg -> IO ()
+doSoundMessage    st        sdMsg     = do
   let vid   :: VoiceId = _soundMsgVoiceId sdMsg
       param :: Param   = _soundMsgParam   sdMsg
       f     :: Float   = _soundMsgVal     sdMsg
@@ -75,12 +76,12 @@ doSoundMessage    st   sdMsg     = do
     _      -> error $
       "doSoundMessage: unrecognized parameter " ++ param
 
-doLedMessage :: St -> LedMsg -> IO ()
+doLedMessage :: St app -> LedMsg -> IO ()
 doLedMessage st (l, (xy,b)) =
   let toWindow = relayToWindow st l
   in toWindow (xy,b)
 
-relayToWindow :: St -> WindowId -> LedRelay
+relayToWindow :: St app -> WindowId -> LedRelay
 relayToWindow st wl = let
   ws = _stWindowLayers st
   w = maybe err id $ findWindow ws wl
@@ -90,7 +91,7 @@ relayToWindow st wl = let
 -- | `relayIfHere dest ws w` returns a `LedRelay` which,
 -- if the coordinate falls in `w` and in no other `Window` before `w` in `ws`,
 -- sends the message to the `Socket`.
-relayIfHere :: Socket -> [Window] -> Window -> LedRelay
+relayIfHere :: Socket -> [Window app] -> Window app -> LedRelay
 relayIfHere dest ws w = f where
   f :: ((X,Y),Led) -> IO ()
   f msg = if belongsHere ws w $ fst msg
@@ -100,7 +101,7 @@ relayIfHere dest ws w = f where
 -- | `belongsHere allWindows w _` returns a `Filter` that returns `True`
 -- if `(X,Y)` belongs in `w` and none of the `Window`s preceding `w`.
 -- PITFALL: `allWindows` should include literally all of them, even `w`.
-belongsHere :: [Window] -> Window -> LedFilter
+belongsHere :: [Window app] -> Window app -> LedFilter
 belongsHere allWindows w = f where
   obscurers = takeWhile (/= w) allWindows
     -- `obscurers` == the windows above `w`
@@ -109,7 +110,7 @@ belongsHere allWindows w = f where
   f :: (X,Y) -> Bool
   f btn = not (obscured btn) && windowContains w btn
 
-findWindow :: [Window] -> WindowId -> Maybe Window
+findWindow :: [Window app] -> WindowId -> Maybe (Window app)
 findWindow ws l = L.find pred ws where
   -- Pitfall: Assumes the window will be found.
   pred = (==) l . windowLabel

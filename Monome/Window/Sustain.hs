@@ -9,8 +9,8 @@ module Monome.Window.Sustain (
   , sustainWindow
   , theButton
 
-  , voicesToSilence_uponSustainOff -- ^ St -> Set VoiceId
-  , toggleSustain                  -- ^ St -> St
+  , voicesToSilence_uponSustainOff -- ^ St EtApp -> Set VoiceId
+  , toggleSustain                  -- ^ St EtApp -> St EtApp
   , insertOneSustainedNote -- ^ PitchClass -> LitPitches -> LitPitches
   , deleteOneSustainedNote -- ^ PitchClass -> LitPitches -> LitPitches
   ) where
@@ -34,7 +34,7 @@ label = "sustain window"
 theButton :: (X,Y)
 theButton = (0,15)
 
-sustainWindow :: Window
+sustainWindow :: Window EtApp
 sustainWindow = Window {
     windowLabel = label
   , windowContains = (==) theButton
@@ -42,30 +42,30 @@ sustainWindow = Window {
   , windowRoutine = handler
 }
 
-handler :: St
+handler :: St EtApp
         -> ( (X,Y) -- ^ ignored, since the sustain window has only one button
            , Switch)
-        -> St
+        -> St EtApp
 handler    st    (_ , False)      = st
 handler    st    (_,  True)      = let
   st1 = toggleSustain st
   kbdMsgs :: [LedMsg] =
-    if null $ _stSustained st1
+    if null $ st1 ^. stApp . stSustained
     then map ( (Kbd.label,) . (,False) ) $
-         concatMap (pcToXys $ _stXyShift st) $
+         concatMap (pcToXys $ st ^. stApp . stXyShift) $
          pitchClassesToDarken_uponSustainOff st st1
     else []
   sdMsgs :: [SoundMsg] =
-    if null $ _stSustained st1
+    if null $ st1 ^. stApp . stSustained
     then map silenceMsg $ S.toList $ voicesToSilence_uponSustainOff st
     else []
   sustainButtonMsg = ( label
-                     , (theButton, isJust $ _stSustained st1) )
+                     , (theButton, isJust $ st1 ^. stApp . stSustained) )
   st2 = st1 & stPending_Monome %~ flip (++) (sustainButtonMsg : kbdMsgs)
             & stPending_Vivid  %~ flip (++) sdMsgs
   in foldr updateVoice st2 sdMsgs
 
-pitchClassesToDarken_uponSustainOff :: St -> St -> Set PitchClass
+pitchClassesToDarken_uponSustainOff :: St EtApp -> St EtApp -> Set PitchClass
   -- TODO ? speed: This calls `voicesToSilence_uponSustainOff`.
   -- Would it be faster to pass the result of `voicesToSilence_uponSustainOff`
   -- as a precomputed argument? (I'm guessing the compiler fogures it out.)
@@ -75,7 +75,7 @@ pitchClassesToDarken_uponSustainOff oldSt newSt =
   S.filter (not . mustStayLit) $ voicesToSilence_pcs
   where
     mustStayLit :: PitchClass -> Bool
-    mustStayLit pc = case M.lookup pc $ _stLit newSt of
+    mustStayLit pc = case M.lookup pc $ newSt ^. stApp . stLit of
       Nothing -> False
       Just s -> if null s
         then error "pitchClassesToDarken_uponSustainOff: null value in LitPitches."
@@ -83,36 +83,36 @@ pitchClassesToDarken_uponSustainOff oldSt newSt =
     voicesToSilence_pcs :: Set PitchClass =
       S.map (vid_to_pitch oldSt) $ voicesToSilence_uponSustainOff oldSt
 
-voicesToSilence_uponSustainOff :: St -> Set VoiceId
+voicesToSilence_uponSustainOff :: St EtApp -> Set VoiceId
 voicesToSilence_uponSustainOff st = let
   sustained :: Set VoiceId =
-    maybe mempty id $ _stSustained st
+    maybe mempty id $ st ^. stApp . stSustained
   fingered :: Set VoiceId =
-    S.fromList $ M.keys $ _stFingers st
+    S.fromList $ M.keys $ st ^. stApp . stFingers
   in S.difference sustained fingered
 
 -- | When the sustain button is toggled --
 -- which happens only when it is pressed, not when it is released --
 -- the set of sustained pitches changes
 -- and the set of lit keys gains new reasons to be lit.
-toggleSustain :: St -> St
+toggleSustain :: St EtApp -> St EtApp
 toggleSustain st = let
   sustainOn' :: Bool = -- new sustain state
-    not $ isJust $ _stSustained st
+    not $ isJust $ st ^. stApp . stSustained
   sustainedVs :: Maybe (Set VoiceId) =
     if not sustainOn' then Nothing
-    else Just $ S.fromList $ M.elems $ _stFingers st
+    else Just $ S.fromList $ M.elems $ st ^. stApp . stFingers
 
   lit' | sustainOn' =
-         foldr insertOneSustainedNote (_stLit st)
+         foldr insertOneSustainedNote (st ^. stApp . stLit)
          $ map (vid_to_pitch st)
-         $ M.elems $ _stFingers st
+         $ M.elems $ st ^. stApp . stFingers
        | otherwise =
-         foldr deleteOneSustainedNote (_stLit st)
+         foldr deleteOneSustainedNote (st ^. stApp . stLit)
          $ map (vid_to_pitch st) $ S.toList
-         $ maybe (error "impossible") id $ _stSustained st
-  in st { _stSustained = sustainedVs
-        , _stLit       = lit'      }
+         $ maybe (error "impossible") id $ st ^. stApp . stSustained
+  in st & stApp . stSustained .~ sustainedVs
+        & stApp . stLit       .~ lit'
 
 -- | When sustain is toggled, the reasons for having LEDs on change.
 -- If it is turned on, some LEDs are now lit for two reasons:

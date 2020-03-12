@@ -26,7 +26,7 @@ import Monome.Window.Common
 label :: WindowId
 label = "keyboard window"
 
-keyboardWindow :: Window
+keyboardWindow :: Window EtApp
 keyboardWindow =  Window {
     windowLabel = label
   , windowContains = \(x,y) -> let pred = numBetween 0 15
@@ -34,39 +34,43 @@ keyboardWindow =  Window {
   , windowInit = \st ->
       st & stPending_Monome %~
       flip (++) ( map ( (label,) . (,True) ) $
-                  concatMap (pcToXys $ _stXyShift st) $
-                  M.keys $ _stLit st )
+                  concatMap (pcToXys $ st ^. stApp . stXyShift) $
+                  M.keys $ st ^. stApp . stLit )
   , windowRoutine = handler }
 
-handler :: St
+handler :: St EtApp
         -> ((X,Y), Switch)
-        -> St
+        -> St EtApp
 handler st press @ (xy,sw) =
   let pcNow :: PitchClass =
         mod (xyToEt31_st st xy) 31
         -- what the key represents currently
       pcThen :: Maybe PitchClass =
-        ledBecause_toPitchClass (_stLit st) $ LedBecauseSwitch xy
+        ledBecause_toPitchClass (st ^. stApp . stLit) $ LedBecauseSwitch xy
         -- what the key represented when it was pressed,
         -- if it is now being released
-      fingers' = case sw of
-        True  -> M.insert xy xy $ _stFingers st
-        False -> M.delete xy    $ _stFingers st
-      lit' :: LitPitches = updateStLit (xy,sw) pcNow pcThen $ _stLit st
-      oldKeys :: Set PitchClass  = S.fromList $ M.keys $ _stLit st
+      fingers' = st ^. stApp . stFingers
+        & case sw of
+            True  -> M.insert xy xy
+            False -> M.delete xy
+      lit  :: LitPitches = st ^. stApp . stLit
+      lit' :: LitPitches = updateStLit (xy,sw) pcNow pcThen lit
+      oldKeys :: Set PitchClass  = S.fromList $ M.keys $ lit
       newKeys :: Set PitchClass  = S.fromList $ M.keys $ lit'
       toDark  ::    [PitchClass] = S.toList $ S.difference oldKeys newKeys
       toLight ::    [PitchClass] = S.toList $ S.difference newKeys oldKeys
       kbdMsgs :: [LedMsg] =
         map (label,) $
-        (map (,False) $ concatMap (pcToXys $ _stXyShift st) toDark) ++
-        (map (,True)  $ concatMap (pcToXys $ _stXyShift st) toLight)
+        ( map (,False) $
+          concatMap (pcToXys $ st ^. stApp . stXyShift) toDark) ++
+        ( map (,True)  $
+          concatMap (pcToXys $ st ^. stApp . stXyShift) toLight)
       soundMsgs :: [SoundMsg] = keyMsg st press
-      st1 :: St = st
-        & stFingers        .~ fingers'
-        & stLit            .~ lit'
-        & stPending_Monome %~ flip (++) kbdMsgs
-        & stPending_Vivid  %~ flip (++) soundMsgs
+      st1 :: St EtApp = st
+        & stApp . stFingers .~ fingers'
+        & stApp . stLit     .~ lit'
+        & stPending_Monome  %~ flip (++) kbdMsgs
+        & stPending_Vivid   %~ flip (++) soundMsgs
   in foldr updateVoice st1 soundMsgs
 
 updateStLit :: ((X,Y), Switch)

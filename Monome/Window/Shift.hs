@@ -48,7 +48,7 @@ shift xy | xy == rightArrow = ( 1, 0)
          | otherwise = error $ "shift: unexpected input: " ++ show xy
 
 -- | = the window
-shiftWindow :: Window
+shiftWindow :: Window EtApp
 shiftWindow = Window {
     windowLabel = label
   , windowContains = \(x,y) -> numBetween 13 15 x && numBetween 14 15 y
@@ -58,13 +58,13 @@ shiftWindow = Window {
   , windowRoutine = handler
 }
 
-handler :: St -> ((X,Y), Switch) -> St
-handler    st0   (_,  False)      = st0
-handler    st0   (xy, True )      = let
-  st' :: St = st0 & stXyShift %~ addPair (shift xy)
-  lit :: [PitchClass] = M.keys $ _stLit st0
+handler :: St EtApp -> ((X,Y), Switch) -> St EtApp
+handler    st0         (_,  False)      = st0
+handler    st0         (xy, True )      = let
+  st' :: St EtApp = st0 & stApp . stXyShift %~ addPair (shift xy)
+  lit :: [PitchClass] = M.keys $ st0 ^. stApp . stLit
   msgs :: [LedMsg] =
     map (Kbd.label,) $
-    (map (,False) $ concatMap (pcToXys $ _stXyShift st0) lit) ++
-    (map (,True)  $ concatMap (pcToXys $ _stXyShift st') lit)
+    (map (,False) $ concatMap (pcToXys $ st0 ^. stApp . stXyShift) lit) ++
+    (map (,True)  $ concatMap (pcToXys $ st' ^. stApp . stXyShift) lit)
   in st' & stPending_Monome %~ flip (++) msgs

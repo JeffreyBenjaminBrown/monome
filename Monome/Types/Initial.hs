@@ -5,13 +5,15 @@ module Monome.Types.Initial (
   , Param, WindowId, VoiceId
   , Pitch, PitchClass, LitPitches
   , LedMsg
+  , SoundMsg(..), soundMsgVoiceId, soundMsgPitch, soundMsgVal, soundMsgParam
   , X, Y, Switch, Led
   , LedBecause(..)
   , Window(..)
-  , SoundMsg(..), soundMsgVoiceId, soundMsgPitch, soundMsgVal, soundMsgParam
-  , St(..), stWindowLayers, stToMonome, stVoices, stPending_Monome
-    , stPending_Vivid, stXyShift, stFingers, stLit, stSustained
   , Voice(..), voiceSynth, voicePitch, voiceParams
+  , St(..), stApp, stWindowLayers, stToMonome, stVoices
+    , stPending_Monome, stPending_Vivid
+  , EtApp(..), stXyShift, stFingers, stLit, stSustained
+  , JiApp(..)
   ) where
 
 import           Control.Lens
@@ -73,24 +75,24 @@ data LedBecause =
   | LedBecauseAnchor -- ^ Some "visual anchor" pitches are always on.
   deriving (Show, Eq, Ord)
 
-data Window = Window {
+data Window app = Window {
     windowLabel :: WindowId -- ^ PITFALL: Must be unique across windows,
     -- or the Eq instance fails.
   , windowContains :: (X,Y) -> Bool
     -- ^ PITFALL: A monome will respond to out-of-bounds (x,y) values.
     -- Every Window therefore needs a nontrivial windowContains field,
     -- even the background Window.
-  , windowInit :: St -> St
+  , windowInit :: St app -> St app
   , windowRoutine :: -- ^ Acts on messages from the monome.
-      St
+      St app
       -> ((X,Y), Switch) -- ^ the incoming button press|release
-      -> St
+      -> St app
   }
 
-instance Eq Window where
+instance Eq (Window  app) where
   (==) a b = windowLabel a == windowLabel b
 
-instance Show Window where
+instance Show (Window app) where
   show = windowLabel
 
 data Voice = Voice {
@@ -101,8 +103,9 @@ data Voice = Voice {
   , _voiceParams :: Map String Float }
   deriving (Show, Eq, Ord)
 
-data St = St {
-    _stWindowLayers :: [Window] -- ^ PITFALL: Order matters.
+data St app = St {
+    _stApp :: app
+  , _stWindowLayers :: [Window  app] -- ^ PITFALL: Order matters.
       -- Key presses are handled by the first window containing them.
       -- Windows listed earlier are thus "above" later ones.
   , _stToMonome :: Socket -- ^ PITFALL: It's tempting to remove this from St.
@@ -117,19 +120,25 @@ data St = St {
   -- scattered functions can simply change an `St` instead of doing IO.
   , _stPending_Monome :: [LedMsg]
   , _stPending_Vivid :: [SoundMsg]
+  } deriving (Show, Eq)
 
-  , _stXyShift :: (X,Y) -- ^ this is relative -- a vector, not a point
+data EtApp = EtApp
+  { _stXyShift :: (X,Y) -- ^ this is relative -- a vector, not a point
   , _stFingers :: Map (X,Y) VoiceId
     -- ^ Where fingers are, what each is sounding,
     -- and what each is lighting up.
   , _stLit :: LitPitches
-
   , _stSustained :: Maybe (Set VoiceId)
     -- ^ PITFALL: In spirit, the thing sustained is a Pitch,
     -- but it's represented as a voice,
     -- identified by the key that originally launched it.
   } deriving (Show, Eq)
 
+data JiApp = JiApp
+  deriving (Show, Eq)
+
 makeLenses ''SoundMsg
 makeLenses ''Voice
 makeLenses ''St
+makeLenses ''EtApp
+makeLenses ''JiApp

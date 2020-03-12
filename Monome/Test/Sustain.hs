@@ -37,16 +37,18 @@ test_toggleSustain :: Test
 test_toggleSustain = TestCase $ do
   assertBool "turn sustain on" $
     toggleSustain st_0f =^=
-    ( st_0f & ( stLit . at pc0 . _Just %~ S.insert LedBecauseSustain )
-      & stSustained .~ Just (S.singleton v0 ) )
+    ( st_0f & ( stApp . stLit . at pc0 . _Just
+                %~ S.insert LedBecauseSustain )
+            & stApp . stSustained .~ Just (S.singleton v0 ) )
   assertBool "turn sustain off" $
     toggleSustain st_0s
-    =^= ( st_0s & stLit .~ mempty
-          & stSustained .~ Nothing )
+    =^= ( st_0s & stApp . stLit .~ mempty
+                & stApp . stSustained .~ Nothing )
   assertBool "turn sustain off, but finger persists" $
     toggleSustain st_0fs
-    =^= ( st_0fs & stLit . at pc0 . _Just %~ S.delete LedBecauseSustain
-          & stSustained .~ Nothing )
+    =^= ( st_0fs & ( stApp . stLit . at pc0 . _Just
+                     %~ S.delete LedBecauseSustain )
+                 & stApp . stSustained .~ Nothing )
 
 test_deleteOneSustainedNote_and_insertOneSustainedNote :: Test
 test_deleteOneSustainedNote_and_insertOneSustainedNote = TestCase $ do
@@ -74,12 +76,12 @@ test_sustainHandler = TestCase $ do
 
   assertBool "turning ON sustain changes the sustain state, the set of sustained voices, the set of reasons for keys to be lit, and the messages pending to the monome." $
     Su.handler st_0f (meh, True)
-    =^= st_0f { _stSustained = Just $ S.singleton v0
-              , _stLit = M.singleton pc0 $
-                         S.fromList [ LedBecauseSustain
-                                    , LedBecauseSwitch xy0 ]
-              , _stPending_Monome =
-                [ (Su.label, (Su.theButton, True)) ] }
+    =^= (st_0f & stApp . stSustained .~ Just (S.singleton v0)
+               & stApp . stLit .~ M.singleton pc0
+                 ( S.fromList [ LedBecauseSustain
+                              , LedBecauseSwitch xy0 ] )
+               & stPending_Monome .~
+                 [ (Su.label, (Su.theButton, True)) ] )
 
   assertBool ( "turning sustain OFF does all this stuff:\n" ++
                "flip the sustain state\n" ++
@@ -90,13 +92,13 @@ test_sustainHandler = TestCase $ do
                "Pitch 0 is fingered, and 0 and 1 sounding; 1 turns off.") $
     Su.handler st_0fs_1s (meh, True)
     =^= ( st_0fs_1s
-          & stSustained .~ mempty
-          & stLit .~ M.singleton pc0 ( S.singleton $
-                                       LedBecauseSwitch xy0 )
+          & stApp . stSustained .~ mempty
+          & stApp . stLit .~ M.singleton pc0 ( S.singleton $
+                                               LedBecauseSwitch xy0 )
           & stPending_Monome .~
           ( ( Su.label, (Su.theButton, False)) :
             map (\xy -> (K.label, (xy, False)))
-            (pcToXys (_stXyShift st_0fs_1s) pc1) )
+            (pcToXys (st_0fs_1s ^. stApp . stXyShift) pc1) )
           & stPending_Vivid .~ [ SoundMsg { _soundMsgVoiceId = v1
                                           , _soundMsgPitch = Nothing
                                           , _soundMsgVal = 0

@@ -26,9 +26,9 @@ et31ToFreq f = 2**(fi f / 31)
 xyToEt31 :: (X,Y) -> Pitch
 xyToEt31 (x,y) = 6 * x + y
 
-xyToEt31_st :: St -> (X,Y) -> Pitch
+xyToEt31_st :: St EtApp -> (X,Y) -> Pitch
 xyToEt31_st st xy =
-  xyToEt31 $ addPair xy $ negPair $ _stXyShift st
+  xyToEt31 $ addPair xy $ negPair $ _stXyShift $ _stApp st
 
 
 -- | The numerically lowest (closest to the top-left corner)
