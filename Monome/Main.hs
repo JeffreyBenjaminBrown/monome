@@ -112,7 +112,7 @@ ji monomePort scale shifts = do
        <$> mapM (synth boop) (replicate 256 ())
 
   mst <- newMVar $ St {
-      _stWindowLayers = []
+      _stWindowLayers = [jiWindow]
     , _stToMonome = toMonome
     , _stVoices = voices
     , _stPending_Vivid = []
