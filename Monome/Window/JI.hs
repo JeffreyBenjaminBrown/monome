@@ -15,8 +15,7 @@ module Monome.Window.JI (
 
 import           Prelude hiding (pred)
 import           Control.Lens
-import           Data.Either
-import qualified Data.Set as S
+import qualified Data.Map as M
 
 import qualified Monome.Config as Config
 import Monome.Types.Button
@@ -36,14 +35,22 @@ jiWindow =  Window {
   , windowInit = id
   , windowRoutine = handler }
 
+-- TODO untested
 handler :: St JiApp
         -> ((X,Y), Switch)
         -> St JiApp
-handler st press @ (xy,sw) =
-  error "like the keyboard handler"
+handler st press @ (xy,sw) = let
+  fingers' = st ^. stApp . jiFingers
+             & case sw of
+                 True  -> M.insert xy xy
+                 False -> M.delete xy
+  soundMsgs :: [SoundMsg] = jiKey_SoundMsg (st ^. stApp) press
+  st1 :: St JiApp = st
+    & stApp . jiFingers .~ fingers'
+    & stPending_Vivid   %~ (++ soundMsgs)
+  in foldr updateVoice st1 soundMsgs
 
 -- TODO ! duplicative of `etKey_SoundMsg`
--- TODO ! untested
 jiKey_SoundMsg :: JiApp -> ((X,Y), Switch) -> [SoundMsg]
 jiKey_SoundMsg ja (xy,switch) = let
   doIfKeyFound :: Float -> [SoundMsg]
