@@ -2,7 +2,7 @@ module Monome.Util (
   ByteString
   , pack
   , unpack
-  , fi
+  , fi, fr
   , numBetween
   , addPair
   , negPair
@@ -17,6 +17,9 @@ import Data.ByteString.Char8 (pack, unpack)
 -- | Because OSC needs a lot of Int32 values while I prefer Int.
 fi :: (Integral a, Num b) => a -> b
 fi = fromIntegral
+
+fr :: Fractional a => Rational -> a
+fr = fromRational
 
 numBetween :: (Num a, Ord a) => a -> a -> a -> Bool
 numBetween low high x = x >= low && x <= high

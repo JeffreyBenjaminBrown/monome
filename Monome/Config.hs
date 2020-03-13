@@ -7,4 +7,4 @@ amp :: Float
 amp = 0.15
 
 freq :: Float
-freq = 100
+freq = 50

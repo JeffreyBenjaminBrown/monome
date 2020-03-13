@@ -26,6 +26,7 @@ library
   exposed-modules:
       Monome.Config
     , Monome.Instances.TypesafeArgs
+    , Monome.JiScales
     , Monome.Main
     , Monome.Math31
     , Monome.Network.ListenAndPrintOsc
