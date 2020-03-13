@@ -14,10 +14,14 @@ module Monome.Window.JI (
 
 import           Prelude hiding (pred)
 import           Control.Lens
+import           Data.Either
+import qualified Data.Set as S
 
+import qualified Monome.Config as Config
 import Monome.Types.Button
 import Monome.Types.Initial
 import Monome.Util
+import Monome.Window.Common
 
 
 label :: WindowId
@@ -35,11 +39,25 @@ handler :: St JiApp
         -> ((X,Y), Switch)
         -> St JiApp
 handler st press @ (xy,sw) =
-  error "like the Keyboard handler"
+  error "like the keyboard handler"
 
-jiKeySound :: St JiApp -> ((X,Y), Switch) -> [SoundMsg]
-jiKeySound st (xy,switch) =
-  error "like keyMsg"
+-- TODO ! duplicative of `etKeyMsg`
+-- TODO ! untested
+jiKeySound :: JiApp -> ((X,Y), Switch) -> [SoundMsg]
+jiKeySound ja (xy,switch) = let
+  doIfKeyFound :: Float -> [SoundMsg]
+  doIfKeyFound freq =
+    if switch
+      then let msg = SoundMsg
+                     { _soundMsgVoiceId = xy
+                     , _soundMsgPitch = Just $ floor freq } -- HACK. `_soundMsgPitch` Isn't used in the JI app, but it is copied to somewhere else, so I can't leave the field unset.
+           in [ msg & soundMsgVal .~ Config.baseFreq * freq
+                & soundMsgParam .~ "freq"
+              , msg & soundMsgVal .~ Config.voiceAmplitude
+                & soundMsgParam .~ "amp" ]
+      else [silenceMsg xy]
+  in either (const []) doIfKeyFound $ jiFreq ja xy
+     -- [] if key out of range; key corresponds to no pitch
 
 jiFreq :: JiApp -> (X,Y) -> Either String Float
 jiFreq ja (x,y) = do

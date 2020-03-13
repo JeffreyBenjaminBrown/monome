@@ -1,5 +1,4 @@
 {-# OPTIONS_GHC -fno-warn-type-defaults #-}
-{-# OPTIONS_GHC -fno-warn-missing-fields #-}
 {-# LANGUAGE TupleSections
 , ScopedTypeVariables #-}
 
@@ -39,14 +38,19 @@ silenceMsg xy = SoundMsg {
   , _soundMsgVal = 0
   , _soundMsgParam = "amp" }
 
+-- TODO ! duplicative of `jiKeySound`
 etKeyMsg :: St EtApp -> ((X,Y), Switch) -> [SoundMsg]
 etKeyMsg st (xy, sw) = do
   let pitch = xyToEt31_st st xy
   if maybe False (S.member xy) $ st ^. stApp . etSustaineded
     then [] -- it's already sounding due to sustain
     else if sw
-         then let msg = SoundMsg { _soundMsgVoiceId = xy
-                                 , _soundMsgPitch = Just pitch }
+         then let msg = SoundMsg
+                    { _soundMsgVoiceId = xy
+                    , _soundMsgPitch = Just pitch
+                    , _soundMsgVal = error "replaced below"
+                    , _soundMsgParam = error "replaced below"
+                    }
               in [ msg & ( soundMsgVal .~
                            Config.baseFreq * et31ToFreq pitch )
                        & soundMsgParam .~ "freq"

@@ -1,4 +1,7 @@
 * TODO for JI synth
+** rename
+etKeyMsg -> etKey_SoundMsg
+jiKeySound -> jiKey_SoundMsg
 * TODO create voices on the fly
 ** Vivid: voice creation, use and deletion
 use "synth" to make a synth, "free" to free it:
