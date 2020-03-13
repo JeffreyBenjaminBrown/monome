@@ -41,36 +41,36 @@ keyboardWindow =  Window {
 handler :: St EtApp
         -> ((X,Y), Switch)
         -> St EtApp
-handler st press @ (xy,sw) =
-  let pcNow :: PitchClass =
-        mod (xyToEt31_st st xy) 31
-        -- what the key represents currently
-      pcThen :: Maybe PitchClass =
-        ledBecause_toPitchClass (st ^. stApp . etLit) $ LedBecauseSwitch xy
-        -- what the key represented when it was pressed,
-        -- if it is now being released
-      fingers' = st ^. stApp . etFingers
+handler st press @ (xy,sw) = let
+  fingers' = st ^. stApp . etFingers
         & case sw of
             True  -> M.insert xy xy
             False -> M.delete xy
-      lit  :: LitPitches = st ^. stApp . etLit
-      lit' :: LitPitches = updateStLit (xy,sw) pcNow pcThen lit
-      oldKeys :: Set PitchClass  = S.fromList $ M.keys $ lit
-      newKeys :: Set PitchClass  = S.fromList $ M.keys $ lit'
-      toDark  ::    [PitchClass] = S.toList $ S.difference oldKeys newKeys
-      toLight ::    [PitchClass] = S.toList $ S.difference newKeys oldKeys
-      kbdMsgs :: [LedMsg] =
-        map (label,) $
-        ( map (,False) $
-          concatMap (pcToXys $ st ^. stApp . etXyShift) toDark) ++
-        ( map (,True)  $
-          concatMap (pcToXys $ st ^. stApp . etXyShift) toLight)
-      soundMsgs :: [SoundMsg] = etKey_SoundMsg st press
-      st1 :: St EtApp = st
-        & stApp . etFingers .~ fingers'
-        & stApp . etLit     .~ lit'
-        & stPending_Monome  %~ flip (++) kbdMsgs
-        & stPending_Vivid   %~ flip (++) soundMsgs
+  pcNow :: PitchClass =
+    mod (xyToEt31_st st xy) 31
+    -- what the key represents currently
+  pcThen :: Maybe PitchClass =
+    ledBecause_toPitchClass (st ^. stApp . etLit) $ LedBecauseSwitch xy
+    -- what the key represented when it was pressed,
+    -- if it is now being released
+  lit  :: LitPitches = st ^. stApp . etLit
+  lit' :: LitPitches = updateStLit (xy,sw) pcNow pcThen lit
+  oldKeys :: Set PitchClass  = S.fromList $ M.keys $ lit
+  newKeys :: Set PitchClass  = S.fromList $ M.keys $ lit'
+  toDark  ::    [PitchClass] = S.toList $ S.difference oldKeys newKeys
+  toLight ::    [PitchClass] = S.toList $ S.difference newKeys oldKeys
+  kbdMsgs :: [LedMsg] =
+    map (label,) $
+    ( map (,False) $
+      concatMap (pcToXys $ st ^. stApp . etXyShift) toDark) ++
+    ( map (,True)  $
+      concatMap (pcToXys $ st ^. stApp . etXyShift) toLight)
+  soundMsgs :: [SoundMsg] = etKey_SoundMsg st press
+  st1 :: St EtApp = st
+    & stApp . etFingers .~ fingers'
+    & stApp . etLit     .~ lit'
+    & stPending_Monome  %~ (++ kbdMsgs)
+    & stPending_Vivid   %~ (++ soundMsgs)
   in foldr updateVoice st1 soundMsgs
 
 updateStLit :: ((X,Y), Switch)
