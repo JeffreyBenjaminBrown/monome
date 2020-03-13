@@ -9,7 +9,8 @@ module Monome.Window.JI (
   , jiWindow
   , label
 
-  , jiFreq -- ^ JiApp -> (X,Y) -> Either String Float
+  , jiKey_SoundMsg -- ^ JiApp -> ((X,Y), Switch) -> [SoundMsg]
+  , jiFreq         -- ^ JiApp -> (X,Y) -> Either String Float
   ) where
 
 import           Prelude hiding (pred)
@@ -50,11 +51,13 @@ jiKey_SoundMsg ja (xy,switch) = let
     if switch
       then let msg = SoundMsg
                      { _soundMsgVoiceId = xy
-                     , _soundMsgPitch = Just $ floor freq } -- HACK. `_soundMsgPitch` Isn't used in the JI app, but it is copied to somewhere else, so I can't leave the field unset.
+                     , _soundMsgPitch = Just $ floor freq -- HACK. `_soundMsgPitch` Isn't used in the JI app, but it is copied to somewhere else, so I can't leave the field unset.
+                     , _soundMsgVal = error "this gets set below"
+                     , _soundMsgParam = error "this gets set below" }
            in [ msg & soundMsgVal .~ Config.freq * freq
-                & soundMsgParam .~ "freq"
+                    & soundMsgParam .~ "freq"
               , msg & soundMsgVal .~ Config.amp
-                & soundMsgParam .~ "amp" ]
+                    & soundMsgParam .~ "amp" ]
       else [silenceMsg xy]
   in either (const []) doIfKeyFound $ jiFreq ja xy
      -- [] if key out of range; key corresponds to no pitch
