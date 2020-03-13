@@ -41,10 +41,10 @@ handler :: St JiApp
 handler st press @ (xy,sw) =
   error "like the keyboard handler"
 
--- TODO ! duplicative of `etKeyMsg`
+-- TODO ! duplicative of `etKey_SoundMsg`
 -- TODO ! untested
-jiKeySound :: JiApp -> ((X,Y), Switch) -> [SoundMsg]
-jiKeySound ja (xy,switch) = let
+jiKey_SoundMsg :: JiApp -> ((X,Y), Switch) -> [SoundMsg]
+jiKey_SoundMsg ja (xy,switch) = let
   doIfKeyFound :: Float -> [SoundMsg]
   doIfKeyFound freq =
     if switch
