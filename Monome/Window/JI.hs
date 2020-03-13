@@ -51,9 +51,9 @@ jiKey_SoundMsg ja (xy,switch) = let
       then let msg = SoundMsg
                      { _soundMsgVoiceId = xy
                      , _soundMsgPitch = Just $ floor freq } -- HACK. `_soundMsgPitch` Isn't used in the JI app, but it is copied to somewhere else, so I can't leave the field unset.
-           in [ msg & soundMsgVal .~ Config.baseFreq * freq
+           in [ msg & soundMsgVal .~ Config.freq * freq
                 & soundMsgParam .~ "freq"
-              , msg & soundMsgVal .~ Config.voiceAmplitude
+              , msg & soundMsgVal .~ Config.amp
                 & soundMsgParam .~ "amp" ]
       else [silenceMsg xy]
   in either (const []) doIfKeyFound $ jiFreq ja xy

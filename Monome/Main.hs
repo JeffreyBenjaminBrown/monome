@@ -42,11 +42,11 @@ et31 monomePort = do
   voices :: M.Map VoiceId Voice <-
     let voiceIds = [(a,b) | a <- [0..15], b <- [0..15]]
         defaultVoiceState s = Voice { _voiceSynth = s
-                                    , _voicePitch = floor Config.baseFreq
+                                    , _voicePitch = floor Config.freq
                                     , _voiceParams = mempty }
           -- `mempty` above is inaccurate -- initially each voice has
           -- amp 0 and freq 100, because those ares the `Boop` defaults.
-          -- Config.baseFreq might be wrong too, since baseFreq is a Hz value.
+          -- Config.freq might be wrong too, since freq is a Hz value.
           -- Since none are sounding, I don't think any of that matters.
     in M.fromList . zip voiceIds . map defaultVoiceState
        <$> mapM (synth boop) (replicate 256 ())
@@ -100,7 +100,7 @@ ji monomePort scale shifts = do
   voices :: M.Map VoiceId Voice <-
     let voiceIds = [(a,b) | a <- [0..15], b <- [0..15]]
         defaultVoiceState s = Voice { _voiceSynth = s
-                                    , _voicePitch = floor Config.baseFreq
+                                    , _voicePitch = floor Config.freq
                                     , _voiceParams = mempty }
     in M.fromList . zip voiceIds . map defaultVoiceState
        <$> mapM (synth boop) (replicate 256 ())

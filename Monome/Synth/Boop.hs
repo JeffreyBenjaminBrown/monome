@@ -16,7 +16,7 @@ type BoopParams = '["freq","amp"]
 -- | PITFALL: A default freq of 0 might seem natural,
 -- but that causes a popping sounds when it's changed.
 boop :: SynthDef BoopParams
-boop = sd ( toI Config.baseFreq :: I "freq"
+boop = sd ( toI Config.freq :: I "freq"
           , 0 :: I "amp"
           ) $ do
   -- p <- pulse (freq_ (V::V "freq"))

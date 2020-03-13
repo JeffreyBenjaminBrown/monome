@@ -1,8 +1,10 @@
+-- | PITFALL: Import this library qualified to avoid name conflicts.
+
 module Monome.Config where
 
 
-voiceAmplitude :: Float
-voiceAmplitude = 0.15
+amp :: Float
+amp = 0.15
 
-baseFreq :: Float
-baseFreq = 100
+freq :: Float
+freq = 100

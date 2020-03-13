@@ -52,9 +52,9 @@ etKey_SoundMsg st (xy, sw) = do
                     , _soundMsgParam = error "replaced below"
                     }
               in [ msg & ( soundMsgVal .~
-                           Config.baseFreq * et31ToFreq pitch )
+                           Config.freq * et31ToFreq pitch )
                        & soundMsgParam .~ "freq"
-                 , msg & soundMsgVal .~ Config.voiceAmplitude
+                 , msg & soundMsgVal .~ Config.amp
                        & soundMsgParam .~ "amp" ]
          else [silenceMsg xy]
 

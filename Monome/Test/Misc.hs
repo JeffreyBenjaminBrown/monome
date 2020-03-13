@@ -43,7 +43,7 @@ test_etKey_SoundMsg = TestCase $ do
                , _soundMsgParam = "freq" }
     , SoundMsg { _soundMsgVoiceId = newVoice
                , _soundMsgPitch = Just newPitch
-               , _soundMsgVal = Config.voiceAmplitude
+               , _soundMsgVal = Config.amp
                , _soundMsgParam = "amp" } ]
   assertBool "release a key that's not sustained" $
     etKey_SoundMsg st (newVoice, False) ==
