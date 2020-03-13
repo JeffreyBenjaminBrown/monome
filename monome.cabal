@@ -35,6 +35,7 @@ library
     , Monome.Test
     , Monome.Test.Data
     , Monome.Test.HandTest
+    , Monome.Test.JI
     , Monome.Test.Misc
     , Monome.Test.Sustain
     , Monome.Test.Windows
@@ -44,6 +45,7 @@ library
     , Monome.Types.Window
     , Monome.Util
     , Monome.Window.Common
+    , Monome.Window.JI
     , Monome.Window.Keyboard
     , Monome.Window.Shift
     , Monome.Window.Sustain

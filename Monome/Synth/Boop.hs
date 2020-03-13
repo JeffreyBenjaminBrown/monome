@@ -8,7 +8,6 @@ module Monome.Synth.Boop (
 
 import Vivid
 
-import Monome.Util
 import qualified Monome.Config as Config
 
 
