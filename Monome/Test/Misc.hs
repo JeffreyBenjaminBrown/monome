@@ -28,7 +28,7 @@ test_etKeyMsg :: Test
 test_etKeyMsg = TestCase $ do
   let sustainedVoice :: VoiceId = (0,0)
       newVoice :: VoiceId = (0,1)
-      st = st0 & ( stApp . stSustained .~
+      st = st0 & ( stApp . etSustaineded .~
                    Just (S.singleton sustainedVoice) )
       newPitch = xyToEt31_st st newVoice
   assertBool "pressing a key that's sustained has no effect" $

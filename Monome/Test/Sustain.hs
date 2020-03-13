@@ -37,18 +37,18 @@ test_toggleSustain :: Test
 test_toggleSustain = TestCase $ do
   assertBool "turn sustain on" $
     toggleSustain st_0f =^=
-    ( st_0f & ( stApp . stLit . at pc0 . _Just
+    ( st_0f & ( stApp . etLit . at pc0 . _Just
                 %~ S.insert LedBecauseSustain )
-            & stApp . stSustained .~ Just (S.singleton v0 ) )
+            & stApp . etSustaineded .~ Just (S.singleton v0 ) )
   assertBool "turn sustain off" $
     toggleSustain st_0s
-    =^= ( st_0s & stApp . stLit .~ mempty
-                & stApp . stSustained .~ Nothing )
+    =^= ( st_0s & stApp . etLit .~ mempty
+                & stApp . etSustaineded .~ Nothing )
   assertBool "turn sustain off, but finger persists" $
     toggleSustain st_0fs
-    =^= ( st_0fs & ( stApp . stLit . at pc0 . _Just
+    =^= ( st_0fs & ( stApp . etLit . at pc0 . _Just
                      %~ S.delete LedBecauseSustain )
-                 & stApp . stSustained .~ Nothing )
+                 & stApp . etSustaineded .~ Nothing )
 
 test_deleteOneSustainedNote_and_insertOneSustainedNote :: Test
 test_deleteOneSustainedNote_and_insertOneSustainedNote = TestCase $ do
@@ -76,8 +76,8 @@ test_sustainHandler = TestCase $ do
 
   assertBool "turning ON sustain changes the sustain state, the set of sustained voices, the set of reasons for keys to be lit, and the messages pending to the monome." $
     Su.handler st_0f (meh, True)
-    =^= (st_0f & stApp . stSustained .~ Just (S.singleton v0)
-               & stApp . stLit .~ M.singleton pc0
+    =^= (st_0f & stApp . etSustaineded .~ Just (S.singleton v0)
+               & stApp . etLit .~ M.singleton pc0
                  ( S.fromList [ LedBecauseSustain
                               , LedBecauseSwitch xy0 ] )
                & stPending_Monome .~
@@ -92,13 +92,13 @@ test_sustainHandler = TestCase $ do
                "Pitch 0 is fingered, and 0 and 1 sounding; 1 turns off.") $
     Su.handler st_0fs_1s (meh, True)
     =^= ( st_0fs_1s
-          & stApp . stSustained .~ mempty
-          & stApp . stLit .~ M.singleton pc0 ( S.singleton $
+          & stApp . etSustaineded .~ mempty
+          & stApp . etLit .~ M.singleton pc0 ( S.singleton $
                                                LedBecauseSwitch xy0 )
           & stPending_Monome .~
           ( ( Su.label, (Su.theButton, False)) :
             map (\xy -> (K.label, (xy, False)))
-            (pcToXys (st_0fs_1s ^. stApp . stXyShift) pc1) )
+            (pcToXys (st_0fs_1s ^. stApp . etXyShift) pc1) )
           & stPending_Vivid .~ [ SoundMsg { _soundMsgVoiceId = v1
                                           , _soundMsgPitch = Nothing
                                           , _soundMsgVal = 0

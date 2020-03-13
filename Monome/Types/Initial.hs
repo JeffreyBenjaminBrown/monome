@@ -12,7 +12,7 @@ module Monome.Types.Initial (
   , Voice(..), voiceSynth, voicePitch, voiceParams
   , St(..), stApp, stWindowLayers, stToMonome, stVoices
     , stPending_Monome, stPending_Vivid
-  , EtApp(..), stXyShift, stFingers, stLit, stSustained
+  , EtApp(..), etXyShift, etFingers, etLit, etSustaineded
   , JiApp(..)
   ) where
 
@@ -123,12 +123,12 @@ data St app = St {
   } deriving (Show, Eq)
 
 data EtApp = EtApp
-  { _stXyShift :: (X,Y) -- ^ this is relative -- a vector, not a point
-  , _stFingers :: Map (X,Y) VoiceId
+  { _etXyShift :: (X,Y) -- ^ this is relative -- a vector, not a point
+  , _etFingers :: Map (X,Y) VoiceId
     -- ^ Where fingers are, what each is sounding,
     -- and what each is lighting up.
-  , _stLit :: LitPitches
-  , _stSustained :: Maybe (Set VoiceId)
+  , _etLit :: LitPitches
+  , _etSustaineded :: Maybe (Set VoiceId)
     -- ^ PITFALL: In spirit, the thing sustained is a Pitch,
     -- but it's represented as a voice,
     -- identified by the key that originally launched it.

@@ -36,45 +36,45 @@ st0 = St {
                            , (v1, Voice { _voicePitch = pitch1 } ) ]
   , _stPending_Monome = []
   , _stPending_Vivid = []
-  , _stApp = EtApp { _stXyShift = (3,5)
-                   , _stFingers = mempty
-                   , _stLit = mempty
-                   , _stSustained = Nothing
+  , _stApp = EtApp { _etXyShift = (3,5)
+                   , _etFingers = mempty
+                   , _etLit = mempty
+                   , _etSustaineded = Nothing
                    }
   }
 
 st_0a = -- 0 is the anchor pitch
-  st0 & stApp . stLit %~ M.insert pc0 (S.singleton LedBecauseAnchor)
+  st0 & stApp . etLit %~ M.insert pc0 (S.singleton LedBecauseAnchor)
 
 st_0f = -- fingering key 0 only
-  st0 & stApp . stFingers .~ M.fromList [ (xy0, v0) ]
-      & stApp . stLit .~  M.fromList
+  st0 & stApp . etFingers .~ M.fromList [ (xy0, v0) ]
+      & stApp . etLit .~  M.fromList
         [ ( pc0, S.singleton $ LedBecauseSwitch xy0) ]
 
 st_0s = -- sustaining key 0 only
   st0
-  & stApp . stLit .~  M.singleton pc0
+  & stApp . etLit .~  M.singleton pc0
     (S.singleton LedBecauseSustain)
-  & stApp . stSustained .~ Just (S.singleton v0)
+  & stApp . etSustaineded .~ Just (S.singleton v0)
 
 st_01f = -- fingering keys 0 and 1
-  st0 & stApp . stFingers .~ M.fromList [ (xy0, v0)
+  st0 & stApp . etFingers .~ M.fromList [ (xy0, v0)
                                         , (xy1, v1) ]
-  & stApp . stLit .~ M.fromList
+  & stApp . etLit .~ M.fromList
     [ ( pc0, S.singleton $ LedBecauseSwitch xy0)
     , ( pc1, S.singleton $ LedBecauseSwitch xy1) ]
 
 st_0fs = -- 0 is both fingered and sustained
   st_0f
-  & stApp . stSustained .~ Just (S.singleton v0)
-  & stApp . stLit .~  ( M.singleton pc0
+  & stApp . etSustaineded .~ Just (S.singleton v0)
+  & stApp . etLit .~  ( M.singleton pc0
                         $ S.fromList [ LedBecauseSwitch xy0
                                      , LedBecauseSustain ] )
 
 st_0af = -- 0 is both fingered and the anchor pitch
-  st_0f & stApp . stLit . at pc0 . _Just
+  st_0f & stApp . etLit . at pc0 . _Just
           %~ S.insert LedBecauseAnchor
 
 st_0fs_1s = -- 0 is both fingered and sustained, 1 is sustained
-  st_0fs & stApp . stSustained . _Just %~ S.insert v1
-         & stApp . stLit %~ M.insert pc1 (S.singleton LedBecauseSustain)
+  st_0fs & stApp . etSustaineded . _Just %~ S.insert v1
+         & stApp . etLit %~ M.insert pc1 (S.singleton LedBecauseSustain)

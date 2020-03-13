@@ -50,17 +50,17 @@ handler    st    (_ , False)      = st
 handler    st    (_,  True)      = let
   st1 = toggleSustain st
   kbdMsgs :: [LedMsg] =
-    if null $ st1 ^. stApp . stSustained
+    if null $ st1 ^. stApp . etSustaineded
     then map ( (Kbd.label,) . (,False) ) $
-         concatMap (pcToXys $ st ^. stApp . stXyShift) $
+         concatMap (pcToXys $ st ^. stApp . etXyShift) $
          pitchClassesToDarken_uponSustainOff st st1
     else []
   sdMsgs :: [SoundMsg] =
-    if null $ st1 ^. stApp . stSustained
+    if null $ st1 ^. stApp . etSustaineded
     then map silenceMsg $ S.toList $ voicesToSilence_uponSustainOff st
     else []
   sustainButtonMsg = ( label
-                     , (theButton, isJust $ st1 ^. stApp . stSustained) )
+                     , (theButton, isJust $ st1 ^. stApp . etSustaineded) )
   st2 = st1 & stPending_Monome %~ flip (++) (sustainButtonMsg : kbdMsgs)
             & stPending_Vivid  %~ flip (++) sdMsgs
   in foldr updateVoice st2 sdMsgs
@@ -75,7 +75,7 @@ pitchClassesToDarken_uponSustainOff oldSt newSt =
   S.filter (not . mustStayLit) $ voicesToSilence_pcs
   where
     mustStayLit :: PitchClass -> Bool
-    mustStayLit pc = case M.lookup pc $ newSt ^. stApp . stLit of
+    mustStayLit pc = case M.lookup pc $ newSt ^. stApp . etLit of
       Nothing -> False
       Just s -> if null s
         then error "pitchClassesToDarken_uponSustainOff: null value in LitPitches."
@@ -86,9 +86,9 @@ pitchClassesToDarken_uponSustainOff oldSt newSt =
 voicesToSilence_uponSustainOff :: St EtApp -> Set VoiceId
 voicesToSilence_uponSustainOff st = let
   sustained :: Set VoiceId =
-    maybe mempty id $ st ^. stApp . stSustained
+    maybe mempty id $ st ^. stApp . etSustaineded
   fingered :: Set VoiceId =
-    S.fromList $ M.keys $ st ^. stApp . stFingers
+    S.fromList $ M.keys $ st ^. stApp . etFingers
   in S.difference sustained fingered
 
 -- | When the sustain button is toggled --
@@ -98,21 +98,21 @@ voicesToSilence_uponSustainOff st = let
 toggleSustain :: St EtApp -> St EtApp
 toggleSustain st = let
   sustainOn' :: Bool = -- new sustain state
-    not $ isJust $ st ^. stApp . stSustained
+    not $ isJust $ st ^. stApp . etSustaineded
   sustainedVs :: Maybe (Set VoiceId) =
     if not sustainOn' then Nothing
-    else Just $ S.fromList $ M.elems $ st ^. stApp . stFingers
+    else Just $ S.fromList $ M.elems $ st ^. stApp . etFingers
 
   lit' | sustainOn' =
-         foldr insertOneSustainedNote (st ^. stApp . stLit)
+         foldr insertOneSustainedNote (st ^. stApp . etLit)
          $ map (vid_to_pitch st)
-         $ M.elems $ st ^. stApp . stFingers
+         $ M.elems $ st ^. stApp . etFingers
        | otherwise =
-         foldr deleteOneSustainedNote (st ^. stApp . stLit)
+         foldr deleteOneSustainedNote (st ^. stApp . etLit)
          $ map (vid_to_pitch st) $ S.toList
-         $ maybe (error "impossible") id $ st ^. stApp . stSustained
-  in st & stApp . stSustained .~ sustainedVs
-        & stApp . stLit       .~ lit'
+         $ maybe (error "impossible") id $ st ^. stApp . etSustaineded
+  in st & stApp . etSustaineded .~ sustainedVs
+        & stApp . etLit       .~ lit'
 
 -- | When sustain is toggled, the reasons for having LEDs on change.
 -- If it is turned on, some LEDs are now lit for two reasons:

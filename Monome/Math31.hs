@@ -28,7 +28,7 @@ xyToEt31 (x,y) = 6 * x + y
 
 xyToEt31_st :: St EtApp -> (X,Y) -> Pitch
 xyToEt31_st st xy =
-  xyToEt31 $ addPair xy $ negPair $ _stXyShift $ _stApp st
+  xyToEt31 $ addPair xy $ negPair $ _etXyShift $ _stApp st
 
 
 -- | The numerically lowest (closest to the top-left corner)

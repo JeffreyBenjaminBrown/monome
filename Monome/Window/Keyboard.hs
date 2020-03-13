@@ -34,8 +34,8 @@ keyboardWindow =  Window {
   , windowInit = \st ->
       st & stPending_Monome %~
       flip (++) ( map ( (label,) . (,True) ) $
-                  concatMap (pcToXys $ st ^. stApp . stXyShift) $
-                  M.keys $ st ^. stApp . stLit )
+                  concatMap (pcToXys $ st ^. stApp . etXyShift) $
+                  M.keys $ st ^. stApp . etLit )
   , windowRoutine = handler }
 
 handler :: St EtApp
@@ -46,14 +46,14 @@ handler st press @ (xy,sw) =
         mod (xyToEt31_st st xy) 31
         -- what the key represents currently
       pcThen :: Maybe PitchClass =
-        ledBecause_toPitchClass (st ^. stApp . stLit) $ LedBecauseSwitch xy
+        ledBecause_toPitchClass (st ^. stApp . etLit) $ LedBecauseSwitch xy
         -- what the key represented when it was pressed,
         -- if it is now being released
-      fingers' = st ^. stApp . stFingers
+      fingers' = st ^. stApp . etFingers
         & case sw of
             True  -> M.insert xy xy
             False -> M.delete xy
-      lit  :: LitPitches = st ^. stApp . stLit
+      lit  :: LitPitches = st ^. stApp . etLit
       lit' :: LitPitches = updateStLit (xy,sw) pcNow pcThen lit
       oldKeys :: Set PitchClass  = S.fromList $ M.keys $ lit
       newKeys :: Set PitchClass  = S.fromList $ M.keys $ lit'
@@ -62,13 +62,13 @@ handler st press @ (xy,sw) =
       kbdMsgs :: [LedMsg] =
         map (label,) $
         ( map (,False) $
-          concatMap (pcToXys $ st ^. stApp . stXyShift) toDark) ++
+          concatMap (pcToXys $ st ^. stApp . etXyShift) toDark) ++
         ( map (,True)  $
-          concatMap (pcToXys $ st ^. stApp . stXyShift) toLight)
+          concatMap (pcToXys $ st ^. stApp . etXyShift) toLight)
       soundMsgs :: [SoundMsg] = etKeyMsg st press
       st1 :: St EtApp = st
-        & stApp . stFingers .~ fingers'
-        & stApp . stLit     .~ lit'
+        & stApp . etFingers .~ fingers'
+        & stApp . etLit     .~ lit'
         & stPending_Monome  %~ flip (++) kbdMsgs
         & stPending_Vivid   %~ flip (++) soundMsgs
   in foldr updateVoice st1 soundMsgs

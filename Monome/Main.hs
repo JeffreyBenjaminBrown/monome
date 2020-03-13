@@ -59,11 +59,11 @@ et31 monomePort = do
     , _stPending_Monome = []
 
     , _stApp = EtApp
-        { _stXyShift = (0,0)
-        , _stFingers = mempty
-        , _stLit = mempty
+        { _etXyShift = (0,0)
+        , _etFingers = mempty
+        , _etLit = mempty
           -- M.singleton (2 :: PitchClass) $ S.singleton LedBecauseAnchor
-        , _stSustained = mempty
+        , _etSustaineded = mempty
         }
     }
 
