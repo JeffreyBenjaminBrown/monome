@@ -42,11 +42,12 @@ et31 monomePort = do
   voices :: M.Map VoiceId Voice <-
     let voiceIds = [(a,b) | a <- [0..15], b <- [0..15]]
         defaultVoiceState s = Voice { _voiceSynth = s
-                                    , _voicePitch = Config.initialPitch
+                                    , _voicePitch = floor Config.baseFreq
                                     , _voiceParams = mempty }
           -- `mempty` above is inaccurate -- initially each voice has
           -- amp 0 and freq 100, because those ares the `Boop` defaults.
-          -- Since none are sounding, I don't think it matters.
+          -- Config.baseFreq might be wrong too, since baseFreq is a Hz value.
+          -- Since none are sounding, I don't think any of that matters.
     in M.fromList . zip voiceIds . map defaultVoiceState
        <$> mapM (synth boop) (replicate 256 ())
   mst <- newMVar $ St {
@@ -95,17 +96,12 @@ ji :: Int -- ^ The monome address, as serialoscd reports on startup.
 ji monomePort scale shifts = do
 
   inbox :: Socket <- receivesAt "127.0.0.1" 8000
-    -- I don't know why it's port 8000, or why it used to be 11111.
   toMonome :: Socket <- sendsTo (unpack localhost) monomePort
-    -- to find the port number above, use the first part of HandTest.hs
   voices :: M.Map VoiceId Voice <-
     let voiceIds = [(a,b) | a <- [0..15], b <- [0..15]]
         defaultVoiceState s = Voice { _voiceSynth = s
-                                    , _voicePitch = Config.initialPitch
+                                    , _voicePitch = floor Config.baseFreq
                                     , _voiceParams = mempty }
-          -- `mempty` above is inaccurate -- initially each voice has
-          -- amp 0 and freq 100, because those ares the `Boop` defaults.
-          -- Since none are sounding, I don't think it matters.
     in M.fromList . zip voiceIds . map defaultVoiceState
        <$> mapM (synth boop) (replicate 256 ())
 
@@ -132,8 +128,6 @@ ji monomePort scale shifts = do
         'q' -> do -- quit
           close inbox
           mapM_ (free . (^. voiceSynth)) (M.elems voices)
-            -- TODO Once `voices` are dynamic,
-            -- this should read that value from `mst`.
           killThread responder
           st <- readMVar mst
           _ <- send toMonome $ allLedOsc "/monome" False

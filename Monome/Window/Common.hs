@@ -48,8 +48,7 @@ etKeyMsg st (xy, sw) = do
          then let msg = SoundMsg { _soundMsgVoiceId = xy
                                  , _soundMsgPitch = Just pitch }
               in [ msg & ( soundMsgVal .~
-                           fromIntegral Config.initialPitch *
-                           et31ToFreq pitch )
+                           Config.baseFreq * et31ToFreq pitch )
                        & soundMsgParam .~ "freq"
                  , msg & soundMsgVal .~ Config.voiceAmplitude
                        & soundMsgParam .~ "amp" ]
