@@ -19,6 +19,7 @@ import qualified Data.Map as M
 import Vivid
 import Vivid.OSC
 
+import qualified Monome.Config as Config
 import Monome.Network.Util
 import Monome.Synth.Boop
 import Monome.Types.Button
@@ -31,9 +32,6 @@ import Monome.Window.Shift
 import Monome.Window.Sustain
 
 
-initialPitch :: Pitch
-initialPitch = 50
-
 et31 :: Int -- ^ The monome address, as serialoscd reports on startup.
      -> IO (St EtApp)
 et31 monomePort = do
@@ -44,7 +42,7 @@ et31 monomePort = do
   voices :: M.Map VoiceId Voice <-
     let voiceIds = [(a,b) | a <- [0..15], b <- [0..15]]
         defaultVoiceState s = Voice { _voiceSynth = s
-                                    , _voicePitch = initialPitch
+                                    , _voicePitch = Config.initialPitch
                                     , _voiceParams = mempty }
           -- `mempty` above is inaccurate -- initially each voice has
           -- amp 0 and freq 100, because those ares the `Boop` defaults.
@@ -103,7 +101,7 @@ ji monomePort scale shifts = do
   voices :: M.Map VoiceId Voice <-
     let voiceIds = [(a,b) | a <- [0..15], b <- [0..15]]
         defaultVoiceState s = Voice { _voiceSynth = s
-                                    , _voicePitch = initialPitch
+                                    , _voicePitch = Config.initialPitch
                                     , _voiceParams = mempty }
           -- `mempty` above is inaccurate -- initially each voice has
           -- amp 0 and freq 100, because those ares the `Boop` defaults.
