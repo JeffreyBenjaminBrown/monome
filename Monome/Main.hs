@@ -91,8 +91,8 @@ et31 monomePort = do
        >> loop
 
 ji :: Int -- ^ The monome address, as serialoscd reports on startup.
-   -> [Float] -- ^ the base scale
-   -> [Float] -- ^ shifts of that scale
+   -> [Float] -- ^ The generator. For a major scale: [1,5/4,3/2]
+   -> [Float] -- ^ Shifts of the generator. Major scale: [1,4/3,3/2]
    -> IO (St JiApp)
 ji monomePort scale shifts = do
 
@@ -117,7 +117,7 @@ ji monomePort scale shifts = do
     , _stVoices = voices
     , _stPending_Vivid = []
     , _stPending_Monome = []
-    , _stApp = JiApp { _jiScale = scale
+    , _stApp = JiApp { _jiGenerator = scale
                      , _jiShifts = shifts
                      , _jiFingers = mempty }
     }

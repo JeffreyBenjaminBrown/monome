@@ -13,7 +13,7 @@ module Monome.Types.Initial (
   , St(..), stApp, stWindowLayers, stToMonome, stVoices
     , stPending_Monome, stPending_Vivid
   , EtApp(..), etXyShift, etFingers, etLit, etSustaineded
-  , JiApp(..)
+  , JiApp(..), jiGenerator, jiShifts, jiFingers
   ) where
 
 import           Control.Lens
@@ -135,7 +135,7 @@ data EtApp = EtApp
   } deriving (Show, Eq)
 
 data JiApp = JiApp
-  { _jiScale :: [Float]
+  { _jiGenerator :: [Float]
   , _jiShifts :: [Float]
   , _jiFingers :: Map (X,Y) VoiceId }
   deriving (Show, Eq)
