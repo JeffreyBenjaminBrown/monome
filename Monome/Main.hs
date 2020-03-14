@@ -34,13 +34,13 @@ import Monome.Window.Sustain
 
 
 et31 :: Int -- ^ The monome address, as serialoscd reports on startup.
-     -> IO (St EtApp)
+     -> IO (St EdoApp)
 et31 monomePort = do
   inbox :: Socket <- receivesAt "127.0.0.1" 8000
     -- I don't know why it's port 8000, or why it used to be 11111.
   toMonome :: Socket <- sendsTo (unpack localhost) monomePort
     -- to find the port number above, use the first part of HandTest.hs
-  voices :: M.Map VoiceId (Voice EtApp) <-
+  voices :: M.Map VoiceId (Voice EdoApp) <-
     let voiceIds = [(a,b) | a <- [0..15], b <- [0..15]]
         defaultVoiceState s = Voice { _voiceSynth = s
                                     , _voicePitch = floor Config.freq
@@ -58,7 +58,7 @@ et31 monomePort = do
     , _stPending_Vivid = []
     , _stPending_Monome = []
 
-    , _stApp = EtApp
+    , _stApp = EdoApp
         { _etXyShift = (0,0)
         , _etFingers = mempty
         , _etLit = mempty
@@ -75,7 +75,7 @@ et31 monomePort = do
       Right osc -> let switch = readSwitchOSC osc
                    in  handleSwitch mst switch
 
-  let loop :: IO (St EtApp) =
+  let loop :: IO (St EdoApp) =
         getChar >>= \case
         'q' -> do -- quit
           close inbox

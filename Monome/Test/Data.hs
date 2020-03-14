@@ -16,7 +16,7 @@ import Monome.Math31
 meh :: a
 meh = error "not relevant to this test"
 
-(=^=) :: (Eq app, Eq (PitchRep app)) => St app -> St app -> Bool
+(=^=) :: (Eq app, Eq (Pitch app)) => St app -> St app -> Bool
 (=^=) x y = and [
     _stPending_Monome x == _stPending_Monome y
   , _stPending_Vivid x  == _stPending_Vivid y
@@ -28,16 +28,16 @@ xy0    :: (X,Y)      = v0
 xy1    :: (X,Y)      = v1
 pitch0 :: Int        = xyToEt31_st st0 xy0
 pitch1 :: Int        = xyToEt31_st st0 xy1
-pc0    :: PitchClassRep EtApp = mod pitch0 31
-pc1    :: PitchClassRep EtApp = mod pitch1 31
+pc0    :: PitchClass EdoApp = mod pitch0 31
+pc1    :: PitchClass EdoApp = mod pitch1 31
 
-st0 :: St EtApp
+st0 :: St EdoApp
 st0 = St {
     _stVoices = M.fromList [ (v0, Voice { _voicePitch = pitch0 } )
                            , (v1, Voice { _voicePitch = pitch1 } ) ]
   , _stPending_Monome = []
   , _stPending_Vivid = []
-  , _stApp = EtApp { _etXyShift = (3,5)
+  , _stApp = EdoApp { _etXyShift = (3,5)
                    , _etFingers = mempty
                    , _etLit = mempty
                    , _etSustaineded = Nothing

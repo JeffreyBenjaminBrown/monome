@@ -55,12 +55,12 @@ test_etKey_SoundMsg = TestCase $ do
 
 testDependentPitchClass :: Test
 testDependentPitchClass = TestCase $ do
-  let m :: LitPitches EtApp
+  let m :: LitPitches EdoApp
       m = M.singleton 10 $ S.singleton $ LedBecauseSwitch (1,1)
   assertBool "ledBecause_toPitchClass finds it" $
-    ledBecause_toPitchClass @ EtApp m (LedBecauseSwitch (1,1)) == Just 10
+    ledBecause_toPitchClass @ EdoApp m (LedBecauseSwitch (1,1)) == Just 10
   assertBool "ledBecause_toPitchClass does not find it" $
-    ledBecause_toPitchClass @ EtApp m (LedBecauseSwitch (1,0)) == Nothing
+    ledBecause_toPitchClass @ EdoApp m (LedBecauseSwitch (1,0)) == Nothing
 
 testBelongsHere :: Test
 testBelongsHere = TestCase $ do

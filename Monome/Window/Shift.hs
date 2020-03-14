@@ -48,7 +48,7 @@ shift xy | xy == rightArrow = ( 1, 0)
          | otherwise = error $ "shift: unexpected input: " ++ show xy
 
 -- | = the window
-shiftWindow :: Window EtApp
+shiftWindow :: Window EdoApp
 shiftWindow = Window {
     windowLabel = label
   , windowContains = \(x,y) -> numBetween 13 15 x && numBetween 14 15 y
@@ -58,11 +58,11 @@ shiftWindow = Window {
   , windowRoutine = handler
 }
 
-handler :: St EtApp -> ((X,Y), Switch) -> St EtApp
+handler :: St EdoApp -> ((X,Y), Switch) -> St EdoApp
 handler    st0         (_,  False)      = st0
 handler    st0         (xy, True )      = let
-  st' :: St EtApp = st0 & stApp . etXyShift %~ addPair (shift xy)
-  lit :: [PitchClassRep EtApp] = M.keys $ st0 ^. stApp . etLit
+  st' :: St EdoApp = st0 & stApp . etXyShift %~ addPair (shift xy)
+  lit :: [PitchClass EdoApp] = M.keys $ st0 ^. stApp . etLit
   msgs :: [LedMsg] =
     map (Kbd.label,) $
     (map (,False) $ concatMap (pcToXys $ st0 ^. stApp . etXyShift) lit) ++

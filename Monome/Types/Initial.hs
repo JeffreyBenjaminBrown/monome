@@ -8,7 +8,7 @@ module Monome.Types.Initial (
   , Param, WindowId, VoiceId
   , LitPitches
   , LedMsg
-  , PitchRep, PitchClassRep
+  , Pitch, PitchClass
   , SoundMsg(..), soundMsgVoiceId, soundMsgPitch, soundMsgVal, soundMsgParam
   , X, Y, Switch, Led
   , LedBecause(..)
@@ -16,7 +16,7 @@ module Monome.Types.Initial (
   , Voice(..), voiceSynth, voicePitch, voiceParams
   , St(..), stApp, stWindowLayers, stToMonome, stVoices
     , stPending_Monome, stPending_Vivid
-  , EtApp(..), etXyShift, etFingers, etLit, etSustaineded
+  , EdoApp(..), etXyShift, etFingers, etLit, etSustaineded
   , JiApp(..), jiGenerator, jiShifts, jiFingers
   ) where
 
@@ -48,15 +48,15 @@ type VoiceId = (Int,Int) -- ^ I would call this (X,Y),
 -- In the Just Tempered app, Pitch is isomorphic to the rationals,
 -- and pitch class is isomorphic to the rationals modulo powers of 2 --
 -- i.e. the rationals in the half-open interval [1,2).
-type family PitchRep app
-type family PitchClassRep app
+type family Pitch app
+type family PitchClass app
 
-type instance PitchRep      EtApp = Int
-type instance PitchClassRep EtApp = Int
-type instance PitchRep      JiApp = Rational
-type instance PitchClassRep JiApp = Rational
+type instance Pitch      EdoApp = Int
+type instance PitchClass EdoApp = Int
+type instance Pitch      JiApp = Rational
+type instance PitchClass JiApp = Rational
 
-type LitPitches app = Map (PitchClassRep app) (Set LedBecause)
+type LitPitches app = Map (PitchClass app) (Set LedBecause)
   -- ^ For each pitch class that is lit,
   -- we need to know why -- e.g. if it's being sustained,
   -- then we should not darken it when the finger on it is lifted,
@@ -66,24 +66,24 @@ type LitPitches app = Map (PitchClassRep app) (Set LedBecause)
 type LedMsg     = (WindowId, ((X,Y), Led))
 data SoundMsg app = SoundMsg {
     _soundMsgVoiceId :: VoiceId
-  , _soundMsgPitch   :: Maybe (PitchRep app)
+  , _soundMsgPitch   :: Maybe (Pitch app)
     -- ^ messages like "off" don't need one
   , _soundMsgVal     :: Float
   , _soundMsgParam   :: Param }
 
-instance Show (PitchRep app) => Show (SoundMsg app) where
+instance Show (Pitch app) => Show (SoundMsg app) where
   show sm = "SoundMsg {_soundMsgVoiceId = " ++ show (_soundMsgVoiceId sm)
                  ++ ", _soundMsgPitch = "   ++ show (_soundMsgPitch sm)
                  ++ ", _soundMsgVal = "     ++ show (_soundMsgVal sm)
                  ++ ", _soundMsgParam = "   ++ show (_soundMsgParam sm) ++ "}"
 
-instance Eq (PitchRep app) => Eq (SoundMsg app) where
+instance Eq (Pitch app) => Eq (SoundMsg app) where
   a == b =
     _soundMsgVoiceId a == _soundMsgVoiceId b &&
     _soundMsgPitch a   == _soundMsgPitch b   &&
     _soundMsgVal a     == _soundMsgVal b     &&
     _soundMsgParam a   == _soundMsgParam b
-instance (Eq (PitchRep app), Ord (PitchRep app))
+instance (Eq (Pitch app), Ord (Pitch app))
          => Ord (SoundMsg app) where
   a <= b =
     if      not $ _soundMsgVoiceId a == _soundMsgVoiceId b
@@ -134,16 +134,16 @@ instance Show (Window app) where
 
 data Voice app = Voice {
     _voiceSynth  :: Synth BoopParams
-  , _voicePitch  :: PitchRep app
+  , _voicePitch  :: Pitch app
   , _voiceParams :: Map String Float }
 
-instance Show (PitchRep app) => Show (Voice app) where
+instance Show (Pitch app) => Show (Voice app) where
   show v = "Voice "
     ++ "{ _voiceSynth = "  ++ show (_voiceSynth v)
     ++ "{ _voicePitch = "  ++ show (_voicePitch v)
     ++ "{ _voiceParams = " ++ show (_voiceParams v)
 
-instance Eq (PitchRep app) => Eq (Voice app) where
+instance Eq (Pitch app) => Eq (Voice app) where
   a == b = and
     [ _voiceSynth a  == _voiceSynth b
     , _voicePitch a  == _voicePitch b
@@ -168,7 +168,7 @@ data St app = St {
   , _stPending_Vivid :: [SoundMsg app]
   }
 
-instance (Show app, Show (PitchRep app)) => Show (St app) where
+instance (Show app, Show (Pitch app)) => Show (St app) where
   show app = "St "
     ++ "{ _stApp app = "            ++ show (_stApp app)
     ++ ", _stWindowLayers app = "   ++ show (_stWindowLayers app)
@@ -177,7 +177,7 @@ instance (Show app, Show (PitchRep app)) => Show (St app) where
     ++ ", _stPending_Monome app = " ++ show (_stPending_Monome app)
     ++ ", _stPending_Vivid app = "  ++ show (_stPending_Vivid app)
 
-instance (Eq app, Eq (PitchRep app)) => Eq (St app) where
+instance (Eq app, Eq (Pitch app)) => Eq (St app) where
   a == b = and
     [ _stApp a           == _stApp b
     , _stWindowLayers a  == _stWindowLayers b
@@ -186,12 +186,12 @@ instance (Eq app, Eq (PitchRep app)) => Eq (St app) where
     , _stPending_Monome a == _stPending_Monome b
     , _stPending_Vivid a  == _stPending_Vivid b ]
 
-data EtApp = EtApp
+data EdoApp = EdoApp
   { _etXyShift :: (X,Y) -- ^ this is relative -- a vector, not a point
   , _etFingers :: Map (X,Y) VoiceId
     -- ^ Where fingers are, what each is sounding,
     -- and what each is lighting up.
-  , _etLit :: LitPitches EtApp
+  , _etLit :: LitPitches EdoApp
   , _etSustaineded :: Maybe (Set VoiceId)
     -- ^ PITFALL: In spirit, the thing sustained is a Pitch,
     -- but it's represented as a voice,
@@ -207,5 +207,5 @@ data JiApp = JiApp
 makeLenses ''SoundMsg
 makeLenses ''Voice
 makeLenses ''St
-makeLenses ''EtApp
+makeLenses ''EdoApp
 makeLenses ''JiApp

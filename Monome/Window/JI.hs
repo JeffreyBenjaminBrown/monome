@@ -36,6 +36,7 @@ jiWindow =  Window {
   , windowRoutine = handler }
 
 -- TODO untested
+-- TODO ! duplicative of `Keyboard.handler`
 handler :: St JiApp
         -> ((X,Y), Switch)
         -> St JiApp

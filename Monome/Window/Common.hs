@@ -27,7 +27,7 @@ import           Monome.Types.Initial
 ledBecause_toPitchClass :: forall app.
                            LitPitches app
                         -> LedBecause
-                        -> Maybe (PitchClassRep app)
+                        -> Maybe (PitchClass app)
 ledBecause_toPitchClass m ldr =
   fst <$> mPair
   where
@@ -43,7 +43,7 @@ silenceMsg xy = SoundMsg {
   , _soundMsgParam = "amp" }
 
 -- TODO ! duplicative of `jiKey_SoundMsg`
-etKey_SoundMsg :: St EtApp -> ((X,Y), Switch) -> [SoundMsg EtApp]
+etKey_SoundMsg :: St EdoApp -> ((X,Y), Switch) -> [SoundMsg EdoApp]
 etKey_SoundMsg st (xy, sw) = do
   let pitch = xyToEt31_st st xy
   if maybe False (S.member xy) $ st ^. stApp . etSustaineded
@@ -73,7 +73,7 @@ updateVoice sdMsg st = let
                       %~ (voicePitch                     .~ p)
                       .  (voiceParams . at param . _Just .~ f)
 
-vid_to_pitch :: St EtApp -> VoiceId ->  PitchClassRep EtApp
+vid_to_pitch :: St EdoApp -> VoiceId ->  PitchClass EdoApp
 vid_to_pitch st v = maybe
   (error "vid_to_pitch: voice not found")
   (flip mod 31 . _voicePitch)

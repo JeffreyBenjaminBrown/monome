@@ -9,8 +9,8 @@ module Monome.Window.Sustain (
   , sustainWindow
   , theButton
 
-  , voicesToSilence_uponSustainOff -- ^ St EtApp -> Set VoiceId
-  , toggleSustain                  -- ^ St EtApp -> St EtApp
+  , voicesToSilence_uponSustainOff -- ^ St EdoApp -> Set VoiceId
+  , toggleSustain                  -- ^ St EdoApp -> St EdoApp
   , insertOneSustainedNote -- ^ PitchClass -> LitPitches -> LitPitches
   , deleteOneSustainedNote -- ^ PitchClass -> LitPitches -> LitPitches
   ) where
@@ -34,7 +34,7 @@ label = "sustain window"
 theButton :: (X,Y)
 theButton = (0,15)
 
-sustainWindow :: Window EtApp
+sustainWindow :: Window EdoApp
 sustainWindow = Window {
     windowLabel = label
   , windowContains = (==) theButton
@@ -42,10 +42,10 @@ sustainWindow = Window {
   , windowRoutine = handler
 }
 
-handler :: St EtApp
+handler :: St EdoApp
         -> ( (X,Y) -- ^ ignored, since the sustain window has only one button
            , Switch)
-        -> St EtApp
+        -> St EdoApp
 handler    st    (_ , False)      = st
 handler    st    (_,  True)      = let
   st1 = toggleSustain st
@@ -55,7 +55,7 @@ handler    st    (_,  True)      = let
          concatMap (pcToXys $ st ^. stApp . etXyShift) $
          pitchClassesToDarken_uponSustainOff st st1
     else []
-  sdMsgs :: [SoundMsg EtApp] =
+  sdMsgs :: [SoundMsg EdoApp] =
     if null $ st1 ^. stApp . etSustaineded
     then map silenceMsg $ S.toList $ voicesToSilence_uponSustainOff st
     else []
@@ -66,7 +66,7 @@ handler    st    (_,  True)      = let
   in foldr updateVoice st2 sdMsgs
 
 pitchClassesToDarken_uponSustainOff ::
-  St EtApp -> St EtApp -> Set (PitchClassRep EtApp)
+  St EdoApp -> St EdoApp -> Set (PitchClass EdoApp)
   -- TODO ? speed: This calls `voicesToSilence_uponSustainOff`.
   -- Would it be faster to pass the result of `voicesToSilence_uponSustainOff`
   -- as a precomputed argument? (I'm guessing the compiler fogures it out.)
@@ -75,16 +75,16 @@ pitchClassesToDarken_uponSustainOff oldSt newSt =
   -- but it excludes visual anchors as well as fingered notes.
   S.filter (not . mustStayLit) $ voicesToSilence_pcs
   where
-    mustStayLit :: PitchClassRep EtApp -> Bool
+    mustStayLit :: PitchClass EdoApp -> Bool
     mustStayLit pc = case M.lookup pc $ newSt ^. stApp . etLit of
       Nothing -> False
       Just s -> if null s
         then error "pitchClassesToDarken_uponSustainOff: null value in LitPitches."
         else True
-    voicesToSilence_pcs :: Set (PitchClassRep EtApp) =
+    voicesToSilence_pcs :: Set (PitchClass EdoApp) =
       S.map (vid_to_pitch oldSt) $ voicesToSilence_uponSustainOff oldSt
 
-voicesToSilence_uponSustainOff :: St EtApp -> Set VoiceId
+voicesToSilence_uponSustainOff :: St EdoApp -> Set VoiceId
 voicesToSilence_uponSustainOff st = let
   sustained :: Set VoiceId =
     maybe mempty id $ st ^. stApp . etSustaineded
@@ -96,7 +96,7 @@ voicesToSilence_uponSustainOff st = let
 -- which happens only when it is pressed, not when it is released --
 -- the set of sustained pitches changes
 -- and the set of lit keys gains new reasons to be lit.
-toggleSustain :: St EtApp -> St EtApp
+toggleSustain :: St EdoApp -> St EdoApp
 toggleSustain st = let
   sustainOn' :: Bool = -- new sustain state
     not $ isJust $ st ^. stApp . etSustaineded
@@ -120,7 +120,7 @@ toggleSustain st = let
 -- fingers and sustain. If it is turned off,
 -- sustain is no longer a reason to light up any LEDs.
 insertOneSustainedNote, deleteOneSustainedNote
-  :: PitchClassRep EtApp -> LitPitches EtApp -> LitPitches EtApp
+  :: PitchClass EdoApp -> LitPitches EdoApp -> LitPitches EdoApp
 insertOneSustainedNote pc m =
   let reasons :: Set LedBecause =
         maybe S.empty id $ M.lookup pc m
