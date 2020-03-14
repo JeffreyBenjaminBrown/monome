@@ -7,4 +7,4 @@ amp :: Float
 amp = 0.15
 
 freq :: Num a => a
-freq = 100
+freq = 80
