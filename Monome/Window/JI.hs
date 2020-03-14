@@ -71,10 +71,14 @@ jiKey_SoundMsg ja (xy,switch) = let
 
 jiFreq :: JiApp -> (X,Y) -> Either String Float
 jiFreq ja (x,y) = do
-  let (octave :: Int, rowInOctave :: Int) =
+  let (yOctave :: Int, yShift :: Int) =
         divMod y $ length $ ja ^. jiShifts
-  f0 :: Float <- let
-    err = Left $ "key x-value " ++ show x ++ " but generator only has (0-indexed) length " ++ show (length $ ja ^. jiGenerator)
-    in maybe err Right $ ja ^? jiGenerator . ix x
-  Right $ f0 * ((ja ^. jiShifts) !! rowInOctave) * 2 ** fi octave
-    -- !! is safe here, because of the divMod above
+      (xOctave :: Int, xGen :: Int) =
+        divMod x $ length $ ja ^. jiGenerator
+      f0 :: Float =
+        (ja ^. jiGenerator) !! xGen
+        -- !! is safe here, because of the divMod that defines xGen
+  Right $ f0
+    * ((ja ^. jiShifts) !! yShift)
+    * 2 ** (fi $ yOctave + xOctave)
+    -- !! is safe here, because of the divMod that defines yShift

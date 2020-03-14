@@ -42,16 +42,12 @@ test_jiKeySound = TestCase $ do
           == [ msg & soundMsgPitch .~ Nothing
                & soundMsgVal .~ 0
                & soundMsgParam .~ "amp" ]
-        assertBool "out of x-range" $
-          jiKey_SoundMsg ja (xy & _1 +~ 100, False) == []
   mapM_ f [(0,0), (1,1), (1,3)]
 
 test_jiFreq :: Test
 test_jiFreq = TestCase $ do
-  assertBool "x-direction can be out of range" $
-    isLeft (jiFreq ja (10,0))
-  assertBool "y-direction cannot be out of range" $
-    isRight (jiFreq ja (0,1000))
+  assertBool "nothing is out of range" $
+    isRight (jiFreq ja (10000,10000))
 
   assertBool "unit" $
     jiFreq ja (0,0) == Right 1

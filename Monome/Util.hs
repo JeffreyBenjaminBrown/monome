@@ -6,10 +6,12 @@ module Monome.Util (
   , numBetween
   , addPair
   , negPair
+  , uniq
   )
 
 where
 
+import qualified Data.Set as S
 import Data.ByteString (ByteString)
 import Data.ByteString.Char8 (pack, unpack)
 
@@ -29,3 +31,6 @@ addPair (a,b) (c,d) = (a+c, b+d)
 
 negPair :: (Int,Int) -> (Int,Int)
 negPair (a,b) = (-a,-b)
+
+uniq :: Ord a => [a] -> [a]
+uniq = S.toList . S.fromList
