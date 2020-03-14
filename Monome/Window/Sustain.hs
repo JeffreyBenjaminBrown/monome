@@ -55,7 +55,7 @@ handler    st    (_,  True)      = let
          concatMap (pcToXys $ st ^. stApp . etXyShift) $
          pitchClassesToDarken_uponSustainOff st st1
     else []
-  sdMsgs :: [SoundMsg] =
+  sdMsgs :: [SoundMsg EtApp] =
     if null $ st1 ^. stApp . etSustaineded
     then map silenceMsg $ S.toList $ voicesToSilence_uponSustainOff st
     else []
@@ -65,7 +65,8 @@ handler    st    (_,  True)      = let
             & stPending_Vivid  %~ flip (++) sdMsgs
   in foldr updateVoice st2 sdMsgs
 
-pitchClassesToDarken_uponSustainOff :: St EtApp -> St EtApp -> Set PitchClass
+pitchClassesToDarken_uponSustainOff ::
+  St EtApp -> St EtApp -> Set (PitchClassRep EtApp)
   -- TODO ? speed: This calls `voicesToSilence_uponSustainOff`.
   -- Would it be faster to pass the result of `voicesToSilence_uponSustainOff`
   -- as a precomputed argument? (I'm guessing the compiler fogures it out.)
@@ -74,13 +75,13 @@ pitchClassesToDarken_uponSustainOff oldSt newSt =
   -- but it excludes visual anchors as well as fingered notes.
   S.filter (not . mustStayLit) $ voicesToSilence_pcs
   where
-    mustStayLit :: PitchClass -> Bool
+    mustStayLit :: PitchClassRep EtApp -> Bool
     mustStayLit pc = case M.lookup pc $ newSt ^. stApp . etLit of
       Nothing -> False
       Just s -> if null s
         then error "pitchClassesToDarken_uponSustainOff: null value in LitPitches."
         else True
-    voicesToSilence_pcs :: Set PitchClass =
+    voicesToSilence_pcs :: Set (PitchClassRep EtApp) =
       S.map (vid_to_pitch oldSt) $ voicesToSilence_uponSustainOff oldSt
 
 voicesToSilence_uponSustainOff :: St EtApp -> Set VoiceId
@@ -119,7 +120,7 @@ toggleSustain st = let
 -- fingers and sustain. If it is turned off,
 -- sustain is no longer a reason to light up any LEDs.
 insertOneSustainedNote, deleteOneSustainedNote
-  :: PitchClass -> LitPitches -> LitPitches
+  :: PitchClassRep EtApp -> LitPitches EtApp -> LitPitches EtApp
 insertOneSustainedNote pc m =
   let reasons :: Set LedBecause =
         maybe S.empty id $ M.lookup pc m

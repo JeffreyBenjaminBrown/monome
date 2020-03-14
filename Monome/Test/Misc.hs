@@ -1,4 +1,5 @@
 {-# LANGUAGE TupleSections
+, TypeApplications
 , ScopedTypeVariables #-}
 
 module Monome.Test.Misc where
@@ -54,11 +55,12 @@ test_etKey_SoundMsg = TestCase $ do
 
 testDependentPitchClass :: Test
 testDependentPitchClass = TestCase $ do
-  let m = M.singleton 10 $ S.singleton $ LedBecauseSwitch (1,1)
+  let m :: LitPitches EtApp
+      m = M.singleton 10 $ S.singleton $ LedBecauseSwitch (1,1)
   assertBool "ledBecause_toPitchClass finds it" $
-    ledBecause_toPitchClass m (LedBecauseSwitch (1,1)) == Just 10
+    ledBecause_toPitchClass @ EtApp m (LedBecauseSwitch (1,1)) == Just 10
   assertBool "ledBecause_toPitchClass does not find it" $
-    ledBecause_toPitchClass m  (LedBecauseSwitch (1,0)) == Nothing
+    ledBecause_toPitchClass @ EtApp m (LedBecauseSwitch (1,0)) == Nothing
 
 testBelongsHere :: Test
 testBelongsHere = TestCase $ do

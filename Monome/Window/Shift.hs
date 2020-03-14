@@ -62,7 +62,7 @@ handler :: St EtApp -> ((X,Y), Switch) -> St EtApp
 handler    st0         (_,  False)      = st0
 handler    st0         (xy, True )      = let
   st' :: St EtApp = st0 & stApp . etXyShift %~ addPair (shift xy)
-  lit :: [PitchClass] = M.keys $ st0 ^. stApp . etLit
+  lit :: [PitchClassRep EtApp] = M.keys $ st0 ^. stApp . etLit
   msgs :: [LedMsg] =
     map (Kbd.label,) $
     (map (,False) $ concatMap (pcToXys $ st0 ^. stApp . etXyShift) lit) ++

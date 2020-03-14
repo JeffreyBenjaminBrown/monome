@@ -6,5 +6,5 @@ module Monome.Config where
 amp :: Float
 amp = 0.15
 
-freq :: Float
+freq :: Num a => a
 freq = 100

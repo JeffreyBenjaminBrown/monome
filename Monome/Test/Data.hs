@@ -1,6 +1,7 @@
 {-# OPTIONS_GHC -fno-warn-missing-fields #-}
 {-# OPTIONS_GHC -fno-warn-missing-signatures #-}
-{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE FlexibleContexts
+, ScopedTypeVariables #-}
 
 module Monome.Test.Data where
 
@@ -15,7 +16,7 @@ import Monome.Math31
 meh :: a
 meh = error "not relevant to this test"
 
-(=^=) :: Eq app => St app -> St app -> Bool
+(=^=) :: (Eq app, Eq (PitchRep app)) => St app -> St app -> Bool
 (=^=) x y = and [
     _stPending_Monome x == _stPending_Monome y
   , _stPending_Vivid x  == _stPending_Vivid y
@@ -25,10 +26,10 @@ v0     :: VoiceId    = (0,0)
 v1     :: VoiceId    = (0,1)
 xy0    :: (X,Y)      = v0
 xy1    :: (X,Y)      = v1
-pitch0 :: Pitch      = xyToEt31_st st0 xy0
-pitch1 :: Pitch      = xyToEt31_st st0 xy1
-pc0    :: PitchClass = mod pitch0 31
-pc1    :: PitchClass = mod pitch1 31
+pitch0 :: Int        = xyToEt31_st st0 xy0
+pitch1 :: Int        = xyToEt31_st st0 xy1
+pc0    :: PitchClassRep EtApp = mod pitch0 31
+pc1    :: PitchClassRep EtApp = mod pitch1 31
 
 st0 :: St EtApp
 st0 = St {

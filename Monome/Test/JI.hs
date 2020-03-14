@@ -11,6 +11,7 @@ import           Data.Either
 
 import qualified Monome.Config as Config
 import           Monome.Types.Initial
+import           Monome.Util
 import           Monome.Window.JI
 
 
@@ -31,13 +32,13 @@ test_jiKeySound = TestCase $ do
       f xy = let
         Right freq = jiFreq ja xy
         msg = SoundMsg { _soundMsgVoiceId = xy
-                       , _soundMsgPitch = Just $ floor freq }
+                       , _soundMsgPitch = Just freq }
         in do
         assertBool "sound on" $ jiKey_SoundMsg ja (xy,True)
-          == [ msg & soundMsgVal .~ Config.freq * freq
-               & soundMsgParam .~ "freq"
+          == [ msg & soundMsgVal .~ Config.freq * fr freq
+                   & soundMsgParam .~ "freq"
              , msg & soundMsgVal .~ Config.amp
-               & soundMsgParam .~ "amp" ]
+                   & soundMsgParam .~ "amp" ]
         assertBool "sound off" $ jiKey_SoundMsg ja (xy,False)
           == [ msg & soundMsgPitch .~ Nothing
                & soundMsgVal .~ 0

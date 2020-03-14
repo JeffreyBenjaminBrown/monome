@@ -1,10 +1,14 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TypeFamilies,
+FlexibleContexts,
+UndecidableInstances,
+TemplateHaskell #-}
 
 module Monome.Types.Initial (
     HostName, Socket
   , Param, WindowId, VoiceId
-  , Pitch, PitchClass, LitPitches
+  , LitPitches
   , LedMsg
+  , PitchRep, PitchClassRep
   , SoundMsg(..), soundMsgVoiceId, soundMsgPitch, soundMsgVal, soundMsgParam
   , X, Y, Switch, Led
   , LedBecause(..)
@@ -33,29 +37,62 @@ type WindowId = String
 type VoiceId = (Int,Int) -- ^ I would call this (X,Y),
                          -- but it would require a cyclic dependency.
 
--- | Pitch is isomorphic to the integers.
+-- | In the Equal Tempered app, Pitch is isomorphic to the integers, and
 -- PitchClass is isomorphic to the integers modulo 31.
 -- That is, PitchClass 0 is identical to PitchClass 31,
 -- whereas Pitch 31 is an octave above Pitch 0.
 -- Pitch classes are (so far) only relevant in the visual context:
 -- if a key is lit up on the keyboard, so are all enharmonic notes,
 -- in all octaves.
-type Pitch      = Int
-type PitchClass = Int
-type LitPitches = Map PitchClass (Set LedBecause)
+--
+-- In the Just Tempered app, Pitch is isomorphic to the rationals,
+-- and pitch class is isomorphic to the rationals modulo powers of 2 --
+-- i.e. the rationals in the half-open interval [1,2).
+type family PitchRep app
+type family PitchClassRep app
+
+type instance PitchRep      EtApp = Int
+type instance PitchClassRep EtApp = Int
+type instance PitchRep      JiApp = Rational
+type instance PitchClassRep JiApp = Rational
+
+type LitPitches app = Map (PitchClassRep app) (Set LedBecause)
   -- ^ For each pitch class that is lit,
   -- we need to know why -- e.g. if it's being sustained,
   -- then we should not darken it when the finger on it is lifted,
   -- and if it's an anchor, we should never darken it.
   -- The Set is a Set because an LED could be on for multiple reasons.
 
-type LedMsg   = (WindowId, ((X,Y), Led))
-data SoundMsg = SoundMsg {
+type LedMsg     = (WindowId, ((X,Y), Led))
+data SoundMsg app = SoundMsg {
     _soundMsgVoiceId :: VoiceId
-  , _soundMsgPitch   :: Maybe Pitch -- ^ messages like "off" don't need one
+  , _soundMsgPitch   :: Maybe (PitchRep app)
+    -- ^ messages like "off" don't need one
   , _soundMsgVal     :: Float
   , _soundMsgParam   :: Param }
-  deriving (Show, Eq, Ord)
+
+instance Show (PitchRep app) => Show (SoundMsg app) where
+  show sm = "SoundMsg {_soundMsgVoiceId = " ++ show (_soundMsgVoiceId sm)
+                 ++ ", _soundMsgPitch = "   ++ show (_soundMsgPitch sm)
+                 ++ ", _soundMsgVal = "     ++ show (_soundMsgVal sm)
+                 ++ ", _soundMsgParam = "   ++ show (_soundMsgParam sm) ++ "}"
+
+instance Eq (PitchRep app) => Eq (SoundMsg app) where
+  a == b =
+    _soundMsgVoiceId a == _soundMsgVoiceId b &&
+    _soundMsgPitch a   == _soundMsgPitch b   &&
+    _soundMsgVal a     == _soundMsgVal b     &&
+    _soundMsgParam a   == _soundMsgParam b
+instance (Eq (PitchRep app), Ord (PitchRep app))
+         => Ord (SoundMsg app) where
+  a <= b =
+    if      not $ _soundMsgVoiceId a == _soundMsgVoiceId b
+    then          _soundMsgVoiceId a <= _soundMsgVoiceId b
+    else if not $ _soundMsgPitch a   == _soundMsgPitch b
+    then          _soundMsgPitch a   <= _soundMsgPitch b
+    else if not $ _soundMsgVal a     == _soundMsgVal b
+    then          _soundMsgVal a     <= _soundMsgVal b
+    else          _soundMsgParam a   <= _soundMsgParam b
 
 -- | X and Y are coordinates on the monome.
 -- PITFALL: X rises from left to right, but Y rises from top to bottom.
@@ -89,19 +126,28 @@ data Window app = Window {
       -> St app
   }
 
-instance Eq (Window  app) where
+instance Eq (Window app) where
   (==) a b = windowLabel a == windowLabel b
 
 instance Show (Window app) where
   show = windowLabel
 
-data Voice = Voice {
+data Voice app = Voice {
     _voiceSynth  :: Synth BoopParams
-  , _voicePitch  :: Pitch -- ^ PITFALL: This looks redundant, but isn't.
-    -- The frequency is indeed stored in the _voiceParams field,
-    -- but that's a float; it's nice to have the integer Pitch around too.
+  , _voicePitch  :: PitchRep app
   , _voiceParams :: Map String Float }
-  deriving (Show, Eq, Ord)
+
+instance Show (PitchRep app) => Show (Voice app) where
+  show v = "Voice "
+    ++ "{ _voiceSynth = "  ++ show (_voiceSynth v)
+    ++ "{ _voicePitch = "  ++ show (_voicePitch v)
+    ++ "{ _voiceParams = " ++ show (_voiceParams v)
+
+instance Eq (PitchRep app) => Eq (Voice app) where
+  a == b = and
+    [ _voiceSynth a  == _voiceSynth b
+    , _voicePitch a  == _voicePitch b
+    , _voiceParams a == _voiceParams b ]
 
 data St app = St {
     _stApp :: app
@@ -110,7 +156,7 @@ data St app = St {
       -- Windows listed earlier are thus "above" later ones.
   , _stToMonome :: Socket -- ^ PITFALL: It's tempting to remove this from St.
     -- That's feasible now, ll want it here when using multiple monomes.
-  , _stVoices :: Map VoiceId Voice
+  , _stVoices :: Map VoiceId (Voice app)
     -- ^ TODO ? This is expensive, precluding the use of big synths.
     -- Maybe I could make them dynamically without much speed penalty.
     -- Tom of Vivid thinks so.
@@ -119,15 +165,33 @@ data St app = St {
   -- is to isolate side-effects to a small portion of the code. Elsewhere,
   -- scattered functions can simply change an `St` instead of doing IO.
   , _stPending_Monome :: [LedMsg]
-  , _stPending_Vivid :: [SoundMsg]
-  } deriving (Show, Eq)
+  , _stPending_Vivid :: [SoundMsg app]
+  }
+
+instance (Show app, Show (PitchRep app)) => Show (St app) where
+  show app = "St "
+    ++ "{ _stApp app = "            ++ show (_stApp app)
+    ++ ", _stWindowLayers app = "   ++ show (_stWindowLayers app)
+    ++ ", _stToMonome app = "       ++ show (_stToMonome app)
+    ++ ", _stVoices app = "         ++ show (_stVoices app)
+    ++ ", _stPending_Monome app = " ++ show (_stPending_Monome app)
+    ++ ", _stPending_Vivid app = "  ++ show (_stPending_Vivid app)
+
+instance (Eq app, Eq (PitchRep app)) => Eq (St app) where
+  a == b = and
+    [ _stApp a           == _stApp b
+    , _stWindowLayers a  == _stWindowLayers b
+    , _stToMonome a      == _stToMonome b
+    , _stVoices a        == _stVoices b
+    , _stPending_Monome a == _stPending_Monome b
+    , _stPending_Vivid a  == _stPending_Vivid b ]
 
 data EtApp = EtApp
   { _etXyShift :: (X,Y) -- ^ this is relative -- a vector, not a point
   , _etFingers :: Map (X,Y) VoiceId
     -- ^ Where fingers are, what each is sounding,
     -- and what each is lighting up.
-  , _etLit :: LitPitches
+  , _etLit :: LitPitches EtApp
   , _etSustaineded :: Maybe (Set VoiceId)
     -- ^ PITFALL: In spirit, the thing sustained is a Pitch,
     -- but it's represented as a voice,
@@ -135,8 +199,8 @@ data EtApp = EtApp
   } deriving (Show, Eq)
 
 data JiApp = JiApp
-  { _jiGenerator :: [Float]
-  , _jiShifts :: [Float]
+  { _jiGenerator :: [Rational]
+  , _jiShifts :: [Rational]
   , _jiFingers :: Map (X,Y) VoiceId }
   deriving (Show, Eq)
 

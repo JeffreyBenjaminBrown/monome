@@ -1,5 +1,6 @@
 {-# OPTIONS_GHC -fno-warn-type-defaults #-}
 {-# LANGUAGE TupleSections
+, AllowAmbiguousTypes
 , ScopedTypeVariables #-}
 
 module Monome.Window.Common (
@@ -23,7 +24,10 @@ import           Monome.Types.Initial
 
 
 -- Todo (#speed) Instead, keep a map from xy to pitchclass
-ledBecause_toPitchClass :: LitPitches -> LedBecause -> Maybe PitchClass
+ledBecause_toPitchClass :: forall app.
+                           LitPitches app
+                        -> LedBecause
+                        -> Maybe (PitchClassRep app)
 ledBecause_toPitchClass m ldr =
   fst <$> mPair
   where
@@ -31,7 +35,7 @@ ledBecause_toPitchClass m ldr =
             $ filter (S.member ldr . snd)
             $ M.toList m
 
-silenceMsg :: (X,Y) -> SoundMsg
+silenceMsg :: (X,Y) -> SoundMsg app
 silenceMsg xy = SoundMsg {
     _soundMsgVoiceId = xy
   , _soundMsgPitch = Nothing
@@ -39,7 +43,7 @@ silenceMsg xy = SoundMsg {
   , _soundMsgParam = "amp" }
 
 -- TODO ! duplicative of `jiKey_SoundMsg`
-etKey_SoundMsg :: St EtApp -> ((X,Y), Switch) -> [SoundMsg]
+etKey_SoundMsg :: St EtApp -> ((X,Y), Switch) -> [SoundMsg EtApp]
 etKey_SoundMsg st (xy, sw) = do
   let pitch = xyToEt31_st st xy
   if maybe False (S.member xy) $ st ^. stApp . etSustaineded
@@ -58,7 +62,7 @@ etKey_SoundMsg st (xy, sw) = do
                        & soundMsgParam .~ "amp" ]
          else [silenceMsg xy]
 
-updateVoice :: SoundMsg -> St app -> St app
+updateVoice :: SoundMsg app -> St app -> St app
 updateVoice sdMsg st = let
   vid   :: VoiceId = _soundMsgVoiceId sdMsg
   param :: Param   = _soundMsgParam   sdMsg
@@ -69,7 +73,7 @@ updateVoice sdMsg st = let
                       %~ (voicePitch                     .~ p)
                       .  (voiceParams . at param . _Just .~ f)
 
-vid_to_pitch :: St EtApp -> VoiceId -> PitchClass
+vid_to_pitch :: St EtApp -> VoiceId ->  PitchClassRep EtApp
 vid_to_pitch st v = maybe
   (error "vid_to_pitch: voice not found")
   (flip mod 31 . _voicePitch)

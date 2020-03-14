@@ -1,4 +1,6 @@
 * TODO for JI synth
+rename EtApp -> EdoApp
+rename Pitch*Rep -> Pitch*
 * TODO create voices on the fly
 ** Vivid: voice creation, use and deletion
 use "synth" to make a synth, "free" to free it:

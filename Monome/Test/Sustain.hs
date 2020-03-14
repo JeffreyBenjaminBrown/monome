@@ -52,13 +52,14 @@ test_toggleSustain = TestCase $ do
 
 test_deleteOneSustainedNote_and_insertOneSustainedNote :: Test
 test_deleteOneSustainedNote_and_insertOneSustainedNote = TestCase $ do
-  let pc = 0
-      lit_a :: Map PitchClass (Set LedBecause) = -- lit b/c anchor
-        M.singleton pc $ S.singleton LedBecauseAnchor
-      lit_s :: Map PitchClass (Set LedBecause) = -- lit b/c/ sustain
-        M.singleton pc $ S.singleton LedBecauseSustain
-      lit_as :: Map PitchClass (Set LedBecause) = -- lit b/c both
-        M.singleton pc $ S.fromList [LedBecauseAnchor, LedBecauseSustain]
+  let
+    pc = 0
+    lit_a :: Map (PitchClassRep EtApp) (Set LedBecause) = -- lit b/c anchor
+      M.singleton pc $ S.singleton LedBecauseAnchor
+    lit_s :: Map (PitchClassRep EtApp) (Set LedBecause) = -- lit b/c/ sustain
+      M.singleton pc $ S.singleton LedBecauseSustain
+    lit_as :: Map (PitchClassRep EtApp) (Set LedBecause) = -- lit b/c both
+      M.singleton pc $ S.fromList [LedBecauseAnchor, LedBecauseSustain]
   assertBool "add sustain to the reasons a lit (because anchored) key is lit"
     $ insertOneSustainedNote pc lit_a == lit_as
   assertBool "add sustain to the previously empty set of reasons a key is lit"

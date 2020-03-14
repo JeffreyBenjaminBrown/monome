@@ -47,7 +47,7 @@ initAllWindows mst = do
 -- | called every time a monome button is pressed or released
 handleSwitch :: forall app.
                 MVar (St app) -> ((X,Y), Switch) -> IO ()
-handleSwitch    mst              sw @ (btn,_)     = do
+handleSwitch    mst              sw@ (btn,_)      = do
   st0 <- takeMVar mst
   let go :: [Window app] -> IO ()
       go    []            = error $
@@ -63,8 +63,8 @@ handleSwitch    mst              sw @ (btn,_)     = do
           False -> go ws
   go $ _stWindowLayers st0
 
-doSoundMessage :: St app -> SoundMsg -> IO ()
-doSoundMessage    st        sdMsg     = do
+doSoundMessage :: St app -> SoundMsg app -> IO ()
+doSoundMessage    st        sdMsg         = do
   let vid   :: VoiceId = _soundMsgVoiceId sdMsg
       param :: Param   = _soundMsgParam   sdMsg
       f     :: Float   = _soundMsgVal     sdMsg

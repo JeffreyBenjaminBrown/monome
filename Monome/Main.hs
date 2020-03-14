@@ -1,6 +1,7 @@
 {-# OPTIONS_GHC -fno-warn-type-defaults #-}
 {-# LANGUAGE DataKinds
 , ExtendedDefaultRules
+, FlexibleContexts
 , LambdaCase
 , OverloadedStrings
 , ScopedTypeVariables
@@ -39,7 +40,7 @@ et31 monomePort = do
     -- I don't know why it's port 8000, or why it used to be 11111.
   toMonome :: Socket <- sendsTo (unpack localhost) monomePort
     -- to find the port number above, use the first part of HandTest.hs
-  voices :: M.Map VoiceId Voice <-
+  voices :: M.Map VoiceId (Voice EtApp) <-
     let voiceIds = [(a,b) | a <- [0..15], b <- [0..15]]
         defaultVoiceState s = Voice { _voiceSynth = s
                                     , _voicePitch = floor Config.freq
@@ -89,18 +90,23 @@ et31 monomePort = do
     in putStrLn "press 'q' to quit"
        >> loop
 
-ji :: Int -- ^ The monome address, as serialoscd reports on startup.
-   -> [Float] -- ^ The generator. For a major scale: [1,5/4,3/2]
-   -> [Float] -- ^ Shifts of the generator. Major scale: [1,4/3,3/2]
+-- | One way to make a major scale it to use
+-- the generators [1,4/3,3/2] and [1,5/4,3/2].
+-- (Another would be to use the generators [1] and
+-- [1,9/8,5/4,4/3,3/2,5/3,15/8], but that's harder to play,
+-- and its geometry gives no insight into the scale.)
+ji :: Int        -- ^ The monome address, as reported by serialoscd.
+   -> [Rational] -- ^ The horizontal generator.
+   -> [Rational] -- ^ The vertical generator.
    -> IO (St JiApp)
 ji monomePort scale shifts = do
 
   inbox :: Socket <- receivesAt "127.0.0.1" 8000
   toMonome :: Socket <- sendsTo (unpack localhost) monomePort
-  voices :: M.Map VoiceId Voice <-
+  voices :: M.Map VoiceId (Voice JiApp) <-
     let voiceIds = [(a,b) | a <- [0..15], b <- [0..15]]
         defaultVoiceState s = Voice { _voiceSynth = s
-                                    , _voicePitch = floor Config.freq
+                                    , _voicePitch = Config.freq
                                     , _voiceParams = mempty }
     in M.fromList . zip voiceIds . map defaultVoiceState
        <$> mapM (synth boop) (replicate 256 ())

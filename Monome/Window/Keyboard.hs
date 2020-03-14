@@ -1,7 +1,8 @@
 {-# OPTIONS_GHC -fno-warn-type-defaults #-}
 {-# LANGUAGE DataKinds
-, TupleSections
 , ScopedTypeVariables
+, TupleSections
+, TypeApplications
 #-}
 
 module Monome.Window.Keyboard (
@@ -38,34 +39,33 @@ keyboardWindow =  Window {
                   M.keys $ st ^. stApp . etLit )
   , windowRoutine = handler }
 
-handler :: St EtApp
-        -> ((X,Y), Switch)
-        -> St EtApp
-handler st press @ (xy,sw) = let
+handler :: St EtApp -> ((X,Y), Switch) -> St EtApp
+handler    st          press@ (xy,sw)   = let
   fingers' = st ^. stApp . etFingers
         & case sw of
             True  -> M.insert xy xy
             False -> M.delete xy
-  pcNow :: PitchClass =
+  pcNow :: (PitchClassRep EtApp) =
     mod (xyToEt31_st st xy) 31
     -- what the key represents currently
-  pcThen :: Maybe PitchClass =
-    ledBecause_toPitchClass (st ^. stApp . etLit) $ LedBecauseSwitch xy
+  pcThen :: Maybe (PitchClassRep EtApp) =
+    ledBecause_toPitchClass @ EtApp
+    (st ^. stApp . etLit) $ LedBecauseSwitch xy
     -- what the key represented when it was pressed,
     -- if it is now being released
-  lit  :: LitPitches = st ^. stApp . etLit
-  lit' :: LitPitches = updateStLit (xy,sw) pcNow pcThen lit
-  oldKeys :: Set PitchClass  = S.fromList $ M.keys $ lit
-  newKeys :: Set PitchClass  = S.fromList $ M.keys $ lit'
-  toDark  ::    [PitchClass] = S.toList $ S.difference oldKeys newKeys
-  toLight ::    [PitchClass] = S.toList $ S.difference newKeys oldKeys
+  lit  :: LitPitches EtApp = st ^. stApp . etLit
+  lit' :: LitPitches EtApp = updateStLit (xy,sw) pcNow pcThen lit
+  oldKeys :: Set (PitchClassRep EtApp) = S.fromList $ M.keys $ lit
+  newKeys :: Set (PitchClassRep EtApp) = S.fromList $ M.keys $ lit'
+  toDark  :: [PitchClassRep EtApp] = S.toList $ S.difference oldKeys newKeys
+  toLight :: [PitchClassRep EtApp] = S.toList $ S.difference newKeys oldKeys
   kbdMsgs :: [LedMsg] =
     map (label,) $
     ( map (,False) $
       concatMap (pcToXys $ st ^. stApp . etXyShift) toDark) ++
     ( map (,True)  $
       concatMap (pcToXys $ st ^. stApp . etXyShift) toLight)
-  soundMsgs :: [SoundMsg] = etKey_SoundMsg st press
+  soundMsgs :: [SoundMsg EtApp] = etKey_SoundMsg st press
   st1 :: St EtApp = st
     & stApp . etFingers .~ fingers'
     & stApp . etLit     .~ lit'
@@ -74,10 +74,10 @@ handler st press @ (xy,sw) = let
   in foldr updateVoice st1 soundMsgs
 
 updateStLit :: ((X,Y), Switch)
-       -> PitchClass       -- ^ what xy represents now
-       -> Maybe PitchClass -- ^ what xy represented when it was last pressed
-       -> LitPitches
-       -> LitPitches
+  -> PitchClassRep EtApp         -- ^ what xy represents now
+  -> Maybe (PitchClassRep EtApp) -- ^ what xy represented when last pressed
+  -> LitPitches EtApp
+  -> LitPitches EtApp
 
 -- | When a button is newly pressed,
 -- it adds anoother LedBecause to the LitPitches.
