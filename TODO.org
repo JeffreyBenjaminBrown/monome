@@ -1,5 +1,7 @@
 * TODO for JI synth
-unify the handlers for JI and Keyboard
+** print each note as it is played
+* TODO clean
+** unify the handlers for JI and Keyboard
 * TODO create voices on the fly
 ** Vivid: voice creation, use and deletion
 use "synth" to make a synth, "free" to free it:

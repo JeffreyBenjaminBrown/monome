@@ -5,6 +5,7 @@ import Control.Concurrent.MVar
 import Control.Lens hiding (set)
 
 import           Data.Either
+import           Data.Fixed
 import qualified Data.List as L
 import           Data.Map (Map)
 import qualified Data.Map  as M
