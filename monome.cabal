@@ -27,11 +27,13 @@ library
       Monome.Config
     , Monome.Instances.TypesafeArgs
     , Monome.JiScales
+    , Monome.JitTest
     , Monome.Main
     , Monome.Math31
     , Monome.Network.ListenAndPrintOsc
     , Monome.Network.Monome
     , Monome.Network.Util
+    , Monome.Synth.Boop
 --    , Monome.Temp
     , Monome.Test
     , Monome.Test.Data

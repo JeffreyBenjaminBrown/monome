@@ -1,12 +1,15 @@
-* TODO for JI synth
-** print each note as it is played
 * TODO clean
 ** unify the handlers for JI and Keyboard
 * TODO create voices on the fly
+** test JIT idea
+Make a tiny synth that just expects me to hit a key,
+and whenever I do it makes a voice, and release when I release it.
 ** Vivid: voice creation, use and deletion
 use "synth" to make a synth, "free" to free it:
-  s <- synth boop
-  set s (toI f :: I "amp")
+  :set -XDataKinds
+  import Vivid as V
+  s <- synth boop ()
+  V.set s (toI 0.5 :: I "amp")
   free s
 * TODO sustained pitches should not disable keys
 ** after spatial drift
@@ -38,6 +41,10 @@ Shading on both monomes becomes easier.
 to remove floating point error
 ** sustain to middle of bottom, and duplicate at both top corners
 so that usually something can touch it
+* JI synth
+** show played notes
+print the grid, with a star next to each held note,
+or at least the most recently pressed note.
 * infrastructure
 ** add tests
 *** TODO test multiple handlers
