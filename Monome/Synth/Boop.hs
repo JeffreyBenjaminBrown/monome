@@ -30,6 +30,7 @@ boop = sd ( toI Config.freq :: I "freq"
   -- sn4 <- sinOsc (freq_ $ 4 ~* (V::V "freq"))
   -- sn5 <- sinOsc (freq_ $ 5 ~* (V::V "freq"))
   s1 <- lag (in_ (V::V "amp"), lagSecs_ 0.03)
+        -- The lag smooths out discontinuities in the change in "amp".
         ~* 0.05 -- to prevent distortion
         ~* foldr1 (~+) ( map (\(f,a) -> f ~* a)
                          [ (sn,1)
@@ -38,5 +39,4 @@ boop = sd ( toI Config.freq :: I "freq"
                          -- , (sn4,1/8)
                          -- , (sn5,1/16)
                          ] )
-    -- The lag smooths out discontinuities in the change in "amp".
   out 0 [s1, s1]
