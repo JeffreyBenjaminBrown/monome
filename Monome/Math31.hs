@@ -17,8 +17,13 @@ import Monome.Types.Initial
 import Monome.Util
 
 edo, spacing :: Num a => a
-edo = 41
-spacing = 7 -- number of edo steps between one row and the next
+edo = 41    -- Pick your temperament. I like 31, 41, 46.
+spacing = 6 -- Pick the number of edo steps between one row and the next
+
+vv = (-1,spacing)
+hv = let x = head $ filter (> edo)
+             $ (*spacing) <$> [1..]
+     in (div x spacing, -1)
 
 et31ToFreq :: Pitch EdoApp -> Float
 et31ToFreq f = 2**(fi f / edo)
@@ -45,11 +50,10 @@ et31ToLowXY i = (div j spacing, mod j spacing)
 -- (modulo octave) visible on the monome.
 enharmonicToXYs :: (X,Y) -> [(X,Y)]
 enharmonicToXYs btn = map (addPair low) wideGrid
-  -- The 31et grid generators are (5,1) and (-1,6),
-  -- which implies the grid formula (5i-j, i+6j).
-  -- Generators used here: (6,-1) and (-1,7).
   where low = et31ToLowXY $ xyToEt31 btn
-        wideGrid = [ (6*i - j, -i + 7*j)
+        ((v1,v2),(h1,h2)) = (vv,hv)
+        wideGrid = [ ( i*h1 + j*v1
+                     , i*h2 + j*v2 )
                    | i <- [0..2] , j <- [0..2] ]
 
 pcToXys :: (X,Y) -> PitchClass EdoApp -> [(X,Y)]
