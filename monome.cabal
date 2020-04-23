@@ -32,7 +32,8 @@ library
     , Monome.Network.ListenAndPrintOsc
     , Monome.Network.Monome
     , Monome.Network.Util
---    , Monome.Temp
+    , Monome.Synth.Boop
+    , Monome.Synth.Zot
     , Monome.Test
     , Monome.Test.Data
     , Monome.Test.HandTest

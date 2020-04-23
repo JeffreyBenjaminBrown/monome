@@ -1,3 +1,6 @@
+* TODO generalize to all EDOs
+** make Math31 "generators" into user-defined parameter
+maybe defined in Params or Common or whatever, instead of Math31
 * TODO for JI synth
 ** print each note as it is played
 * TODO clean

@@ -47,7 +47,7 @@ handler    st          press@ (xy,sw)   = let
             True  -> M.insert xy xy
             False -> M.delete xy
   pcNow :: (PitchClass EdoApp) =
-    mod (xyToEt31_st st xy) 31
+    mod (xyToEt31_st st xy) edo
     -- what the key represents currently
   pcThen :: Maybe (PitchClass EdoApp) =
     ledBecause_toPitchClass @ EdoApp
