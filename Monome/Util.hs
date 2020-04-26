@@ -4,6 +4,8 @@ module Monome.Util (
   , unpack
   , fi, fr
   , numBetween
+  , dot        -- ^ (Int,Int) -> (Int,Int) -> Int
+  , taxiMetric -- ^ (Int,Int) -> (Int,Int) -> Int
   , addPair
   , negPair
   , uniq
@@ -25,6 +27,12 @@ fr = fromRational
 
 numBetween :: (Num a, Ord a) => a -> a -> a -> Bool
 numBetween low high x = x >= low && x <= high
+
+dot :: (Int,Int) -> (Int,Int) -> Int
+dot (a,b) (c,d) = a*c + b*d
+
+taxiMetric :: (Int,Int) -> (Int,Int) -> Int
+taxiMetric (a,b) (c,d) = abs (a-c) + abs (b-d)
 
 addPair :: (Int,Int) -> (Int,Int) -> (Int,Int)
 addPair (a,b) (c,d) = (a+c, b+d)
