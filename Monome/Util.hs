@@ -1,14 +1,14 @@
 module Monome.Util (
-  ByteString
-  , pack
-  , unpack
-  , fi, fr
-  , numBetween
-  , dot        -- ^ (Int,Int) -> (Int,Int) -> Int
-  , taxiMetric -- ^ (Int,Int) -> (Int,Int) -> Int
-  , addPair
-  , negPair
-  , uniq
+  ByteString, pack, unpack
+  , fi         -- ^ (Integral a, Num b) => a -> b
+  , fr         -- ^ Fractional a => Rational -> a
+  , numBetween -- ^ (Num a, Ord a) => a -> a -> a -> Bool
+  , dot        -- ^ Num a => (a,a) -> (a,a) -> a
+  , taxiMetric -- ^ Num a => (a,a) -> (a,a) -> a
+  , addPair    -- ^ Num a => (a,a) -> (a,a) -> (a,a)
+  , mulPair    -- ^ Num a => a -> (a,a) -> (a,a)
+  , negPair    -- ^ Num a => (a,a) -> (a,a)
+  , uniq       -- ^ Ord a => [a] -> [a]
   )
 
 where
@@ -28,16 +28,19 @@ fr = fromRational
 numBetween :: (Num a, Ord a) => a -> a -> a -> Bool
 numBetween low high x = x >= low && x <= high
 
-dot :: (Int,Int) -> (Int,Int) -> Int
+dot :: Num a => (a,a) -> (a,a) -> a
 dot (a,b) (c,d) = a*c + b*d
 
-taxiMetric :: (Int,Int) -> (Int,Int) -> Int
+taxiMetric :: Num a => (a,a) -> (a,a) -> a
 taxiMetric (a,b) (c,d) = abs (a-c) + abs (b-d)
 
-addPair :: (Int,Int) -> (Int,Int) -> (Int,Int)
+addPair :: Num a => (a,a) -> (a,a) -> (a,a)
 addPair (a,b) (c,d) = (a+c, b+d)
 
-negPair :: (Int,Int) -> (Int,Int)
+mulPair :: Num a => a -> (a,a) -> (a,a)
+mulPair n (a,b) = (n*a,n*b)
+
+negPair :: Num a => (a,a) -> (a,a)
 negPair (a,b) = (-a,-b)
 
 uniq :: Ord a => [a] -> [a]
