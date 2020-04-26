@@ -32,8 +32,8 @@ hv = let
     head $ filter (>= edo) $ (*spacing) <$> [1..]
   v1 = (div x spacing, edo - x)
   v2 = addPair v1 vv
-  in if abs (dot vv v1) < abs (dot vv v2)
-     then           v1  else          v2
+  in if abs (dot vv v1) <= abs (dot vv v2)
+     then           v1  else           v2
 
 
 et31ToFreq :: Pitch EdoApp -> Float
@@ -50,7 +50,6 @@ xyToEt31_st :: St EdoApp -> (X,Y) -> Pitch EdoApp
 xyToEt31_st st xy =
   xyToEt31 $ addPair xy $ negPair $ _etXyShift $ _stApp st
 
-
 -- | The numerically lowest (closest to the top-left corner)
 -- member of a pitch class, if the monome is not shifted (modulo octaves).
 et31ToLowXY :: PitchClass EdoApp -> (X,Y)
@@ -59,13 +58,21 @@ et31ToLowXY i = (div j spacing, mod j spacing)
 
 -- | A (maybe proper) superset of all keys that sound the same note
 -- (modulo octave) visible on the monome.
+--
+-- TODO ? (speed) This computes a lot of out-of-range values.
+-- (The higher the edo, the lesser this problem.)
 enharmonicToXYs :: (X,Y) -> [(X,Y)]
-enharmonicToXYs btn = map (addPair low) wideGrid
-  where low = et31ToLowXY $ xyToEt31 btn
-        ((v1,v2),(h1,h2)) = (vv,hv)
-        wideGrid = [ ( i*h1 + j*v1
-                     , i*h2 + j*v2 )
-                   | i <- [0..3] , j <- [0..3] ]
+enharmonicToXYs btn = let
+  low = et31ToLowXY $ xyToEt31 btn
+  ((v1,v2),(h1,h2)) = (vv,hv)
+  wideGrid = [
+    ( i*h1 + j*v1
+    , i*h2 + j*v2 )
+    | i <- [ 0 ..      div 15 h1 + 1] ,
+      j <- [      -   (div 15 v2 + 1)
+               .. 2 * (div 15 v2 + 1) ] ]
+  -- `j` needs a wide range because `hv` might be diagonal.
+  in map (addPair low) wideGrid
 
 pcToXys :: (X,Y) -> PitchClass EdoApp -> [(X,Y)]
 pcToXys shift pc =
