@@ -17,13 +17,15 @@ import Monome.Types.Initial
 import Monome.Util
 
 edo, spacing :: Num a => a
-edo = 41    -- Pick your temperament. I like 31, 41, 46.
-spacing = 6 -- Pick the number of edo steps between one row and the next
+edo = 31  -- Pick your temperament.
+spacing = 6 -- Pick the number of edo steps between one row
+            -- and the next. Negative doesn't work yet.
+  -- Some combinations I like: (31,6), (41,6), (46,7)
 
 vv = (-1,spacing)
 hv = let x = head $ filter (> edo)
              $ (*spacing) <$> [1..]
-     in (div x spacing, -1)
+     in (div x spacing, edo - x)
 
 et31ToFreq :: Pitch EdoApp -> Float
 et31ToFreq f = 2**(fi f / edo)
@@ -54,7 +56,7 @@ enharmonicToXYs btn = map (addPair low) wideGrid
         ((v1,v2),(h1,h2)) = (vv,hv)
         wideGrid = [ ( i*h1 + j*v1
                      , i*h2 + j*v2 )
-                   | i <- [0..2] , j <- [0..2] ]
+                   | i <- [0..3] , j <- [0..3] ]
 
 pcToXys :: (X,Y) -> PitchClass EdoApp -> [(X,Y)]
 pcToXys shift pc =
