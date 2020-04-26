@@ -37,14 +37,14 @@ downOctave = (13,14)
 -- | PITFALL: There are multiple ways to represent an octave shift.
 -- Here I've chosen one arbitrarily.
 shift :: (X,Y) -> (X,Y)
-shift xy | xy == rightArrow = ( 1, 0)
-         | xy == downArrow  = ( 0, 1)
+shift xy | xy == rightArrow = (-1, 0)
+         | xy == downArrow  = ( 0,-1)
            -- origin at top-left => down means add to Y
-         | xy == leftArrow  = (-1, 0)
-         | xy == upOctave   = (-5,-1)
+         | xy == leftArrow  = ( 1, 0)
+         | xy == upOctave   = negPair hv
            -- lowering the origin raises the coordinate values of a given key, hence raising its pitch
-         | xy == upArrow    = ( 0,-1)
-         | xy == downOctave = ( 5, 1)
+         | xy == upArrow    = ( 0, 1)
+         | xy == downOctave = hv
          | otherwise = error $ "shift: unexpected input: " ++ show xy
 
 -- | = the window
