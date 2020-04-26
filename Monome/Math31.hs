@@ -5,9 +5,10 @@
 
 module Monome.Math31 (
     edo, spacing    -- ^ Num a => a
+  , vv, hv          -- ^ (X,Y)
   , et31ToFreq      -- ^ Pitch -> Float
   , xyToEt31        -- ^ (X,Y) -> Pitch
-  , xyToEt31_st
+  , xyToEt31_st     -- ^ St EdoApp -> (X,Y) -> Pitch EdoApp
   , et31ToLowXY     -- ^ PitchClass -> (X,Y)
   , enharmonicToXYs -- ^ (X,Y) -> [(X,Y)]
   , pcToXys         -- ^ PitchClass -> (X,Y) -> [(X,Y)]
@@ -22,10 +23,18 @@ spacing = 6 -- Pick the number of edo steps between one row
             -- and the next. Negative doesn't work yet.
   -- Some combinations I like: (31,6), (41,6), (46,7)
 
+-- | `hv` and `vv` form The smallest, most orthogonal set of
+-- basis vectors possible for the octave grid.
+vv, hv :: (X,Y)
 vv = (-1,spacing)
-hv = let x = head $ filter (> edo)
-             $ (*spacing) <$> [1..]
-     in (div x spacing, edo - x)
+hv = let
+  x = -- the first multiple of spacing greater than or equal to edo
+    head $ filter (>= edo) $ (*spacing) <$> [1..]
+  v1 = (div x spacing, edo - x)
+  v2 = addPair v1 vv
+  in if abs (dot vv v1) < abs (dot vv v2)
+     then           v1  else          v2
+
 
 et31ToFreq :: Pitch EdoApp -> Float
 et31ToFreq f = 2**(fi f / edo)
