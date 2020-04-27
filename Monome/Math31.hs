@@ -21,7 +21,8 @@ edo, spacing :: Num a => a
 edo = 31  -- Pick your temperament.
 spacing = 6 -- Pick the number of edo steps between one row
             -- and the next. Negative doesn't work yet.
-  -- Some combinations I like: (31,6), (41,6), (46,7)
+  -- Some (edo,spacing) pairs I like:
+  -- (31,6), (41,6), (46,7), (87,12 or 13)
 
 -- | `hv` and `vv` form The smallest, most orthogonal set of
 -- basis vectors possible for the octave grid.
