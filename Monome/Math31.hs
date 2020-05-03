@@ -18,7 +18,7 @@ import Monome.Types.Initial
 import Monome.Util
 
 edo, spacing :: Num a => a
-edo = 31  -- Pick your temperament.
+edo = 41  -- Pick your temperament.
 spacing = 6 -- Pick the number of edo steps between one row
             -- and the next. Negative doesn't work yet.
   -- Some (edo,spacing) pairs I like:
