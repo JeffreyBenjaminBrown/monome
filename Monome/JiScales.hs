@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -fno-warn-type-defaults #-}
 {-# LANGUAGE ScopedTypeVariables
 , TypeApplications #-}
 
@@ -5,7 +6,6 @@ module Monome.JiScales where
 
 import Prelude hiding (lines)
 
-import Data.Fixed
 import Data.List hiding (lines)
 import Data.Ratio
 
@@ -116,4 +116,5 @@ pad n s = case length s < n of
   False -> s ++ "!!"
   True -> s ++ replicate (max (n - length s) 0) ' '
 
+showLen :: Int
 showLen = 10
