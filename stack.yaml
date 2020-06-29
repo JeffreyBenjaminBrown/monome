@@ -1,4 +1,4 @@
-resolver: lts-15.10
+resolver: lts-16.0
 
 extra-deps:
   - vivid-0.4.2.3@sha256:00d6bf34c982d747c3171e4279ef109f6fef7dcd39e55ee666dbcefb0f95cf3d,8219
